@@ -1,24 +1,5 @@
-# README
+# Robinhood on Rails
+Robinhood on Rails is a simple front end for the free trading platform [Robinhood](https://robinhood.com/).
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## DISCLAIMER
+This app relies on the private API as found [here](https://github.com/sanko/Robinhood). It isn't recommended to use this since the API is private and can change unexpectedly at any time, and is not officially supported.
