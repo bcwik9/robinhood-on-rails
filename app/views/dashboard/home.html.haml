@@ -1,0 +1,6 @@
+%h1 Robinhood Dashboard
+- if session[:robinhood_auth_token].present?
+  %p Here you can find information about your investments. Click on an investment for more information.
+  #basic-info{data: {behavior: "DeferredLoader", path: basic_info_path}}
+- else
+  = render "layouts/robinhood_login_form"
