@@ -7,7 +7,7 @@ class RobinhoodController < ApplicationController
   end
 
   def basic_info
-    @basic_info = robinhood_get "https://api.robinhood.com/user/basic_info/"
+    @basic_info = robinhood_get "https://api.robinhood.com/user/"
   end
 
   def portfolios
@@ -34,6 +34,10 @@ class RobinhoodController < ApplicationController
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
+  end
+
+  def orders
+    @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
   end
 
   def logout
