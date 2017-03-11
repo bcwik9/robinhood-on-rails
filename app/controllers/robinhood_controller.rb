@@ -14,6 +14,28 @@ class RobinhoodController < ApplicationController
     @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]
   end
 
+  def positions
+    @investments = {}
+    response = robinhood_get "https://api.robinhood.com/positions/"
+    @positions = response["results"]
+    next_page = response["next"]
+    while next_page.present?
+      response = robinhood_get "https://api.robinhood.com/positions/"
+      @positions += response["results"]
+      next_page = response["next"]
+    end
+    @instruments = []
+    @positions.each do |position|
+      instrument = robinhood_get position["instrument"]
+      @instruments << instrument
+      @investments[instrument["symbol"]] = position.merge instrument
+    end
+    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@instruments.map{|i| i["symbol"]}.join(',')}")["results"]
+    @quotes.each do |quote|
+      @investments[quote["symbol"]].merge! quote
+    end
+  end
+
   def logout
     session.delete :robinhood_auth_token
     redirect_to root_path
