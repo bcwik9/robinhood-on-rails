@@ -8,9 +8,10 @@ class RobinhoodController < ApplicationController
 
   def basic_info
     @basic_info = robinhood_get "https://api.robinhood.com/user/basic_info/"
-    respond_to do |format|
-      format.html
-    end
+  end
+
+  def portfolios
+    @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]
   end
 
   def logout

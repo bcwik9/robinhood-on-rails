@@ -1,0 +1,5 @@
+%h2 Portfolios
+- @portfolios.each do |p|
+  %ul
+  - p.each do |k,v|
+    %li= "#{k}: #{v}"

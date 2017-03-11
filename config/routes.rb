@@ -4,5 +4,6 @@ Rails.application.routes.draw do
 
   post "robinhood_login", to: "robinhood#login"
   get "basic_info", to: "robinhood#basic_info"
+  get "portfolios", to: "robinhood#portfolios"
   get "logout", to: "robinhood#logout"
 end
