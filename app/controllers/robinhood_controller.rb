@@ -13,6 +13,10 @@ class RobinhoodController < ApplicationController
     end
   end
 
+  def logout
+    session.delete :robinhood_auth_token
+    redirect_to root_path
+  end
 
   private
 
