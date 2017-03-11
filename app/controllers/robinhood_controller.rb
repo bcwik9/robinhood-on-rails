@@ -7,7 +7,8 @@ class RobinhoodController < ApplicationController
   end
 
   def basic_info
-    @basic_info = robinhood_get "https://api.robinhood.com/user/"
+    session[:robinhood_user] ||= robinhood_get "https://api.robinhood.com/user/"
+    @basic_info = session[:robinhood_user]
   end
 
   def portfolios
@@ -41,7 +42,9 @@ class RobinhoodController < ApplicationController
   end
 
   def logout
-    session.delete :robinhood_auth_token
+    session.keys.select{|k| k =~ /robinhood/i}.each do |k|
+      session.delete k
+    end
     redirect_to root_path
   end
 
