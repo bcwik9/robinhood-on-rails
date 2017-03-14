@@ -14,7 +14,7 @@
     .value
       Value
       = price_display(data["quantity"].to_i * data["last_trade_price"].to_f)
-- if @debug
+- if false #debug
   %ul
     - @positions.each do |k,v|
       %li= "#{k}: #{v}"

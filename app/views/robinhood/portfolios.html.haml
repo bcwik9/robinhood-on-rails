@@ -9,7 +9,7 @@
   .cash
     Cash
     = price_display p["unwithdrawable_deposits"]
-  - if @debug
+  - if false # debug
     %ul
     - p.each do |k,v|
       %li= "#{k}: #{v}"
