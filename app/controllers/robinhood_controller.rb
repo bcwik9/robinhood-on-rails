@@ -6,9 +6,20 @@ class RobinhoodController < ApplicationController
     redirect_to root_path
   end
 
+  def logout
+    session.keys.select{|k| k =~ /robinhood/i}.each do |k|
+      session.delete k
+    end
+    redirect_to root_path
+  end
+
   def basic_info
     session[:robinhood_user] ||= robinhood_get "https://api.robinhood.com/user/"
     @basic_info = session[:robinhood_user]
+  end
+
+  def quote
+    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"]}")["results"]
   end
 
   def portfolios
@@ -43,11 +54,24 @@ class RobinhoodController < ApplicationController
     @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
   end
 
-  def logout
-    session.keys.select{|k| k =~ /robinhood/i}.each do |k|
-      session.delete k
-    end
-    redirect_to root_path
+  def order
+    @order = robinhood_get "https://api.robinhood.com/orders/#{params["order_id"]}/"
+  end
+
+  def new_order
+    data = {
+      account: params["account"],
+      instrument: params["instrument"],
+      symbol: params["symbol"],
+      side: params["side"], # buy|sell
+      quantity: params["quantity"],
+      type: "market",
+      time_in_force: "fok",
+      trigger: "immediate"      
+    }
+
+    @order = robinhood_post "https://api.robinhood.com/orders/", data
+    render 
   end
 
   private

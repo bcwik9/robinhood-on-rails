@@ -3,9 +3,13 @@ Rails.application.routes.draw do
   root to: "dashboard#home"
 
   post "robinhood_login", to: "robinhood#login"
+  get "logout", to: "robinhood#logout"
+
   get "basic_info", to: "robinhood#basic_info"
   get "portfolios", to: "robinhood#portfolios"
   get "positions", to: "robinhood#positions"
+  get "quote", to: "robinhood#quote"
+
   get "orders", to: "robinhood#orders"
-  get "logout", to: "robinhood#logout"
+  post "new_order", to: "robinhood#new_order"
 end

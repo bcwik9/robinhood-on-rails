@@ -6,5 +6,6 @@
   #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path}}
   #positions{data: {behavior: "DeferredLoader", path: positions_path}}
   #orders{data: {behavior: "DeferredLoader", path: orders_path}}
+  = render "robinhood/quote_form"
 - else
   = render "layouts/robinhood_login_form"
