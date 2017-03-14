@@ -4,7 +4,7 @@
     %h3= symbol
     .price
       Price
-      = price_display data["bid_price"]
+      = price_display data["last_trade_price"]
     .change
       Change
       = change_display data["previous_close"], data["last_trade_price"]
@@ -13,8 +13,8 @@
       = data["quantity"].to_i
     .value
       Value
-      = price_display(data["quantity"].to_i * data["bid_price"].to_f)
-- if true # debug
+      = price_display(data["quantity"].to_i * data["last_trade_price"].to_f)
+- if @debug
   %ul
     - @positions.each do |k,v|
       %li= "#{k}: #{v}"

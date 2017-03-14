@@ -2,13 +2,14 @@
 - @portfolios.each do |p|
   .value
     Total value
-    = price_display p["extended_hours_equity"]
+    = price_display(p["extended_hours_equity"] || p["equity"])
   .return
     Daily change
     = change_display p["equity_previous_close"], p["equity"]
   .cash
     Cash
     = price_display p["unwithdrawable_deposits"]
-  %ul
-  - p.each do |k,v|
-    %li= "#{k}: #{v}"
+  - if @debug
+    %ul
+    - p.each do |k,v|
+      %li= "#{k}: #{v}"
