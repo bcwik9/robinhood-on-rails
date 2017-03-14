@@ -17,6 +17,7 @@ class RobinhoodController < ApplicationController
 
   def positions
     @investments = {}
+    @accounts = []
     response = robinhood_get "https://api.robinhood.com/positions/"
     @positions = response["results"]
     next_page = response["next"]
@@ -29,6 +30,7 @@ class RobinhoodController < ApplicationController
     @positions.each do |position|
       instrument = robinhood_get position["instrument"]
       @instruments << instrument
+      @accounts << position["account"] unless @accounts.include?(position["account"])
       @investments[instrument["symbol"]] = position.merge instrument
     end
     @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@instruments.map{|i| i["symbol"]}.join(',')}")["results"]
