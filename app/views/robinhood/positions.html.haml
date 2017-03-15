@@ -4,7 +4,7 @@
   - @investments.each do |symbol,data|
     .col-xs-4.col-sm-3
       .investment
-        %h3= google_stock_link symbol
+        %h3= stock_link symbol
         - price = data["last_extended_hours_trade_price"] || data["last_trade_price"]
         .price
           Price

@@ -67,9 +67,10 @@ class RobinhoodController < ApplicationController
       symbol: params["symbol"],
       side: params["side"], # buy|sell
       quantity: params["quantity"],
+      price: set_num_decimals(params["price"]).to_f,
       type: "market",
-      time_in_force: "fok",
-      trigger: "immediate"      
+      time_in_force: "gfd",
+      trigger: "immediate"
     }
 
     @order = robinhood_post "https://api.robinhood.com/orders/", data

@@ -19,6 +19,7 @@ gem "less-rails"
 gem "twitter-bootstrap-rails"
 gem "haml"
 gem "elementaljs-rails"
+gem "browser"
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
