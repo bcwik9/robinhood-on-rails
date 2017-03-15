@@ -10,15 +10,16 @@
         = order["state"].capitalize
       .order_date= DateTime.parse(order["updated_at"]).strftime("%b %e, %Y")
       .side= order["side"].capitalize
-      .price
-        Price
-        = price_display order["average_price"]
-      .quantity
-        = order["quantity"].to_i
-        = "Share".pluralize(order["quantity"].to_i)
-      .total
-        Total
-        = price_display(order["quantity"].to_i * order["average_price"].to_f)
+      - if order["state"] =~ /filled/i
+        .price
+          Price
+          = price_display order["average_price"]
+        .quantity
+          = order["quantity"].to_i
+          = "Share".pluralize(order["quantity"].to_i)
+        .total
+          Total
+          = price_display(order["quantity"].to_i * order["average_price"].to_f)
   - if false # debug
     .col-xs-12
       %ul
