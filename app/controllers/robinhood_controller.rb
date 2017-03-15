@@ -40,6 +40,9 @@ class RobinhoodController < ApplicationController
       next_page = response["next"]
     end
 
+    # remove positions where the user has no shares
+    @positions.delete_if{|p| p["quantity"].to_f == 0.0}
+
     @instruments = []
     @positions.each do |position|
       instrument = robinhood_get position["instrument"]
@@ -73,7 +76,27 @@ class RobinhoodController < ApplicationController
       trigger: "immediate"
     }
 
-    @order = robinhood_post "https://api.robinhood.com/orders/", data
+    response = robinhood_post "https://api.robinhood.com/orders/", data
+    success = response["id"].present?
+    if success
+      flash[:success] = "Successfully placed order"
+    else
+      flash[:warning] = "Failed to place order: #{response.values.join}"
+    end
+
+    redirect_to orders_path
+  end
+
+  def cancel_order
+    response = robinhood_post params["url"], {}
+    success = response.empty?
+    if success
+      flash[:success] = "Successfully canceled order"
+    else
+      flash[:warning] = "Failed to cancel order: #{response.values.join}"
+    end
+
+    redirect_to orders_path
   end
 
   private

@@ -11,4 +11,5 @@ Rails.application.routes.draw do
 
   get "orders", to: "robinhood#orders"
   post "new_order", to: "robinhood#new_order"
+  get "cancel_order", to: "robinhood#cancel_order"
 end

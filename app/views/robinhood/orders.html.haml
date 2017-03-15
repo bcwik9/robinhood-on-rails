@@ -4,24 +4,4 @@
     = link_to "Back", root_path, class: "btn btn-default"
   - @orders.each do |order|
     .col-xs-4.col-sm-3
-      %h3= stock_link order["instrument"]["symbol"]
-      .status
-        Status
-        = order["state"].capitalize
-      .order_date= DateTime.parse(order["updated_at"]).strftime("%b %e, %Y")
-      .side= order["side"].capitalize
-      - if order["state"] =~ /filled/i
-        .price
-          Price
-          = price_display order["average_price"]
-        .quantity
-          = order["quantity"].to_i
-          = "Share".pluralize(order["quantity"].to_i)
-        .total
-          Total
-          = price_display(order["quantity"].to_i * order["average_price"].to_f)
-  - if false # debug
-    .col-xs-12
-      %ul
-        - @orders.each do |order|
-          %li= order
+      = render "order", order: order

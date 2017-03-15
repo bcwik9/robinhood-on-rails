@@ -1,0 +1,6 @@
+- %w[success info warning danger].each do |type|
+  - if flash[type].present?
+    .alert.alert-dismissible{role: "alert", class: "alert-#{type}"}
+      %button.close{"data-dismiss": "alert", "aria-label": "Close"}
+        %span{"aria-hidden": true} &times;
+      %strong= flash[type]
