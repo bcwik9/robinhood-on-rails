@@ -55,6 +55,9 @@ class RobinhoodController < ApplicationController
 
   def orders
     @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
+    @orders.each do |order|
+      order["instrument"] = robinhood_get order["instrument"]
+    end
   end
 
   def new_order

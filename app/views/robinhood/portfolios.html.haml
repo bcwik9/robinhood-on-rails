@@ -1,15 +1,17 @@
-%h2 Portfolios
-- @portfolios.each do |p|
-  .value
-    Total value
-    = price_display(p["extended_hours_equity"] || p["equity"])
-  .return
-    Daily change
-    = change_display p["equity_previous_close"], p["equity"]
-  .cash
-    Cash
-    = price_display p["unwithdrawable_deposits"]
-  - if false # debug
-    %ul
-    - p.each do |k,v|
-      %li= "#{k}: #{v}"
+.row
+  .col-xs-12
+    %h2= "My portfolio".pluralize(@portfolios.size)
+  - @portfolios.each do |p|
+    .col-xs-4.value
+      Total value
+      %h3= price_display(p["extended_hours_equity"] || p["equity"])
+    .col-xs-4.return
+      Daily change
+      %h3= change_display p["equity_previous_close"], p["equity"]
+    .col-xs-4.cash
+      Cash
+      %h3= price_display p["unwithdrawable_deposits"]
+    - if false # debug
+      %ul
+      - p.each do |k,v|
+        %li= "#{k}: #{v}"
