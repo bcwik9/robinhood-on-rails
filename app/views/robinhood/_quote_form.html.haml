@@ -1,6 +1,7 @@
 .col-xs-12
   %h2 Search and buy stocks
-.col-xs-12
-  = form_tag quote_path, method: :get do
-    = text_field_tag :symbols, nil, placeholder: "FB,GOOG,AMZN"
-    = submit_tag "Get quote"
+.col-xs-6
+  = form_tag quote_path, method: :get, class: "form-inline" do
+    .form-group
+      = text_field_tag :symbols, nil, placeholder: "FB,GOOG,AMZN", class: "form-control"
+    = submit_tag "Get quote", class: "btn btn-default"

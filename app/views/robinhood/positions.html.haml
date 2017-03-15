@@ -11,7 +11,8 @@
           = price_display price
         .change
           Change
-          = change_display data["previous_close"], data["last_trade_price"]
+          %span{class: up_down(data["previous_close"], data["last_trade_price"])}
+            = change_display(data["previous_close"], data["last_trade_price"])
         .num-shares
           Number of shares
           = data["quantity"].to_i

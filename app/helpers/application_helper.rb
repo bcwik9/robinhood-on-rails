@@ -3,6 +3,10 @@ module ApplicationHelper
     "$#{set_num_decimals amount}"
   end
 
+  def up_down start_amount, end_amount
+    change_display(start_amount, end_amount).include?('+') ? "text-success" : "text-danger"
+  end
+
   def change_display start_amount, end_amount
     change = set_num_decimals(end_amount.to_f - start_amount.to_f).to_f
     gain = change.positive? ? "+" : ""

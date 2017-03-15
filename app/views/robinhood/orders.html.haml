@@ -1,7 +1,8 @@
 .row
   .col-xs-12
     %h2 Orders
-  - @orders.reverse.each do |order|
+    = link_to "Back", root_path, class: "btn btn-default"
+  - @orders.each do |order|
     .col-xs-4.col-sm-3
       %h3= google_stock_link order["instrument"]["symbol"]
       .status
