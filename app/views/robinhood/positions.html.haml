@@ -1,10 +1,11 @@
 %h2 Investments
 - @investments.each do |symbol,data|
   .investment
-    %h3= symbol
+    %h3= google_stock_link symbol
+    - price = data["last_extended_hours_trade_price"] || data["last_trade_price"]
     .price
       Price
-      = price_display data["last_trade_price"]
+      = price_display price
     .change
       Change
       = change_display data["previous_close"], data["last_trade_price"]
@@ -13,12 +14,12 @@
       = data["quantity"].to_i
     .value
       Value
-      = price_display(data["quantity"].to_i * data["last_trade_price"].to_f)
-- if true #debug
+      = price_display(data["quantity"].to_i * price.to_f)
+- if false #debug
   %ul
     - @positions.each do |k,v|
       %li= "#{k}: #{v}"
-    - @accounts.each do |k,v|
+    - session[:robinhood_accounts].each do |k,v|
       %li= "#{k}: #{v}"
     - @instruments.each do |k,v|
       %li= "#{k}: #{v}"

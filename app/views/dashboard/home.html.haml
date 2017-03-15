@@ -1,11 +1,12 @@
 %h1 Robinhood Dashboard
 - if session[:robinhood_auth_token].present?
   = link_to "Log out", logout_path
-  %p Here you can find information about your investments. Click on an investment for more information.
-  #basic-info{data: {behavior: "DeferredLoader", path: basic_info_path}}
+  %p Hi #{session[:robinhood_user]["first_name"]}! Here you can find information about your #{link_to "Robinhood", "https://robinhood.com/"} investments. Feel free to check how your portfolio is doing, get stock information, or place orders.
+  .row
+    .col-xs-12
+      = render "robinhood/quote_form"
   #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path}}
   #positions{data: {behavior: "DeferredLoader", path: positions_path}}
   #orders{data: {behavior: "DeferredLoader", path: orders_path}}
-  = render "robinhood/quote_form"
 - else
   = render "layouts/robinhood_login_form"

@@ -1,8 +1,10 @@
 class RobinhoodController < ApplicationController
-  
+
   def login
     response = robinhood_post "https://api.robinhood.com/api-token-auth/", {"username" => params[:username], "password" => params[:password]}
     session[:robinhood_auth_token] = response["token"]
+    session[:robinhood_user] = robinhood_get "https://api.robinhood.com/user/"
+    session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]
     redirect_to root_path
   end
 
@@ -13,13 +15,13 @@ class RobinhoodController < ApplicationController
     redirect_to root_path
   end
 
-  def basic_info
-    session[:robinhood_user] ||= robinhood_get "https://api.robinhood.com/user/"
-    @basic_info = session[:robinhood_user]
-  end
-
   def quote
-    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"]}")["results"]
+    begin
+      @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"]}")["results"]
+      @quotes.delete_if{|q| q.nil?}
+    rescue Exception => e
+      @quotes = {}
+    end
   end
 
   def portfolios
@@ -28,22 +30,23 @@ class RobinhoodController < ApplicationController
 
   def positions
     @investments = {}
-    @accounts = []
     response = robinhood_get "https://api.robinhood.com/positions/"
     @positions = response["results"]
+    # example of pagination to get everything (iterate all pages)
     next_page = response["next"]
     while next_page.present?
       response = robinhood_get "https://api.robinhood.com/positions/"
       @positions += response["results"]
       next_page = response["next"]
     end
+
     @instruments = []
     @positions.each do |position|
       instrument = robinhood_get position["instrument"]
       @instruments << instrument
-      @accounts << position["account"] unless @accounts.include?(position["account"])
       @investments[instrument["symbol"]] = position.merge instrument
     end
+
     @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@instruments.map{|i| i["symbol"]}.join(',')}")["results"]
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
@@ -54,14 +57,10 @@ class RobinhoodController < ApplicationController
     @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
   end
 
-  def order
-    @order = robinhood_get "https://api.robinhood.com/orders/#{params["order_id"]}/"
-  end
-
   def new_order
     data = {
-      account: params["account"],
-      instrument: params["instrument"],
+      account: session[:robinhood_accounts].first["url"],
+      instrument: instrument_from_symbol(params["symbol"])["url"],
       symbol: params["symbol"],
       side: params["side"], # buy|sell
       quantity: params["quantity"],
@@ -71,7 +70,6 @@ class RobinhoodController < ApplicationController
     }
 
     @order = robinhood_post "https://api.robinhood.com/orders/", data
-    render 
   end
 
   private
@@ -97,5 +95,9 @@ class RobinhoodController < ApplicationController
     request = Net::HTTP::Get.new(uri.request_uri, initheader=headers)
     response = http.request(request)
     JSON.parse(response.body)
+  end
+
+  def instrument_from_symbol symbol
+    robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
   end
 end

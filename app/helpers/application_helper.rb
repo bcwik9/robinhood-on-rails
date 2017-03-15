@@ -9,6 +9,18 @@ module ApplicationHelper
     "#{price_display change} (#{gain}#{set_num_decimals change/start_amount.to_f*100}%)"
   end
 
+  def yahoo_stock_link symbol
+    link_to symbol, "https://finance.yahoo.com/quote/#{symbol}", target: :_blank
+  end
+
+  def google_stock_link symbol
+    link_to symbol, "https://www.google.com/finance?q=#{symbol}", target: :_blank
+  end
+
+  def google_stock_comparison_link symbols
+    link_to symbols.join(" vs "), "https://www.google.com/finance?q=#{symbols.join(',')}", target: :_blank
+  end
+
   def set_num_decimals amount, decimal_points=2
     sprintf("%.#{decimal_points}f", amount)
   end
