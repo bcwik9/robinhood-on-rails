@@ -1,11 +1,13 @@
 - @quotes.each do |quote|
   %h3= google_stock_link quote["symbol"]
   Current price
-  = price_display quote["ask_price"]
+  = price_display quote["last_trade_price"]
   = form_tag new_order_path do
     = hidden_field_tag :symbol, quote["symbol"]
     = hidden_field_tag :side, :buy
     = number_field_tag :quantity, 1, min: 1
     = submit_tag "Buy"
+  - if false # debug
+    = @quotes
 - if @quotes.empty?
   Sorry, no quotes were found.
