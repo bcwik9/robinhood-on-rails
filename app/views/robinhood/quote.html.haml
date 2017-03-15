@@ -1,14 +1,20 @@
-- @quotes.each do |quote|
-  %h3= stock_link quote["symbol"]
-  Current price
-  = price_display quote["last_trade_price"]
-  = form_tag new_order_path do
-    = hidden_field_tag :symbol, quote["symbol"]
-    = hidden_field_tag :side, :buy
-    = hidden_field_tag :price, quote["last_trade_price"]
-    = number_field_tag :quantity, 1, min: 1
-    = submit_tag "Buy"
-  - if false # debug
-    = @quotes
-- if @quotes.empty?
-  Sorry, no quotes were found.
+%h2 Quotes for #{params["symbols"]}
+= link_to "Back", root_path, class: "btn btn-default"
+.row
+  - @quotes.each do |quote|
+    .col-sm-4
+      %h3= stock_link quote["symbol"]
+      Current price
+      = price_display quote["last_trade_price"]
+      = form_tag new_order_path, class: "form-inline" do
+        .form-group
+          = hidden_field_tag :symbol, quote["symbol"]
+          = hidden_field_tag :side, :buy
+          = hidden_field_tag :price, set_num_decimals(quote["last_trade_price"])
+          = number_field_tag :quantity, 1, min: 1, class: "form-control"
+          = submit_tag "Buy", class: "btn btn-success"
+      - if false # debug
+        = @quotes
+  - if @quotes.empty?
+    .col-xs-12
+      Sorry, no quotes were found for "#{params["symbols"]}".

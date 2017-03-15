@@ -20,7 +20,7 @@
         .total
           Total
           = price_display(order["quantity"].to_i * order["average_price"].to_f)
-  - if true # debug
+  - if false # debug
     .col-xs-12
       %ul
         - @orders.each do |order|

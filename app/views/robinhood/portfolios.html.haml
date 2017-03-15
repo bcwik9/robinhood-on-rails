@@ -7,11 +7,11 @@
       %h3= price_display(p["extended_hours_equity"] || p["equity"])
     .col-xs-4.return
       Daily change
-      %h3{class: up_down(p["equity_previous_close"], p["equity"])}
-        = change_display p["equity_previous_close"], p["equity"]
+      %h3{class: up_down(p["adjusted_equity_previous_close"], p["equity"])}
+        = change_display p["adjusted_equity_previous_close"], p["equity"]
     .col-xs-4.cash
-      Cash
-      %h3= price_display p["unwithdrawable_deposits"]
+      Buying power
+      %h3= price_display session[:robinhood_accounts].map{|a| a["buying_power"]}.sum
     - if false # debug
       %ul
       - p.each do |k,v|
