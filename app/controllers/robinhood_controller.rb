@@ -26,6 +26,7 @@ class RobinhoodController < ApplicationController
 
   def portfolios
     @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]
+    render layout: false
   end
 
   def positions
