@@ -18,5 +18,9 @@
 
 //$(document).on("turbolinks:load", function(){
 $(function(){
-  Elemental.load(document);
+  if(!window.elemental_loaded){
+    console.log("loading Elemental");
+    Elemental.load(document);
+    window.elemental_loaded = true;
+  }
 });
