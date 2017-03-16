@@ -1,20 +1,19 @@
+- price = order["average_price"] || order["price"]
 .order
   %h3= stock_link order["instrument"]["symbol"]
+  .total
+    = price_display(order["quantity"].to_i * price.to_f)
+  .side= order["side"].capitalize
+  .order_date= DateTime.parse(order["updated_at"]).strftime("%b %e, %Y")
+  .price
+    = price_display price
+    per share
+  .quantity
+    = order["quantity"].to_i
+    = "Share".pluralize(order["quantity"].to_i)
   .status
     = order["state"].capitalize
-  .order_date= DateTime.parse(order["updated_at"]).strftime("%b %e, %Y")
-  .side= order["side"].capitalize
-  - if order["state"] =~ /filled/i
-    .price
-      Price
-      = price_display order["average_price"]
-    .quantity
-      = order["quantity"].to_i
-      = "Share".pluralize(order["quantity"].to_i)
-    .total
-      Total
-      = price_display(order["quantity"].to_i * order["average_price"].to_f)
-  - elsif order["state"] =~ /(queued|unconfirmed)/i
+  - if order["state"] =~ /(queued|unconfirmed)/i
     = link_to "Cancel", cancel_order_path(url: order["cancel"])
 
   - if false # debug

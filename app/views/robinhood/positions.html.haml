@@ -13,6 +13,9 @@
             = change_display(data["previous_close"].to_f*num_shares, data["last_trade_price"].to_f*num_shares)
         .num-shares
           #{data["quantity"].to_i} #{"share".pluralize(data["quantity"].to_i)}
+        .sell
+          = link_to "Sell", quote_path(symbols: symbol, side: :sell)
+
   - if false #debug
     .col-xs-12
       %ul
