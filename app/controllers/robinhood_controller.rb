@@ -57,6 +57,7 @@ class RobinhoodController < ApplicationController
   end
 
   def watchlist
+    @side = :buy
     @watchlists = robinhood_get("https://api.robinhood.com/watchlists/")["results"]
     default = robinhood_get @watchlists.first["url"]
     @instruments = []

@@ -14,7 +14,7 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require elemental
-//= require_tree .
+//= require deferred_loader
 
 //$(document).on("turbolinks:load", function(){
 $(function(){
