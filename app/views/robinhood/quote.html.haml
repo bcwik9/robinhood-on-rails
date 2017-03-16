@@ -6,10 +6,13 @@
 .row
   - @quotes.each do |quote|
     - price = quote["last_trade_price"]
-    .col-sm-4
+    .col-xs-4.col-sm-3
       %h3= stock_link quote["symbol"]
-      Current price
       = price_display price
+      .change
+        %span{class: up_down(quote["previous_close"], quote["last_trade_price"])}
+          = change_display(quote["previous_close"], quote["last_trade_price"])
+
       = form_tag new_order_path, class: "form-inline" do
         .form-group
           = hidden_field_tag :symbol, quote["symbol"]
@@ -23,7 +26,7 @@
             = submit_tag "Sell", class: "btn btn-success", data: {confirm: "Are you sure you want to sell #{quote['symbol']}?"}
 
       - if false # debug
-        = @quotes
+        = quote
   - if @quotes.empty?
     .col-xs-12
       Sorry, no quotes were found for "#{params["symbols"]}".
