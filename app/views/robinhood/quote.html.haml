@@ -13,17 +13,7 @@
         %span{class: up_down(quote["previous_close"], quote["last_trade_price"])}
           = change_display(quote["previous_close"], quote["last_trade_price"])
 
-      = form_tag new_order_path, class: "form-inline" do
-        .form-group
-          = hidden_field_tag :symbol, quote["symbol"]
-          = hidden_field_tag :side, @side
-          = hidden_field_tag :price, set_num_decimals(price)
-          - if @side.nil? || @side =~ /buy/i
-            = number_field_tag :quantity, 1, min: 1, class: "form-control"
-            = submit_tag "Buy", class: "btn btn-success", data: {confirm: "Are you sure you want to buy #{quote['symbol']}?"}
-          - else
-            = number_field_tag :quantity, 1, min: 1, max: @investments[quote["symbol"]]["quantity"],class: "form-control"
-            = submit_tag "Sell", class: "btn btn-success", data: {confirm: "Are you sure you want to sell #{quote['symbol']}?"}
+      = render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
 
       - if false # debug
         = quote
