@@ -9,9 +9,7 @@ class RobinhoodController < ApplicationController
   end
 
   def logout
-    session.keys.select{|k| k =~ /robinhood/i}.each do |k|
-      session.delete k
-    end
+    reset_session
     redirect_to root_path
   end
 

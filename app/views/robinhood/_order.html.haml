@@ -13,7 +13,7 @@
     = "Share".pluralize(order["quantity"].to_i)
   .status
     = order["state"].capitalize
-  - if order["state"] =~ /(queued|unconfirmed)/i
+  - if order["state"] =~ /queued/i
     = link_to "Cancel", cancel_order_path(url: order["cancel"])
 
   - if false # debug
