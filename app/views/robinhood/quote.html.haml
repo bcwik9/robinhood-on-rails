@@ -2,7 +2,7 @@
   = render "robinhood/quote_form"
 .col-xs-12
 %br
-= link_to "Back", root_path, class: "btn btn-default"
+#back= link_to "Back", root_path, class: "btn btn-default"
 .row
   - @quotes.each do |quote|
     - price = quote["last_trade_price"]
@@ -15,7 +15,7 @@
           = hidden_field_tag :symbol, quote["symbol"]
           = hidden_field_tag :side, @side
           = hidden_field_tag :price, set_num_decimals(price)
-          - if @side =~ /buy/i
+          - if @side.nil? || @side =~ /buy/i
             = number_field_tag :quantity, 1, min: 1, class: "form-control"
             = submit_tag "Buy", class: "btn btn-success", data: {confirm: "Are you sure you want to buy #{quote['symbol']}?"}
           - else

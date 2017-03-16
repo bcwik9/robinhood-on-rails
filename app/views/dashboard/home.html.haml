@@ -13,6 +13,9 @@
   = render "robinhood/quote_form"
   #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path}}
   #positions{data: {behavior: "DeferredLoader", path: positions_path}}
+  .col-xs-12
+    %h2 Watchlist
+  #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path}}
 - else
   %p Log in to your #{link_to "Robinhood", "https://robinhood.com/"} account to access and manage your portfolio.
   = render "layouts/robinhood_login_form"

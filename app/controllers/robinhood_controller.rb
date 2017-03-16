@@ -52,10 +52,29 @@ class RobinhoodController < ApplicationController
       @investments[instrument["symbol"]] = position.merge instrument
     end
 
-    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@instruments.map{|i| i["symbol"]}.join(',')}")["results"]
+    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
+  end
+
+  def watchlist
+    @watchlists = robinhood_get("https://api.robinhood.com/watchlists/")["results"]
+    default = robinhood_get @watchlists.first["url"]
+    @instruments = []
+    @investments = {}
+    default["results"].each do |instrument|
+      instrument_data = robinhood_get instrument["instrument"]
+      @instruments << instrument_data
+      @investments[instrument_data["symbol"]] = instrument_data
+    end
+
+    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
+    @quotes.each do |quote|
+      @investments[quote["symbol"]].merge! quote
+    end
+
+    render "quote"
   end
 
   def orders
