@@ -1,24 +1,18 @@
 .row
   .col-xs-12
-    %h2 Investments
+    %h2 Positions
   - @investments.each do |symbol,data|
+    - num_shares = data["quantity"].to_i
     .col-xs-4.col-sm-3
       .investment
         %h3= stock_link symbol
-        - price = data["last_extended_hours_trade_price"] || data["last_trade_price"]
-        .price
-          Price
-          = price_display price
-        .change
-          Change
-          %span{class: up_down(data["previous_close"], data["last_trade_price"])}
-            = change_display(data["previous_close"], data["last_trade_price"])
-        .num-shares
-          Number of shares
-          = data["quantity"].to_i
         .value
-          Value
-          = price_display(data["quantity"].to_i * price.to_f)
+          = price_display(data["quantity"].to_i * (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f)
+        .change
+          %span{class: up_down(data["previous_close"], data["last_trade_price"])}
+            = change_display(data["previous_close"].to_f*num_shares, data["last_trade_price"].to_f*num_shares)
+        .num-shares
+          #{data["quantity"].to_i} #{"share".pluralize(data["quantity"].to_i)}
   - if false #debug
     .col-xs-12
       %ul
