@@ -54,6 +54,8 @@ class RobinhoodController < ApplicationController
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
+
+    render layout: false
   end
 
   def watchlist
@@ -73,7 +75,7 @@ class RobinhoodController < ApplicationController
       @investments[quote["symbol"]].merge! quote
     end
 
-    render "quote"
+    render "quote", layout: false
   end
 
   def orders
