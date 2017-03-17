@@ -16,7 +16,11 @@ class RobinhoodController < ApplicationController
   def quote
     @side = params[:side] || "buy"
     begin
-      positions if @side =~ /sell/i
+      if @side =~ /buy/i
+        refresh_accounts
+      else
+        positions
+      end
       @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"].upcase}")["results"]
       @quotes.delete_if{|q| q.nil?}
     rescue Exception => e
@@ -67,10 +71,10 @@ class RobinhoodController < ApplicationController
   def watchlist
     @side = :buy
     @watchlists = robinhood_get("https://api.robinhood.com/watchlists/")["results"]
-    default = robinhood_get @watchlists.first["url"]
+    default_watchlist = robinhood_get @watchlists.first["url"]
     @instruments = []
     @investments = {}
-    default["results"].each do |instrument|
+    default_watchlist["results"].each do |instrument|
       instrument_data = robinhood_get instrument["instrument"]
       @instruments << instrument_data
       @investments[instrument_data["symbol"]] = instrument_data
@@ -80,6 +84,8 @@ class RobinhoodController < ApplicationController
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
+
+    refresh_accounts
 
     render "quote", layout: false
   end
