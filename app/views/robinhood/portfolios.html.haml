@@ -3,7 +3,7 @@
     .subtext Total value
     %h3= price_display(p["extended_hours_equity"] || p["equity"])
   .col-xs-6.col-sm-4.return
-    .subtext Daily change
+    .subtext Today
     %h3{class: up_down(p["adjusted_equity_previous_close"], p["equity"])}
       = change_display p["adjusted_equity_previous_close"], p["equity"]
   .col-xs-6.col-sm-4.cash
