@@ -79,6 +79,24 @@ class RobinhoodController < ApplicationController
     render "quote", layout: false
   end
 
+  def add_to_watchlist
+    response = robinhood_post("https://api.robinhood.com/watchlists/Default/bulk_add/", {symbols: params["symbols"]})
+    if response.present?
+      flash[:success] = "Added position to watchlist."
+      redirect_to root_path
+    else
+      flash[:warning] = "Position already on watchlist."
+      redirect_to request.referrer
+    end
+  end
+
+  def remove_from_watchlist
+    instrument = instrument_from_symbol params["symbol"]
+    response = robinhood_delete "https://api.robinhood.com/watchlists/Default/#{instrument["id"]}/"
+    flash[:success] = "Removed #{params["symbol"]} from watchlist."
+    redirect_to root_path
+  end
+
   def orders
     @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
     @orders.each do |order|
@@ -102,9 +120,9 @@ class RobinhoodController < ApplicationController
     response = robinhood_post "https://api.robinhood.com/orders/", data
     success = response["id"].present?
     if success
-      flash[:success] = "Successfully placed order"
+      flash[:success] = "Successfully placed order."
     else
-      flash[:warning] = "Failed to place order: #{response.values.join}"
+      flash[:warning] = "Failed to place order: #{response.values.join}."
     end
 
     redirect_to orders_path
@@ -114,9 +132,9 @@ class RobinhoodController < ApplicationController
     response = robinhood_post params["url"], {}
     success = response.empty?
     if success
-      flash[:success] = "Successfully canceled order"
+      flash[:success] = "Successfully canceled order."
     else
-      flash[:warning] = "Failed to cancel order: #{response.values.join}"
+      flash[:warning] = "Failed to cancel order: #{response.values.join}."
     end
 
     redirect_to orders_path
@@ -134,6 +152,16 @@ class RobinhoodController < ApplicationController
     request.set_form_data(data)
     response = http.request(request)
     JSON.parse(response.body)
+  end
+
+  def robinhood_delete url
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    headers = {"Accept" => 'application/json'}
+    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if user_logged_in_to_robinhood?
+    request = Net::HTTP::Delete.new(uri.request_uri, initheader=headers)
+    response = http.request(request)
   end
 
   def robinhood_get url
