@@ -1,21 +1,32 @@
-%h1 Dashboard
+.row
+  .col-xs-12
+    %h1 Dashboard
+
 - if session[:robinhood_auth_token].present?
-  .col-xs-12
-    %p Hi #{session[:robinhood_user]["first_name"]}! Here you can find information about your #{link_to "Robinhood", "https://robinhood.com/"} investments. Feel free to check how your portfolio is doing, get stock information, or place orders.
-  .col-xs-6
-    .dropdown
-      = link_to "#", data: {toggle: "dropdown"}, aria: {haspopup: true, expanded: false}, class: "btn btn-default", id: "menu-dropdown" do
-        Menu
-        .caret
-      %ul.dropdown-menu{aria: {labelledby: "menu-dropdown"}}
-        %li= link_to "Log out", logout_path
-        %li= link_to "Orders", orders_path
-  = render "robinhood/quote_form"
-  #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path}}
-  #positions{data: {behavior: "DeferredLoader", path: positions_path}}
-  .col-xs-12
-    %h2 Watchlist
-  #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path}}
+  .row
+    .col-xs-12
+      %p Hi #{session[:robinhood_user]["first_name"]}! Here you can find information about your #{link_to "Robinhood", "https://robinhood.com/"} investments. Feel free to check how your portfolio is doing, get stock information, or place orders.
+    .col-xs-6
+      .dropdown
+        = link_to "#", data: {toggle: "dropdown"}, aria: {haspopup: true, expanded: false}, class: "btn btn-default", id: "menu-dropdown" do
+          Menu
+          .caret
+        %ul.dropdown-menu{aria: {labelledby: "menu-dropdown"}}
+          %li= link_to "Log out", logout_path
+          %li= link_to "Orders", orders_path
+
+    = render "robinhood/quote_form"
+  %br
+  .row
+    #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path}}
+  .row
+    #positions{data: {behavior: "DeferredLoader", path: positions_path}}
+  .row
+    .col-xs-12
+      %h2 Watchlist
+    #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path}}
 - else
-  %p Log in to your #{link_to "Robinhood", "https://robinhood.com/"} account to access and manage your portfolio.
-  = render "layouts/robinhood_login_form"
+  .row
+    .col-xs-12
+      %p Log in to your #{link_to "Robinhood", "https://robinhood.com/"} account to access and manage your portfolio.
+      = render "layouts/robinhood_login_form"

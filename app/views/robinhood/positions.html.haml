@@ -1,29 +1,28 @@
-.row
-  .col-xs-12
-    %h2 Positions
-  - @investments.each do |symbol,data|
-    - num_shares = data["quantity"].to_i
-    - price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
-    .col-xs-4.col-sm-3
-      .investment
-        %h3= stock_link symbol
-        .value
-          = price_display(price * num_shares)
-        .change
-          %span{class: up_down(data["previous_close"], price)}
-            = change_display(data["previous_close"].to_f*num_shares, price*num_shares)
-        .num-shares
-          #{data["quantity"].to_i} #{"share".pluralize(data["quantity"].to_i)}
-        = render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: price, num_shares: num_shares
+.col-xs-12
+  %h2 Positions
+- @investments.each do |symbol,data|
+  - num_shares = data["quantity"].to_i
+  - price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
+  .col-xs-4.col-sm-3
+    .investment
+      %h3= stock_link symbol
+      .value
+        = price_display(price * num_shares)
+      .change
+        %span{class: up_down(data["previous_close"], price)}
+          = change_display(data["previous_close"].to_f*num_shares, price*num_shares)
+      .num-shares
+        #{data["quantity"].to_i} #{"share".pluralize(data["quantity"].to_i)}
+      = render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: price, num_shares: num_shares
 
-  - if false #debug
-    .col-xs-12
-      %ul
-        - @positions.each do |k,v|
-          %li= "#{k}: #{v}"
-        - session[:robinhood_accounts].each do |k,v|
-          %li= "#{k}: #{v}"
-        - @instruments.each do |k,v|
-          %li= "#{k}: #{v}"
-        - @quotes.each do |k,v|
-          %li= "#{k}: #{v}"
+- if false #debug
+  .col-xs-12
+    %ul
+      - @positions.each do |k,v|
+        %li= "#{k}: #{v}"
+      - session[:robinhood_accounts].each do |k,v|
+        %li= "#{k}: #{v}"
+      - @instruments.each do |k,v|
+        %li= "#{k}: #{v}"
+      - @quotes.each do |k,v|
+        %li= "#{k}: #{v}"

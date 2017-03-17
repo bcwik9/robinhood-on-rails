@@ -1,22 +1,18 @@
-.row
-  = render "robinhood/quote_form"
-.col-xs-12
-%br
+= render "robinhood/quote_form"
 #back= link_to "Back", root_path, class: "btn btn-default"
-.row
-  - @quotes.each do |quote|
-    - price = quote["last_trade_price"]
-    .col-xs-4.col-sm-3
-      %h3= stock_link quote["symbol"]
-      = price_display price
-      .change
-        %span{class: up_down(quote["previous_close"], quote["last_trade_price"])}
-          = change_display(quote["previous_close"], quote["last_trade_price"])
+- @quotes.each do |quote|
+  - price = quote["last_trade_price"]
+  .col-xs-4.col-sm-3
+    %h3= stock_link quote["symbol"]
+    = price_display price
+    .change
+      %span{class: up_down(quote["previous_close"], quote["last_trade_price"])}
+        = change_display(quote["previous_close"], quote["last_trade_price"])
 
-      = render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
+    = render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
 
-      - if false # debug
-        = quote
-  - if @quotes.empty?
-    .col-xs-12
-      Sorry, no quotes were found for "#{params["symbols"]}".
+    - if false # debug
+      = quote
+- if @quotes.empty?
+  .col-xs-12
+    Sorry, no quotes were found for "#{params["symbols"]}".
