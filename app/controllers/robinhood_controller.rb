@@ -17,7 +17,7 @@ class RobinhoodController < ApplicationController
     @side = params[:side] || "buy"
     begin
       positions if @side =~ /sell/i
-      @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"]}")["results"]
+      @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"].upcase}")["results"]
       @quotes.delete_if{|q| q.nil?}
     rescue Exception => e
       @quotes = {}
