@@ -1,0 +1,19 @@
+.col-xs-12
+  %h2 ACH Transfers
+  #back= link_to "Back", root_path, class: "btn btn-default"
+  %br
+- @transfers.each do |transfer|
+  - state = transfer["state"]
+  - direction = transfer["direction"]
+  - amount = transfer["amount"]
+  - complete = state =~ /complete/i
+  - amount_available = complete ? amount : transfer["early_access_amount"]
+  .col-xs-4
+    %h3{class: direction =~ /deposit/i ? "text-success" : "text-danger"}= price_display amount
+    #{state} #{direction}
+    %br
+    #{price_display amount_available} of #{price_display amount} available
+    %br
+    = transfer["expected_landing_date"]
+    - if false # debug
+      = transfer

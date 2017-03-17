@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "portfolios", to: "robinhood#portfolios"
   get "positions", to: "robinhood#positions"
   get "quote", to: "robinhood#quote"
+  get "transfers", to: "robinhood#transfers"
 
   post "add_to_watchlist", to: "robinhood#add_to_watchlist"
   post "remove_from_watchlist", to: "robinhood#remove_from_watchlist"

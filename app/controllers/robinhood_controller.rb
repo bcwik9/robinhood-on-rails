@@ -24,6 +24,10 @@ class RobinhoodController < ApplicationController
     end
   end
 
+  def transfers
+    @transfers = robinhood_get("https://api.robinhood.com/ach/transfers/")["results"]
+  end
+
   def portfolios
     @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]
     render layout: false
