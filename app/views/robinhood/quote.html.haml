@@ -1,5 +1,7 @@
 = render "robinhood/quote_form"
-#back= link_to "Back", root_path, class: "btn btn-default"
+.col-xs-12
+  %br
+  #back= link_to "Back", root_path, class: "btn btn-default"
 - @quotes.each do |quote|
   - price = quote["last_trade_price"]
   .col-xs-4.col-sm-3

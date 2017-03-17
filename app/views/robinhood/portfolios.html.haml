@@ -1,13 +1,13 @@
 - @portfolios.each do |p|
-  .col-xs-4.value
-    Total value
+  .col-xs-6.col-sm-4.value
+    .subtext Total value
     %h3= price_display(p["extended_hours_equity"] || p["equity"])
-  .col-xs-4.return
-    Daily change
+  .col-xs-6.col-sm-4.return
+    .subtext Daily change
     %h3{class: up_down(p["adjusted_equity_previous_close"], p["equity"])}
       = change_display p["adjusted_equity_previous_close"], p["equity"]
-  .col-xs-4.cash
-    Buying power
+  .col-xs-6.col-sm-4.cash
+    .subtext Buying power
     %h3= price_display session[:robinhood_accounts].map{|a| a["buying_power"]}.sum
   - if false # debug
     %ul
