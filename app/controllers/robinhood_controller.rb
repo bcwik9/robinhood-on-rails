@@ -4,7 +4,7 @@ class RobinhoodController < ApplicationController
     response = robinhood_post "https://api.robinhood.com/api-token-auth/", {"username" => params[:username], "password" => params[:password]}
     session[:robinhood_auth_token] = response["token"]
     session[:robinhood_user] = robinhood_get "https://api.robinhood.com/user/"
-    session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]
+    refresh_accounts
     redirect_to root_path
   end
 
@@ -29,6 +29,7 @@ class RobinhoodController < ApplicationController
   end
 
   def portfolios
+    refresh_accounts
     @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]
     render layout: false
   end
@@ -145,6 +146,10 @@ class RobinhoodController < ApplicationController
   end
 
   private
+
+  def refresh_accounts
+    session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]
+  end
 
   def robinhood_post url, data
     uri = URI.parse(url)
