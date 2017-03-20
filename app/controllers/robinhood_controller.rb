@@ -47,10 +47,16 @@ class RobinhoodController < ApplicationController
       else
         positions
       end
-      @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{params["symbols"].upcase}")["results"]
+      quote_url = "https://api.robinhood.com/quotes/?symbols="
+      @quotes = robinhood_get(quote_url + params["symbols"].upcase)["results"]
       @quotes.delete_if{|q| q.nil?}
     rescue Exception => e
-      @quotes = {}
+      if(!@quotes || @quotes.empty?)
+        instruments = robinhood_get("https://api.robinhood.com/instruments/?query=#{params["symbols"].upcase}")["results"]
+        @quotes = instruments.map{|instrument| robinhood_get instrument["quote"]}
+      end
+    ensure
+      @quotes ||= {}
     end
   end
 
