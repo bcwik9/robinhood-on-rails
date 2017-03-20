@@ -1,2 +1,0 @@
-- @fundamentals.each do |symbol,data|
-  = data["description"]
