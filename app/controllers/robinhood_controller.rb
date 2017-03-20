@@ -84,7 +84,6 @@ class RobinhoodController < ApplicationController
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
-    get_fundamentals @investments.keys
 
     render layout: false
   end
