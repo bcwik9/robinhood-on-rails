@@ -13,17 +13,18 @@ module ApplicationHelper
     "#{price_display change} (#{gain}#{set_num_decimals change/start_amount.to_f*100}%)"
   end
 
-  def stock_link symbol
+  def stock_link symbol, opts={}
     #browser.device.mobile? ? yahoo_stock_link(symbol) : google_stock_link(symbol)
-    yahoo_stock_link symbol
+    opts[:target] = :_blank
+    yahoo_stock_link symbol, opts
   end
 
-  def yahoo_stock_link symbol
-    link_to symbol, "https://finance.yahoo.com/quote/#{symbol}", target: :_blank
+  def yahoo_stock_link symbol, opts
+    link_to symbol, "https://finance.yahoo.com/quote/#{symbol}", opts
   end
 
-  def google_stock_link symbol
-    link_to symbol, "https://www.google.com/finance?q=#{symbol}", target: :_blank
+  def google_stock_link symbol, opts
+    link_to symbol, "https://www.google.com/finance?q=#{symbol}", opts
   end
 
   def google_stock_comparison_link symbols

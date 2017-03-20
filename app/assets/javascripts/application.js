@@ -16,6 +16,8 @@
 //= require turbolinks
 //= require elemental
 //= require deferred_loader
+//= require fundamentals_tooltip
+//= require tooltip_loader
 
 $(document).on("turbolinks:load", function(){
   console.log("loading Elemental");

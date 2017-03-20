@@ -28,6 +28,11 @@ class RobinhoodController < ApplicationController
     end
   end
 
+  def fundamentals
+    get_fundamentals
+    render layout: false
+  end
+
   def quote
     @side = params[:side] || "buy"
     begin
@@ -79,6 +84,7 @@ class RobinhoodController < ApplicationController
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
+    get_fundamentals @investments.keys
 
     render layout: false
   end
@@ -167,6 +173,13 @@ class RobinhoodController < ApplicationController
   end
 
   private
+
+  def get_fundamentals symbols=params["symbols"].split(",")
+    @fundamentals ||= {}
+    symbols.each_with_index do |symbol,i|
+      @fundamentals[symbol.upcase] = robinhood_get("https://api.robinhood.com/fundamentals/?symbols=#{symbol.upcase}")["results"].try(:first)
+    end
+  end
 
   def refresh_accounts
     session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]

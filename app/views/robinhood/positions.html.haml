@@ -1,9 +1,10 @@
+#fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip", path: fundamentals_path}}
 - @investments.each do |symbol,data|
   - num_shares = data["quantity"].to_i
   - price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
   .col-xs-4.col-sm-3
     .investment
-      %h3= stock_link symbol
+      %h3= stock_link(symbol, {class: "symbol", data:{ html: true, placement: :right}})
       .value
         = price_display(price * num_shares)
       .change

@@ -3,6 +3,7 @@ DeferredLoader = function(element) {
   var update_content = function() {
     $.get(element.data("path"), function(data) {
       element.html(data);
+      Elemental.load(element.html())
     })
   }
 
