@@ -19,6 +19,9 @@
     = render "robinhood/quote_form"
   %br
   .row
+    #markets{data: {behavior: "DeferredLoader", path: markets_path}}
+    %br
+  .row
     #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 20}}
   .row
     #positions{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}

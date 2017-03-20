@@ -1,0 +1,6 @@
+.row
+  - @markets.each do |market|
+    - time_display = market["is_open"] ? "closes in " : "opens in "
+    .col-xs-6
+      = market["acronym"]
+      = time_display + distance_of_time_in_words(Time.now,market["is_open"] ? market["closes_at"] : market["opens_at"])

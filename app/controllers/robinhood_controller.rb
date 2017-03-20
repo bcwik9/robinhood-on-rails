@@ -13,6 +13,21 @@ class RobinhoodController < ApplicationController
     redirect_to root_path
   end
 
+  def markets
+    @markets = robinhood_get("https://api.robinhood.com/markets/")["results"]
+    @markets.delete_if{|m| m["mic"] !~ /(xnys|xnas)/i }
+    @markets.each do |market|
+      market.merge! robinhood_get(market["todays_hours"])
+      if !market["is_open"]
+        opens = market["opens_at"].present? ? DateTime.parse(market["opens_at"]) : nil
+        if opens.nil? || opens < Time.now
+          opens = robinhood_get(market["next_open_hours"])["opens_at"]
+        end
+        market["opens_at"] = opens.to_s
+      end
+    end
+  end
+
   def quote
     @side = params[:side] || "buy"
     begin
