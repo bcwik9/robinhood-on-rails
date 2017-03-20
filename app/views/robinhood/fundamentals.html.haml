@@ -1,2 +1,14 @@
 - @fundamentals.each do |symbol,data|
-  = data["description"]
+  .fundamentals
+    .row
+      .col-xs-12
+        = data.delete("description").truncate(200)
+        %br
+        %br
+    .row.text-left
+      - data.each do |k,v|
+        - next if k =~ /instrument/i
+        .col-xs-6
+          = k.capitalize.gsub("_", " ")
+        .col-xs-6
+          = v || "-"
