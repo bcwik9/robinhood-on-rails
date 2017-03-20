@@ -1,3 +1,4 @@
+#fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip", path: fundamentals_path}}
 = render "robinhood/quote_form"
 .col-xs-12
   %br
@@ -5,7 +6,7 @@
 - @quotes.each do |quote|
   - price = quote["last_trade_price"]
   .col-xs-4.col-sm-3
-    %h3= stock_link quote["symbol"]
+    %h3= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
     = price_display price
     .change
       %span{class: up_down(quote["previous_close"], quote["last_trade_price"])}

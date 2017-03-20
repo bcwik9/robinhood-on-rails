@@ -26,6 +26,7 @@ class RobinhoodController < ApplicationController
         market["opens_at"] = opens.to_s
       end
     end
+    render layout: nil
   end
 
   def fundamentals
