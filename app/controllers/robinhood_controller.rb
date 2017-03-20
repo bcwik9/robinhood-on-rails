@@ -18,12 +18,17 @@ class RobinhoodController < ApplicationController
     @markets.delete_if{|m| m["mic"] !~ /(xnys|xnas)/i }
     @markets.each do |market|
       market.merge! robinhood_get(market["todays_hours"])
-      if !market["is_open"]
-        opens = market["opens_at"].present? ? DateTime.parse(market["opens_at"]) : nil
-        if opens.nil? || opens < Time.now
-          opens = robinhood_get(market["next_open_hours"])["opens_at"]
+      if !market["opens_at"]
+        next_open = robinhood_get(market["next_open_hours"])
+        market["opens_at"] = next_open["opens_at"]
+        market["closes_at"] = next_open["closes_at"]
+      else
+        closes = DateTime.parse market["closes_at"]
+        if closes < Time.now
+          next_open = robinhood_get(market["next_open_hours"])
+          market["opens_at"] = next_open["opens_at"]
+          market["closes_at"] = next_open["closes_at"]
         end
-        market["opens_at"] = opens.to_s
       end
     end
     render layout: nil
