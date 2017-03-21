@@ -1,4 +1,9 @@
 FundamentalsTooltip = function(element) {
+
+  var hide_all = function() {
+    $(".symbol").tooltip("hide")
+  }
+
   $(".symbol").hover(function(e) {
     var target = $(e.target)
     if(!target.data("tooltip-loaded")){
@@ -9,5 +14,10 @@ FundamentalsTooltip = function(element) {
         target.tooltip("show")
       })
     }
+    hide_all()
+  })
+
+  $(document).click(function() {
+    hide_all()
   })
 }

@@ -31,11 +31,16 @@ class RobinhoodController < ApplicationController
         end
       end
     end
-    render layout: nil
+    render layout: false
   end
 
   def fundamentals
     get_fundamentals
+    render layout: false
+  end
+
+  def history
+    get_history params[:symbol].upcase, params[:interval].downcase, {span: params[:span].downcase}
     render layout: false
   end
 
@@ -184,6 +189,20 @@ class RobinhoodController < ApplicationController
   end
 
   private
+
+  # GET /quotes/historicals/$symbol/[?interval=$i&span=$s&bounds=$b] interval=week|day|10minute|5minute|null(all) span=day|week|year|5year|all bounds=extended|regular|trading
+  # only certain combos work, such as:
+  # get_history :AAPL, "5minute", {span: "day"}
+  # get_history :AAPL, "10minute", {span: "week"}
+  # get_history :AAPL, "day", {span: "year"}
+  # get_history :AAPL, "week", {span: "5year"}
+  def get_history symbol, interval, opts={}
+    url = "https://api.robinhood.com/quotes/historicals/#{symbol}/?interval=#{interval}"
+    opts.each do |k,v|
+      url += "&#{k}=#{v}"
+    end
+    @history = robinhood_get(url)["historicals"]
+  end
 
   def get_fundamentals symbols=params["symbols"].split(",")
     @fundamentals ||= {}
