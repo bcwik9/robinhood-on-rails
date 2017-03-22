@@ -1,4 +1,9 @@
 module ApplicationHelper
+  def user_timezone
+    # TODO make this a setting?
+    'Eastern Time (US & Canada)'
+  end
+  
   def price_display amount
     "$#{set_num_decimals amount}"
   end

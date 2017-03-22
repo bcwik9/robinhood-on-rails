@@ -4,7 +4,7 @@
   .total
     = price_display(order["quantity"].to_i * price.to_f)
   .side= order["side"].capitalize
-  .order_date= DateTime.parse(order["updated_at"]).strftime("%b %e %l%P %Y")
+  .order_date= DateTime.parse(order["updated_at"]).in_time_zone(user_timezone).strftime("%b %e %Y %l%P")
   .price
     = price_display price
     per share

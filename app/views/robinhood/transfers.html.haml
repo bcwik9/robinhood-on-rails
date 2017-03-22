@@ -3,8 +3,8 @@
   #back= link_to "Back", root_path, class: "btn btn-default"
   %br
 - @transfers.each do |transfer|
-  - state = transfer["state"]
-  - direction = transfer["direction"]
+  - state = transfer["state"].capitalize
+  - direction = transfer["direction"].capitalize
   - amount = transfer["amount"]
   - complete = state =~ /complete/i
   - amount_available = complete ? amount : transfer["early_access_amount"]
@@ -14,6 +14,7 @@
     %br
     #{price_display amount_available} of #{price_display amount} available
     %br
+    Expected
     = transfer["expected_landing_date"]
     - if false # debug
       = transfer
