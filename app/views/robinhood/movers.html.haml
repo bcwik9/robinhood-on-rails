@@ -1,0 +1,5 @@
+- @movers.each do |mover|
+  = mover["symbol"] rescue raise mover.to_s
+  = mover["price_movement"]["market_hours_last_movement_pct"]
+  = mover["price_movement"]["market_hours_last_price"]
+  %br

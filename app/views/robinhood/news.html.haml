@@ -1,0 +1,4 @@
+- @news["results"].each do |article|
+  = link_to article["title"], article["url"], target: :_blank
+  = DateTime.parse(article["published_at"]).strftime("%b %e %l%P")
+  %br

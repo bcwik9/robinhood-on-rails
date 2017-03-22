@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   get "markets", to: "robinhood#markets"
   get "fundamentals", to: "robinhood#fundamentals"
   get "history", to: "robinhood#history"
+  get "movers", to: "robinhood#movers"
+  get "news", to: "robinhood#news"
 
   post "add_to_watchlist", to: "robinhood#add_to_watchlist"
   post "remove_from_watchlist", to: "robinhood#remove_from_watchlist"

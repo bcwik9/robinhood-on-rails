@@ -38,6 +38,21 @@ class RobinhoodController < ApplicationController
     get_fundamentals
     render layout: false
   end
+  
+  def movers
+    if params[:direction].present?
+      @movers = get_sp500_movers(params[:direction])["results"]
+    else
+      @up_and_down = get_sp500_movers("up")["results"]
+      @up_and_down += get_sp500_movers("down")["results"]
+      @movers = @up_and_down
+    end
+    render layout: false
+  end
+
+  def news
+    get_news params[:symbol]
+  end
 
   def history
     get_history params[:symbol].upcase, params[:interval].downcase, {span: params[:span].downcase}
@@ -189,6 +204,14 @@ class RobinhoodController < ApplicationController
   end
 
   private
+
+  def get_news symbol
+    @news = robinhood_get "https://api.robinhood.com/midlands/news/#{symbol.upcase}/"
+  end
+
+  def get_sp500_movers direction
+    @movers = robinhood_get "https://api.robinhood.com/midlands/movers/sp500/?direction=#{direction}"
+  end
 
   # GET /quotes/historicals/$symbol/[?interval=$i&span=$s&bounds=$b] interval=week|day|10minute|5minute|null(all) span=day|week|year|5year|all bounds=extended|regular|trading
   # only certain combos work, such as:
