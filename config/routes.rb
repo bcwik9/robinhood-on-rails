@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get "logout", to: "robinhood#logout"
 
   get "portfolios", to: "robinhood#portfolios"
+  get "portfolio_history", to: "robinhood#portfolio_history"
   get "positions", to: "robinhood#positions"
   get "quote", to: "robinhood#quote"
   get "transfers", to: "robinhood#transfers"
