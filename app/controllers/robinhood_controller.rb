@@ -90,7 +90,8 @@ class RobinhoodController < ApplicationController
   end
 
   def transfers
-    @transfers = robinhood_get("https://api.robinhood.com/ach/transfers/")["results"]
+    get_transfers
+    @ach_accounts = robinhood_get("https://api.robinhood.com/ach/relationships/")["results"]
   end
 
   def portfolios
@@ -217,6 +218,10 @@ class RobinhoodController < ApplicationController
   end
 
   private
+
+  def get_transfers
+    @transfers = robinhood_get("https://api.robinhood.com/ach/transfers/")["results"]
+  end
 
   def get_news symbol
     @news = robinhood_get "https://api.robinhood.com/midlands/news/#{symbol.upcase}/"

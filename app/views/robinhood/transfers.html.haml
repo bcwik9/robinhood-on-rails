@@ -1,20 +1,28 @@
 .col-xs-12
-  %h2 ACH Transfers
+  %h2 ACH transfers and accounts
   #back= link_to "Back", root_path, class: "btn btn-default"
   %br
-- @transfers.each do |transfer|
-  - state = transfer["state"].capitalize
-  - direction = transfer["direction"].capitalize
-  - amount = transfer["amount"]
-  - complete = state =~ /complete/i
-  - amount_available = complete ? amount : transfer["early_access_amount"]
-  .col-xs-4
-    %h3{class: direction =~ /deposit/i ? "text-success" : "text-danger"}= price_display amount
-    #{state} #{direction}
+- @ach_accounts.select{|a| a["unlinked_at"].nil?}.each do |account|
+  .col-xs-12
+    %h3= account["bank_account_nickname"] + " " + account["bank_account_type"].capitalize
+    = account["verified"] ? "Verified" : "Unverified"
     %br
-    #{price_display amount_available} of #{price_display amount} available
-    %br
-    Expected
-    = transfer["expected_landing_date"]
     - if false # debug
-      = transfer
+      = account
+
+    - @transfers.select{|t| t["ach_relationship"] == account["url"]}.each do |transfer|
+      - state = transfer["state"].capitalize
+      - direction = transfer["direction"].capitalize
+      - amount = transfer["amount"]
+      - complete = state =~ /complete/i
+      - amount_available = complete ? amount : transfer["early_access_amount"]
+      .col-xs-4
+        %h3{class: direction =~ /deposit/i ? "text-success" : "text-danger"}= price_display amount
+        #{state} #{direction}
+        %br
+        #{price_display amount_available} of #{price_display amount} available
+        %br
+        Expected
+        = transfer["expected_landing_date"]
+        - if false # debug
+          = transfer
