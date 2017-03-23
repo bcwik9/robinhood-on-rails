@@ -170,7 +170,7 @@ class RobinhoodController < ApplicationController
   end
 
   def orders
-    @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
+    get_orders
     @orders.each do |order|
       order["instrument"] = robinhood_get order["instrument"]
     end
@@ -234,6 +234,10 @@ class RobinhoodController < ApplicationController
       url += "&#{k}=#{v}"
     end
     @history = robinhood_get(url)["historicals"]
+  end
+
+  def get_orders
+    @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
   end
 
   def get_fundamentals symbols=params["symbols"].split(",")
