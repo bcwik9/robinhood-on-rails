@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   get "movers", to: "robinhood#movers"
   get "news", to: "robinhood#news"
 
+  get "cards", to: "robinhood#cards"
+  get "dismiss_card", to: "robinhood#dismiss_card"
+
   post "add_to_watchlist", to: "robinhood#add_to_watchlist"
   post "remove_from_watchlist", to: "robinhood#remove_from_watchlist"
   get "watchlist", to: "robinhood#watchlist"

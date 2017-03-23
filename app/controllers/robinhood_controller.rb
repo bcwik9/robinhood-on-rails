@@ -50,6 +50,15 @@ class RobinhoodController < ApplicationController
     render layout: false
   end
 
+  def cards
+    @cards = robinhood_get("https://api.robinhood.com/midlands/notifications/stack/")["results"]
+  end
+
+  def dismiss_card
+    response = robinhood_post params["card_url"] + "dismiss/", {}
+    raise response.to_s
+  end
+
   def news
     get_news params[:symbol]
   end
