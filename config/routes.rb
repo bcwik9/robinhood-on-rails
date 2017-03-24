@@ -9,12 +9,15 @@ Rails.application.routes.draw do
   get "portfolio_history", to: "robinhood#portfolio_history"
   get "positions", to: "robinhood#positions"
   get "quote", to: "robinhood#quote"
-  get "transfers", to: "robinhood#transfers"
   get "markets", to: "robinhood#markets"
   get "fundamentals", to: "robinhood#fundamentals"
   get "history", to: "robinhood#history"
   get "movers", to: "robinhood#movers"
   get "news", to: "robinhood#news"
+
+  get "transfers", to: "robinhood#transfers"
+  post "new_transfer", to: "robinhood#new_transfer"
+  get "cancel_transfer", to: "robinhood#cancel_transfer"
 
   get "cards", to: "robinhood#cards"
   get "dismiss_card", to: "robinhood#dismiss_card"

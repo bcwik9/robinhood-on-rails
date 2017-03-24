@@ -79,6 +79,23 @@ class RobinhoodController < ApplicationController
     @ach_accounts = robinhood_get("https://api.robinhood.com/ach/relationships/")["results"]
   end
 
+  def new_transfer
+    raise "CWIK TODO"
+    #response = robinhood_post "https://api.robinhood.com/ach/transfers/", {direction: :deposit, amount: 100.00, ach_relationship: @ach_accounts.first["url"]}
+  end
+
+  def cancel_transfer
+    response = robinhood_post params["transfer_url"], {}
+    success = response.empty?
+    if success
+      flash[:success] = "Successfully canceled transfer."
+    else
+      flash[:warning] = "Failed to cancel transfer: #{response.values.join}."
+    end
+
+    redirect_to transfers_path
+  end
+
   def portfolios
     refresh_accounts
     @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]

@@ -24,5 +24,9 @@
         %br
         Expected
         = transfer["expected_landing_date"]
+        %br
+        - if transfer["cancel"].present?
+          = link_to "Cancel", cancel_transfer_path(transfer_url: transfer["cancel"]), data: {confirm: "Are you sure you want to cancel this transfer?"}
+
         - if false # debug
           = transfer
