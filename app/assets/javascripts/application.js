@@ -13,13 +13,13 @@
 //= require jquery
 //= require jquery_ujs
 //= require twitter/bootstrap
-//= require turbolinks
 //= require elemental
 //= require deferred_loader
 //= require fundamentals_tooltip
 //= require tooltip_loader
 
-$(document).on("turbolinks:load", function(){
+//$(document).on("turbolinks:load", function(){
+$(function(){
   console.log("loading Elemental");
   Elemental.load(document);
 });
