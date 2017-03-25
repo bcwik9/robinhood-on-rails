@@ -80,8 +80,14 @@ class RobinhoodController < ApplicationController
   end
 
   def new_transfer
-    raise "CWIK TODO"
-    #response = robinhood_post "https://api.robinhood.com/ach/transfers/", {direction: :deposit, amount: 100.00, ach_relationship: @ach_accounts.first["url"]}
+    response = robinhood_post "https://api.robinhood.com/ach/transfers/", {direction: params[:direction].downcase, amount: params[:amount], ach_relationship: params[:ach_relationship]}
+    success = response["id"].present?
+    if success
+      flash[:success] = "Successfully created transfer."
+    else
+      flash[:warning] = response.values.join
+    end
+    redirect_to transfers_path
   end
 
   def cancel_transfer

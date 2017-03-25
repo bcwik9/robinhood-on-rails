@@ -1,0 +1,13 @@
+= form_tag new_transfer_path do
+  .form-group
+    = label_tag "Account"
+    - options = accounts.select{|a| a["verified"]}.map{|a| [a["bank_account_nickname"], a["url"]]}
+    = select_tag :ach_relationship, options_for_select(options), class: "form-control"
+  .form-group
+    = label_tag "Type"
+    = select_tag :direction, options_for_select(["Deposit", "Withdraw"]), class: "form-control"
+  .form_group
+    = label_tag "Amount"
+    = number_field_tag :amount, 1, min: 1, class: "form-control"
+  %br
+  = submit_tag "Submit", class: "btn btn-default"

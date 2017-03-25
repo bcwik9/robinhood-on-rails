@@ -2,6 +2,11 @@
   %h2 ACH transfers and accounts
   #back= link_to "Back", root_path, class: "btn btn-default"
   %br
+.col-sm-4.col-xs-6
+  = link_to "Create a new transfer", "#transfer-form", "data-toggle": :collapse, "aria-controls": "#transfer-form", "aria-expanded": false, class: "btn btn-default"
+  #transfer-form.collapse
+    %br
+    = render "robinhood/transfer_form", accounts: @ach_accounts
 - @ach_accounts.select{|a| a["unlinked_at"].nil?}.each do |account|
   .col-xs-12
     %h3= account["bank_account_nickname"] + " " + account["bank_account_type"].capitalize
@@ -16,7 +21,7 @@
       - amount = transfer["amount"]
       - complete = state =~ /complete/i
       - amount_available = complete ? amount : transfer["early_access_amount"]
-      .col-xs-4
+      .col-xs-4.transfer
         %h3{class: direction =~ /deposit/i ? "text-success" : "text-danger"}= price_display amount
         #{state} #{direction}
         %br
