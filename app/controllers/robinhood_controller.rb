@@ -54,23 +54,27 @@ class RobinhoodController < ApplicationController
   end
 
   def quote
-    @side = params[:side] || "buy"
-    begin
-      if @side =~ /buy/i
-        refresh_accounts
-      else
-        positions
+    if params["symbols"].present?
+      @side = params[:side] || "buy"
+      begin
+        if @side =~ /buy/i
+          refresh_accounts
+        else
+          positions
+        end
+        quote_url = "https://api.robinhood.com/quotes/?symbols="
+        @quotes = robinhood_get(quote_url + params["symbols"].upcase)["results"]
+        @quotes.delete_if{|q| q.nil?}
+      rescue Exception => e
+        if(!@quotes || @quotes.empty?)
+          instruments = robinhood_get("https://api.robinhood.com/instruments/?query=#{params["symbols"].upcase}")["results"]
+          @quotes = instruments.map{|instrument| robinhood_get instrument["quote"]}
+        end
+      ensure
+        @quotes ||= {}
       end
-      quote_url = "https://api.robinhood.com/quotes/?symbols="
-      @quotes = robinhood_get(quote_url + params["symbols"].upcase)["results"]
-      @quotes.delete_if{|q| q.nil?}
-    rescue Exception => e
-      if(!@quotes || @quotes.empty?)
-        instruments = robinhood_get("https://api.robinhood.com/instruments/?query=#{params["symbols"].upcase}")["results"]
-        @quotes = instruments.map{|instrument| robinhood_get instrument["quote"]}
-      end
-    ensure
-      @quotes ||= {}
+    else
+      @quotes = {}
     end
   end
 
@@ -137,6 +141,21 @@ class RobinhoodController < ApplicationController
     @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
+    end
+
+    get_orders
+    @investments.each do |symbol,data|
+      ret = 0.0
+      total = 0.0
+      @orders.select{|o| o["state"] =~ /filled/i && o["instrument"] == data["instrument"]}.each do |o|
+        current_price = data["last_extended_hours_trade_price"] || data["last_trade_price"]
+        purchase_price = o["average_price"] || o["price"]
+        purchase_quantity = o["quantity"].to_i
+        total += purchase_price.to_f * purchase_quantity
+        ret += ((current_price.to_f - purchase_price.to_f) * purchase_quantity)
+      end
+      @investments[symbol]["overall_return"] = ret
+      @investments[symbol]["purchase_cost"] = total
     end
 
     render layout: false

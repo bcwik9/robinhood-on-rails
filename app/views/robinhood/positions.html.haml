@@ -2,16 +2,23 @@
 - @investments.each do |symbol,data|
   - num_shares = data["quantity"].to_i
   - price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
+  - current_value = price * num_shares
+  - purchase_cost = data["purchase_cost"]
   .col-xs-4.col-sm-3
     .investment
       %h3= stock_link(symbol, {class: "symbol", data:{ html: true, placement: :right}})
       .value
-        = price_display(price * num_shares)
+        = price_display current_value
       .change
+        Today
         %span{class: up_down(data["previous_close"], price)}
           = change_display(data["previous_close"].to_f*num_shares, price*num_shares)
+      .return-to-date
+        Total
+        %span{class: up_down(purchase_cost, (data["overall_return"] + purchase_cost))}
+          = change_display(purchase_cost, (data["overall_return"] + purchase_cost))
       .num-shares
-        #{data["quantity"].to_i} #{"share".pluralize(data["quantity"].to_i)}
+        #{num_shares} #{"share".pluralize(num_shares)}
       = render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: price, num_shares: num_shares
 
 - if false #debug
