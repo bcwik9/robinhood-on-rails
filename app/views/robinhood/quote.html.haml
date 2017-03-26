@@ -3,30 +3,34 @@
 .col-xs-12
   %br
   #back= link_to "Back", root_path, class: "btn btn-default"
-- @quotes.each do |quote|
-  - price = quote["last_trade_price"]
-  .col-xs-4.col-sm-3
-    .quote
-      %h3= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
-      = price_display price
-      .change
-        %span{class: "text-" + up_down(quote["previous_close"], quote["last_trade_price"])}
-          = change_display(quote["previous_close"], quote["last_trade_price"])
-
-      = render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
-
-      .add-to-watchlist
+  %br
+%table.table
+  %tr
+    %th Symbol
+    %th Price
+    %th Today's change
+    %th Buy
+    %th Watchlist
+  - @quotes.each do |quote|
+    - price = quote["last_trade_price"]
+    %tr
+      %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
+      %td= price_display price
+      %td.change{class: up_down(quote["previous_close"], price)}
+        = change_display(quote["previous_close"], price)
+      %td= render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
+      %td.add-to-watchlist
         = form_tag add_to_watchlist_path do
           = hidden_field_tag :symbols, quote["symbol"]
           = submit_tag "Add to watchlist", class: "btn btn-default"
-
-      .remove-from-watchlist
+      %td.remove-from-watchlist
         = form_tag remove_from_watchlist_path do
           = hidden_field_tag :symbol, quote["symbol"]
           = submit_tag "Remove from watchlist", class: "btn btn-default"
 
       - if false # debug
         = quote
+
 - if @quotes.empty?
   .col-xs-12
     Sorry, no quotes were found for "#{params["symbols"]}".
