@@ -9,7 +9,7 @@ module ApplicationHelper
   end
 
   def up_down start_amount, end_amount
-    change_display(start_amount, end_amount).include?('+') ? "text-success" : "text-danger"
+    change_display(start_amount, end_amount).include?('+') ? "success" : "danger"
   end
 
   def change_display start_amount, end_amount

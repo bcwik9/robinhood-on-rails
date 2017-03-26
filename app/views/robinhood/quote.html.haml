@@ -10,7 +10,7 @@
       %h3= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
       = price_display price
       .change
-        %span{class: up_down(quote["previous_close"], quote["last_trade_price"])}
+        %span{class: "text-" + up_down(quote["previous_close"], quote["last_trade_price"])}
           = change_display(quote["previous_close"], quote["last_trade_price"])
 
       = render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
