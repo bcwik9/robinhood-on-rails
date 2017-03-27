@@ -32,6 +32,10 @@ module ApplicationHelper
     link_to symbol, "https://www.google.com/finance?q=#{symbol}", opts
   end
 
+  def zacks_stock_link symbol, opts
+    link_to symbol, "https://www.zacks.com/stock/quote/#{symbol}", opts
+  end
+
   def google_stock_comparison_link symbols
     link_to symbols.join(" vs "), "https://www.google.com/finance?q=#{symbols.join(',')}", target: :_blank
   end
