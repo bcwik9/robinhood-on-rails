@@ -145,17 +145,34 @@ class RobinhoodController < ApplicationController
 
     get_orders
     @investments.each do |symbol,data|
-      ret = 0.0
-      total = 0.0
-      @orders.select{|o| o["state"] =~ /filled/i && o["instrument"] == data["instrument"]}.each do |o|
-        current_price = data["last_extended_hours_trade_price"] || data["last_trade_price"]
-        purchase_price = o["average_price"] || o["price"]
+      data["overall_return"] =  0.0
+      data["value"] = 0.0
+      data["purchase_cost"] = 0.0
+      data["todays_return"] = 0.0
+      current_price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
+      filled_orders = @orders.select{|o| o["state"] =~ /filled/i && o["instrument"] == data["instrument"]}
+      buy_orders = filled_orders.select{|o| o["side"] =~ /buy/i}.sort{|a,b| a["average_price"].to_f <=> b["average_price"].to_f}
+      sell_orders = filled_orders - buy_orders
+      total_num_shares_to_skip = sell_orders.map{|o| o["quantity"].to_i}.sum
+      buy_orders.each do |o|
+        purchase_price = (o["average_price"] || o["price"]).to_f
         purchase_quantity = o["quantity"].to_i
-        total += purchase_price.to_f * purchase_quantity
-        ret += ((current_price.to_f - purchase_price.to_f) * purchase_quantity)
+
+        # factor in if the user has sold some of the purchased shares
+        # TODO this needs fixed so it accounts for profits from sold shares
+        num_shares_to_skip = [purchase_quantity, total_num_shares_to_skip].min
+        purchase_quantity -= num_shares_to_skip
+        total_num_shares_to_skip -= num_shares_to_skip
+        next if purchase_quantity <= 0
+
+        data["purchase_cost"] += purchase_price * purchase_quantity
+        data["overall_return"] += ((current_price - purchase_price) * purchase_quantity)
+        owned_for_partial_day = DateTime.parse(data["created_at"]) > Date.today
+        compare_price = owned_for_partial_day ? purchase_price : data["previous_close"].to_f
+        data["todays_return"] += (current_price - compare_price) * purchase_quantity
       end
-      @investments[symbol]["overall_return"] = ret
-      @investments[symbol]["purchase_cost"] = total
+      data["value"] = data["purchase_cost"] + data["overall_return"]
+      data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
     end
 
     render layout: false

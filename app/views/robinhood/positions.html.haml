@@ -10,27 +10,19 @@
     %th Sell
   - @investments.each do |symbol,data|
     - num_shares = data["quantity"].to_i
-    - price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
-    - current_value = price * num_shares
-    - purchase_cost = data["purchase_cost"]
-    - return_to_date_class = up_down(purchase_cost, (data["overall_return"] + purchase_cost))
-    - return_to_date_change = change_display(purchase_cost, (data["overall_return"] + purchase_cost))
-    - ignore_today = DateTime.parse(data["created_at"]) > 1.day.ago
-    - todays_class = ignore_today ? return_to_date_class : up_down(data["previous_close"], price)
-    - todays_change = ignore_today ? return_to_date_change : change_display(data["previous_close"].to_f*num_shares, price*num_shares)
     %tr.investment
       %td= stock_link(symbol, {class: "symbol", data:{ html: true, placement: :right}})
       %td.num-shares= num_shares
       %td.value
-        = price_display current_value
-      %td.change{class: todays_class}
-        = todays_change
-      %td.return-to-date{class: return_to_date_class}
-        = return_to_date_change
-      %td= price_display price
-      %td= render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: price, num_shares: num_shares
+        = price_display data["value"]
+      %td.change{class: up_down(data["current_price"], data["current_price"] + data["todays_return"]/num_shares)}
+        = change_display(data["current_price"]*num_shares, data["current_price"]*num_shares + data["todays_return"])
+      %td.return-to-date{class: up_down(data["purchase_cost"], data["value"])}
+        = change_display(data["purchase_cost"], data["value"])
+      %td= price_display data["current_price"]
+      %td= render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
 
-- if true #debug
+- if false #debug
   .col-xs-12
     %ul
       - @positions.each do |k,v|
@@ -40,4 +32,6 @@
       - @instruments.each do |k,v|
         %li= "#{k}: #{v}"
       - @quotes.each do |k,v|
+        %li= "#{k}: #{v}"
+      - @orders.each do |k,v|
         %li= "#{k}: #{v}"
