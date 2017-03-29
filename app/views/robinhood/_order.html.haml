@@ -11,8 +11,10 @@
   .quantity
     = order["quantity"].to_i
     = "Share".pluralize(order["quantity"].to_i)
-  .status
-    = order["state"].capitalize
+  .status= order["state"].capitalize
+  .fees
+    = price_display order["fees"]
+    fee
   .cancel
     = link_to "Cancel", cancel_order_path(url: order["cancel"]) if order["cancel"].present?
 

@@ -149,7 +149,8 @@ class RobinhoodController < ApplicationController
       data["value"] = 0.0
       data["purchase_cost"] = 0.0
       data["todays_return"] = 0.0
-      current_price = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
+      data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
+      data["value"] = data["quantity"].to_i * data["current_price"]
       filled_orders = @orders.select{|o| o["state"] =~ /filled/i && o["instrument"] == data["instrument"]}
       buy_orders = filled_orders.select{|o| o["side"] =~ /buy/i}.sort{|a,b| a["average_price"].to_f <=> b["average_price"].to_f}
       sell_orders = filled_orders - buy_orders
@@ -157,22 +158,20 @@ class RobinhoodController < ApplicationController
       buy_orders.each do |o|
         purchase_price = (o["average_price"] || o["price"]).to_f
         purchase_quantity = o["quantity"].to_i
+        data["purchase_cost"] += purchase_price * purchase_quantity
 
         # factor in if the user has sold some of the purchased shares
-        # TODO this needs fixed so it accounts for profits from sold shares
         num_shares_to_skip = [purchase_quantity, total_num_shares_to_skip].min
         purchase_quantity -= num_shares_to_skip
         total_num_shares_to_skip -= num_shares_to_skip
         next if purchase_quantity <= 0
 
-        data["purchase_cost"] += purchase_price * purchase_quantity
-        data["overall_return"] += ((current_price - purchase_price) * purchase_quantity)
-        owned_for_partial_day = DateTime.parse(data["created_at"]) > Date.today
-        compare_price = owned_for_partial_day ? purchase_price : data["previous_close"].to_f
-        data["todays_return"] += (current_price - compare_price) * purchase_quantity
+        purchased_today = DateTime.parse(o["created_at"]) > Date.today
+        compare_price = purchased_today ? purchase_price : data["previous_close"].to_f
+        data["todays_return"] += (data["current_price"] - compare_price) * purchase_quantity
       end
-      data["value"] = data["purchase_cost"] + data["overall_return"]
-      data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
+      data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f}.sum
+      data["overall_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
     end
 
     render layout: false
