@@ -29,7 +29,7 @@
         = price_display data["low_52_weeks"]
       .col-xs-6 Dividend yield
       .col-xs-6
-        = data["dividend_yield"].present? ? set_num_decimals(data["dividend_yield"]) : "-"
+        = data["dividend_yield"].present? ? set_num_decimals(data["dividend_yield"]) + "%" : "-"
       .col-xs-6 Market cap
       .col-xs-6
         = set_num_decimals data["market_cap"]
