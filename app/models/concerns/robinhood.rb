@@ -9,6 +9,10 @@ module Robinhood
     @dividends = get_all_results robinhood_get "https://api.robinhood.com/dividends/"
   end
 
+  def get_documents
+    @documents = get_all_results robinhood_get "https://api.robinhood.com/documents/"
+  end
+
   def get_markets
     @markets = get_all_results robinhood_get("https://api.robinhood.com/markets/")
     @markets.delete_if{|m| m["mic"] !~ /(xnys|xnas)/i }

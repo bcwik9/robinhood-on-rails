@@ -26,6 +26,10 @@ class RobinhoodController < ApplicationController
     end
   end
 
+  def documents
+    get_documents
+  end
+
   def fundamentals
     get_fundamentals
     render layout: false
