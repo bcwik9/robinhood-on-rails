@@ -108,28 +108,21 @@ class RobinhoodController < ApplicationController
 
   def portfolios
     refresh_accounts
-    @portfolios = robinhood_get("https://api.robinhood.com/portfolios/")["results"]
+    get_portfolios
     render layout: false
   end
 
   def portfolio_history
     refresh_accounts
     account = session[:robinhood_accounts].first["account_number"]
-    response = robinhood_get "https://api.robinhood.com/portfolios/historicals/#{account}/?span=day&interval=5minute"
+    response = robinhood_get "https://api.robinhood.com/portfolios/historicals/#{account}/?span=year&interval=day"
     raise response.to_s
   end
 
   def positions
     @investments = {}
     response = robinhood_get "https://api.robinhood.com/positions/?nonzero=true"
-    @positions = response["results"]
-    # example of pagination to get everything (iterate all pages)
-    next_page = response["next"]
-    while next_page.present?
-      response = robinhood_get next_page + "?nonzero=true"
-      @positions += response["results"]
-      next_page = response["next"]
-    end
+    @positions = get_all_results response, "?nonzero=true"
 
     @instruments = []
     @positions.each do |position|

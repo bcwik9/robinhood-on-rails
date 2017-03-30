@@ -1,8 +1,12 @@
 module Robinhood
   extend ActiveSupport::Concern
 
+  def get_portfolios
+    @portfolios = get_all_results robinhood_get("https://api.robinhood.com/portfolios/")
+  end
+
   def get_markets
-    @markets = robinhood_get("https://api.robinhood.com/markets/")["results"]
+    @markets = get_all_results robinhood_get("https://api.robinhood.com/markets/")
     @markets.delete_if{|m| m["mic"] !~ /(xnys|xnas)/i }
     @markets.each do |market|
       market.merge! robinhood_get(market["todays_hours"])
@@ -22,7 +26,7 @@ module Robinhood
   end
 
   def get_transfers
-    @transfers = robinhood_get("https://api.robinhood.com/ach/transfers/")["results"]
+    @transfers = get_all_results robinhood_get("https://api.robinhood.com/ach/transfers/")
   end
 
   def get_news symbol
@@ -48,7 +52,7 @@ module Robinhood
   end
 
   def get_orders
-    @orders = robinhood_get("https://api.robinhood.com/orders/")["results"]
+    @orders = get_all_results robinhood_get("https://api.robinhood.com/orders/")
   end
 
   def get_fundamentals symbols=params["symbols"].split(",")
@@ -60,6 +64,17 @@ module Robinhood
 
   def refresh_accounts
     session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]
+  end
+
+  def get_all_results response, params=""
+    results = response["results"]
+    next_page = response["next"]
+    while next_page.present?
+      response = robinhood_get next_page + params
+      results += response["results"]
+      next_page = response["next"]
+    end
+    results
   end
 
   def robinhood_post url, data
