@@ -1,0 +1,17 @@
+.row{data:{behavior: "FundamentalsTooltip"}}
+  .col-xs-12
+    %h2 Dividends
+    = link_to "Back", root_path, class: "btn btn-default"
+  - @dividends.each do |dividend|
+    .col-xs-4.col-sm-3
+      %h3= price_display dividend["amount"]
+      = stock_link dividend["instrument"]["symbol"], {class: "symbol", data: {html: true, placement: :right}}
+      %br
+      Expected
+      = dividend["payable_date"]
+      %br
+      = price_display dividend["rate"]
+      per share
+      %br
+      = dividend["position"].to_i
+      shares owned

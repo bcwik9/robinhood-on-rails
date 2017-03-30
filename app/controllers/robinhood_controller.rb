@@ -19,6 +19,13 @@ class RobinhoodController < ApplicationController
     render layout: false
   end
 
+  def dividends
+    get_dividends
+    @dividends.each do |dividend|
+      dividend["instrument"] = robinhood_get dividend["instrument"]
+    end
+  end
+
   def fundamentals
     get_fundamentals
     render layout: false

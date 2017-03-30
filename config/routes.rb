@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   get "history", to: "robinhood#history"
   get "movers", to: "robinhood#movers"
   get "news", to: "robinhood#news"
+  get "dividends", to: "robinhood#dividends"
 
   get "transfers", to: "robinhood#transfers"
   post "new_transfer", to: "robinhood#new_transfer"
