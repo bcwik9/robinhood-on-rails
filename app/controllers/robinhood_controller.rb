@@ -155,7 +155,7 @@ class RobinhoodController < ApplicationController
       data["todays_return"] = 0.0
       data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
       data["value"] = data["quantity"].to_i * data["current_price"]
-      filled_orders = @orders.select{|o| o["state"] =~ /filled/i && o["instrument"] == data["instrument"]}
+      filled_orders = @orders.select{|o| o["state"] !~ /cancelled/i && o["instrument"] == data["instrument"]}
       buy_orders = filled_orders.select{|o| o["side"] =~ /buy/i}.sort{|a,b| a["average_price"].to_f <=> b["average_price"].to_f}
       sell_orders = filled_orders - buy_orders
       total_num_shares_to_skip = sell_orders.map{|o| o["quantity"].to_i}.sum
