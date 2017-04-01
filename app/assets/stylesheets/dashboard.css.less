@@ -1,20 +1,57 @@
 // Place all the styles related to the dashboard controller here.
 // They will automatically be included in application.css.
 // You can use Less here: http://lesscss.org/
+#dashboard {
+  .side-menu {
+    width: 110%;
 
-#watchlist {
-  #quote-form, #back {
+    &.affix {
+      width: 44%;
+    }
+
+    #quote-form {
+      input[type=submit] {
+        display: none;
+      }
+    }
+  }
+
+  #portfolios {
+    margin-bottom: 75px;
+
+    h3 {
+      font-size: 35px;
+      margin: 0;
+    }
+  }
+
+  #order-form {
+    .form-group {
+      width: 100%;
+      input {
+        width: 100%;
+        &[type=submit] {
+          display: none;
+        }
+      }
+    }
+  }
+
+
+  #watchlist {
+    #quote-form, #back {
+      display: none;
+    }
+
+    .add-to-watchlist {
+      display: none;
+    }
+    .remove-from-watchlist {
+      display: block;
+    }
+  }
+
+  .remove-from-watchlist { 
     display: none;
   }
-
-  .add-to-watchlist {
-    display: none;
-  }
-  .remove-from-watchlist {
-    display: block;
-  }
-}
-
-.remove-from-watchlist { 
-  display: none;
 }

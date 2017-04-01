@@ -10,6 +10,5 @@
     = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
     = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
   %body
-    .container
-      = render "layouts/flash_message"
-      = yield
+    = render "layouts/flash_message"
+    = yield

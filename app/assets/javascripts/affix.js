@@ -1,0 +1,3 @@
+$(function() {
+  $(".affix").affix()
+})
