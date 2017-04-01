@@ -3,28 +3,26 @@
     .row
       .col-md-5
         .affix.side-menu
-          .col-xs-5
-            = link_to "Notifications", cards_path
-            %br
-            = link_to "Orders", orders_path
-            %br
-            = link_to "Dividends", dividends_path
-            %br
-            = link_to "Transfers", transfers_path
-            %br
-            = link_to "Log out", logout_path
-          .col-xs-7
-            = render "robinhood/quote_form"
-            menu item
-            %br
-            menu item
-            %br
-            menu item
-            %br
-            menu item
-            %br
-            menu item
-            %br
+          .wrapper
+            .col-xs-5
+              .main-menu
+                .menu-item= link_to "Notifications", cards_path
+                .menu-item= link_to "Orders", orders_path
+                .menu-item= link_to "Dividends", dividends_path
+                .menu-item= link_to "Transfers", transfers_path
+                .menu-item= link_to "Log out", logout_path
+            .col-xs-7
+              = render "robinhood/quote_form"
+              menu item
+              %br
+              menu item
+              %br
+              menu item
+              %br
+              menu item
+              %br
+              menu item
+              %br
       .col-md-7
         .row
           #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 300}}
