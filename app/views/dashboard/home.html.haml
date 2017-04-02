@@ -33,6 +33,10 @@
   .container
     .row
       .col-xs-12
-        %h1 Say hello to your portfolio.
+        %h1
+          Say
+          %span.text-success hello
+          to your 
+          %span.text-success portfolio.
         %p Log in to your #{link_to "Robinhood", "https://robinhood.com/"} account to access and manage your portfolio.
         = render "layouts/robinhood_login_form"
