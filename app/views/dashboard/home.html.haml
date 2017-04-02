@@ -1,34 +1,33 @@
 - if session[:robinhood_auth_token].present?
   #dashboard
-    .row
-      .col-md-2
-        .side-menu.affix
-          .wrapper
-            .logo
-              = link_to root_path do
-                = image_tag asset_path("robinhood_logo")
-            .main-menu
-              .menu-item= link_to "Notifications", cards_path
-              .menu-item= link_to "Orders", orders_path
-              .menu-item= link_to "Dividends", dividends_path
-              .menu-item= link_to "Transfers", transfers_path
-              .menu-item= link_to "Log out", logout_path
-      .col-md-10.content
-        .row
-          #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 300}}
-          %br
-          %br
-        .row
-          #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
-        .row
-          .col-sm-4
-            = render "robinhood/quote_form"
-        .row
-          #positions{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
-        .row
-          .col-xs-12
-            %h2 Watchlist
-          #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
+    .col-md-2.no-padding
+      .side-menu
+        .wrapper
+          .logo
+            = link_to root_path do
+              = image_tag asset_path("robinhood_logo")
+          .main-menu
+            .menu-item= link_to "Notifications", cards_path
+            .menu-item= link_to "Orders", orders_path
+            .menu-item= link_to "Dividends", dividends_path
+            .menu-item= link_to "Transfers", transfers_path
+            .menu-item= link_to "Log out", logout_path
+    .col-md-10.content
+      .row
+        #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 300}}
+        %br
+        %br
+      .row
+        #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
+      .row
+        .col-sm-4
+          = render "robinhood/quote_form"
+      .row
+        #positions{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
+      .row
+        .col-xs-12
+          %h2 Watchlist
+        #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
 - else
   .container
     .row
