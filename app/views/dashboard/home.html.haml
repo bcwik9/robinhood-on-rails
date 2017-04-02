@@ -1,5 +1,5 @@
-#dashboard
-  - if session[:robinhood_auth_token].present?
+- if session[:robinhood_auth_token].present?
+  #dashboard
     .row
       .col-md-2
         .side-menu.affix
@@ -20,8 +20,6 @@
           %br
         .row
           #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
-          %br
-          %br
         .row
           .col-sm-4
             = render "robinhood/quote_form"
@@ -31,10 +29,10 @@
           .col-xs-12
             %h2 Watchlist
           #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
-  - else
-    .container
-      .row
-        .col-xs-12
-          %h1 Say hello to your portfolio.
-          %p Log in to your #{link_to "Robinhood", "https://robinhood.com/"} account to access and manage your portfolio.
-          = render "layouts/robinhood_login_form"
+- else
+  .container
+    .row
+      .col-xs-12
+        %h1 Say hello to your portfolio.
+        %p Log in to your #{link_to "Robinhood", "https://robinhood.com/"} account to access and manage your portfolio.
+        = render "layouts/robinhood_login_form"

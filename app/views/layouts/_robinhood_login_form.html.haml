@@ -1,9 +1,10 @@
-.col-sm-6
-  = form_tag robinhood_login_path, method: :post do
-    .form-group
-      = label_tag "Robinhood username"
-      = text_field_tag :username, nil, placeholder: "Robinhood username", class: "form-control", required: true
-    .form-group
-      = label_tag "Password"
-      = password_field_tag :password, nil, placeholder: "Password", class: "form-control", required: true
-    = submit_tag "Log in", class: "btn btn-default"
+.row
+  .col-sm-6
+    = form_tag robinhood_login_path, method: :post do
+      .form-group
+        = label_tag "Robinhood username"
+        = text_field_tag :username, nil, placeholder: "Robinhood username", class: "form-control", required: true
+      .form-group
+        = label_tag "Password"
+        = password_field_tag :password, nil, placeholder: "Password", class: "form-control", required: true
+      = submit_tag "Log in", class: "btn btn-default"
