@@ -1,32 +1,19 @@
 #dashboard
   - if session[:robinhood_auth_token].present?
     .row
-      .col-md-5
-        .affix.side-menu
+      .col-md-2
+        .side-menu.affix
           .wrapper
-            .col-xs-5
-              .logo
-                = link_to root_path do
-                  = image_tag asset_path("robinhood_logo")
-              .main-menu
-                .menu-item= link_to "Notifications", cards_path
-                .menu-item= link_to "Orders", orders_path
-                .menu-item= link_to "Dividends", dividends_path
-                .menu-item= link_to "Transfers", transfers_path
-                .menu-item= link_to "Log out", logout_path
-            .col-xs-7
-              = render "robinhood/quote_form"
-              menu item
-              %br
-              menu item
-              %br
-              menu item
-              %br
-              menu item
-              %br
-              menu item
-              %br
-      .col-md-7.content
+            .logo
+              = link_to root_path do
+                = image_tag asset_path("robinhood_logo")
+            .main-menu
+              .menu-item= link_to "Notifications", cards_path
+              .menu-item= link_to "Orders", orders_path
+              .menu-item= link_to "Dividends", dividends_path
+              .menu-item= link_to "Transfers", transfers_path
+              .menu-item= link_to "Log out", logout_path
+      .col-md-10.content
         .row
           #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 300}}
           %br
@@ -35,6 +22,9 @@
           #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
           %br
           %br
+        .row
+          .col-sm-4
+            = render "robinhood/quote_form"
         .row
           #positions{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
         .row
