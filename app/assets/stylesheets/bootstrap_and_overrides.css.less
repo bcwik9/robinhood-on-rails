@@ -29,10 +29,30 @@
 
 body {
   font-family: 'Nunito', sans-serif;
-  //background-color: @black;
-  //color: white;
+  background-color: @dark_grey;
+  color: white;
 
   .alert {
     margin-top: 20px;
   }
+
+  .form-control {
+    &:focus {
+      border: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  a {
+    color: @light_grey;
+    &:focus, &:hover {
+      text-decoration: none;
+      color: white;
+    }
+  }
+
+  .text-success { color: @green !important; }
+  .success { background-color: @green !important; } 
+  .text-danger { color: @orange !important; }
+  .danger { background-color: @orange !important; } 
 }

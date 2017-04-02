@@ -17,7 +17,7 @@
       %tr
         %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
         %td= price_display price
-        %td.change{class: up_down(quote["previous_close"], price)}
+        %td.change{class: "text-" + up_down(quote["previous_close"], price)}
           = change_display(quote["previous_close"], price)
         %td= render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
         %td.add-to-watchlist

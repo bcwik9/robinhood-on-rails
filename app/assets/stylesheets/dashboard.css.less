@@ -2,43 +2,62 @@
 // They will automatically be included in application.css.
 // You can use Less here: http://lesscss.org/
 #dashboard {
-  
-  #portfolios {
-    margin-bottom: 75px;
 
-    h3 {
-      font-size: 35px;
-      margin: 0;
+ .content {
+   background-color: @black;
+
+    table {
+      td, th {
+        border-color: @dark_grey;
+        vertical-align: middle;
+      }
+      th { 
+        color: @light_grey;
+      }
     }
-  }
 
-  #order-form {
-    .form-group {
-      width: 100%;
-      input {
+    #portfolios {
+      margin-bottom: 75px;
+
+      .subtext {
+        color: @light_grey;
+      }
+
+      h3 {
+        font-size: 35px;
+        margin: 0;
+      }
+    }
+
+    #order-form {
+      .form-group {
         width: 100%;
-        &[type=submit] {
-          display: none;
+        input {
+          width: 100%;
+          background-color: @dark_grey;
+          border: none;
+          &[type=submit] {
+            display: none;
+          }
         }
       }
     }
-  }
 
+    #watchlist {
+      #quote-form, #back {
+        display: none;
+      }
 
-  #watchlist {
-    #quote-form, #back {
+      .add-to-watchlist {
+        display: none;
+      }
+      .remove-from-watchlist {
+        display: block;
+      }
+    }
+
+    .remove-from-watchlist { 
       display: none;
     }
-
-    .add-to-watchlist {
-      display: none;
-    }
-    .remove-from-watchlist {
-      display: block;
-    }
-  }
-
-  .remove-from-watchlist { 
-    display: none;
   }
 }

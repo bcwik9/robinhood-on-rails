@@ -16,9 +16,9 @@
         %td.num-shares= num_shares
         %td.value
           = price_display data["value"]
-        %td.change{class: up_down(0, data["todays_return"])}
+        %td.change{class: "text-" + up_down(0, data["todays_return"])}
           = change_display(data["current_price"]*num_shares, data["current_price"]*num_shares + data["todays_return"])
-        %td.return-to-date{class: up_down(0, data["overall_return"])}
+        %td.return-to-date{class: "text-" + up_down(0, data["overall_return"])}
           = change_display(data["purchase_cost"], data["value"] + data["amount_sold"])
         %td= price_display data["current_price"]
         %td= render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
