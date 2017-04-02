@@ -5,6 +5,9 @@
         .affix.side-menu
           .wrapper
             .col-xs-5
+              .logo
+                = link_to root_path do
+                  = image_tag asset_path("robinhood_logo")
               .main-menu
                 .menu-item= link_to "Notifications", cards_path
                 .menu-item= link_to "Orders", orders_path
