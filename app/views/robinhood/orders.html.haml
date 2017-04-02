@@ -1,7 +1,8 @@
-.row
-  .col-xs-12
-    %h2 Orders
-    = link_to "Back", root_path, class: "btn btn-default"
-  - @orders.each do |order|
-    .col-xs-4.col-sm-3
-      = render "order", order: order
+.container
+  .row
+    .col-xs-12
+      %h2 Orders
+      = link_to "Back", root_path, class: "btn btn-default"
+    - @orders.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order

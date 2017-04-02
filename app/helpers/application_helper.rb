@@ -41,6 +41,6 @@ module ApplicationHelper
   end
 
   def set_num_decimals amount, decimal_points=2
-    sprintf("%.#{decimal_points}f", amount)
+    number_with_precision amount, precision: decimal_points, delimiter: ','
   end
 end

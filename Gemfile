@@ -20,6 +20,7 @@ gem "twitter-bootstrap-rails"
 gem "haml"
 gem "elementaljs-rails"
 gem "browser"
+gem "font-awesome-rails"
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

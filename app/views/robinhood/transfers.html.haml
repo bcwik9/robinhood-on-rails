@@ -1,37 +1,38 @@
-.col-xs-12
-  %h2 ACH transfers and accounts
-  #back= link_to "Back", root_path, class: "btn btn-default"
-  %br
-.col-sm-4.col-xs-6
-  = link_to "Create a new transfer", "#transfer-form", "data-toggle": :collapse, "aria-controls": "#transfer-form", "aria-expanded": false, class: "btn btn-default"
-  #transfer-form.collapse
-    %br
-    = render "robinhood/transfer_form", accounts: @ach_accounts
-- @ach_accounts.select{|a| a["unlinked_at"].nil?}.each do |account|
+.container
   .col-xs-12
-    %h3= account["bank_account_nickname"] + " " + account["bank_account_type"].capitalize
-    = account["verified"] ? "Verified" : "Unverified"
+    %h2 ACH transfers and accounts
+    #back= link_to "Back", root_path, class: "btn btn-default"
     %br
-    - if false # debug
-      = account
+  .col-sm-4.col-xs-6
+    = link_to "Create a new transfer", "#transfer-form", "data-toggle": :collapse, "aria-controls": "#transfer-form", "aria-expanded": false, class: "btn btn-default"
+    #transfer-form.collapse
+      %br
+      = render "robinhood/transfer_form", accounts: @ach_accounts
+  - @ach_accounts.select{|a| a["unlinked_at"].nil?}.each do |account|
+    .col-xs-12
+      %h3= account["bank_account_nickname"] + " " + account["bank_account_type"].capitalize
+      = account["verified"] ? "Verified" : "Unverified"
+      %br
+      - if false # debug
+        = account
 
-    - @transfers.select{|t| t["ach_relationship"] == account["url"]}.each do |transfer|
-      - state = transfer["state"].capitalize
-      - direction = transfer["direction"].capitalize
-      - amount = transfer["amount"]
-      - complete = state =~ /complete/i
-      - amount_available = complete ? amount : transfer["early_access_amount"]
-      .col-xs-4.transfer
-        %h3{class: direction =~ /deposit/i ? "text-success" : "text-danger"}= price_display amount
-        #{state} #{direction}
-        %br
-        #{price_display amount_available} of #{price_display amount} available
-        %br
-        Expected
-        = transfer["expected_landing_date"]
-        %br
-        - if transfer["cancel"].present?
-          = link_to "Cancel", cancel_transfer_path(transfer_url: transfer["cancel"]), data: {confirm: "Are you sure you want to cancel this transfer?"}
+      - @transfers.select{|t| t["ach_relationship"] == account["url"]}.each do |transfer|
+        - state = transfer["state"].capitalize
+        - direction = transfer["direction"].capitalize
+        - amount = transfer["amount"]
+        - complete = state =~ /complete/i
+        - amount_available = complete ? amount : transfer["early_access_amount"]
+        .col-xs-4.transfer
+          %h3{class: direction =~ /deposit/i ? "text-success" : "text-danger"}= price_display amount
+          #{state} #{direction}
+          %br
+          #{price_display amount_available} of #{price_display amount} available
+          %br
+          Expected
+          = transfer["expected_landing_date"]
+          %br
+          - if transfer["cancel"].present?
+            = link_to "Cancel", cancel_transfer_path(transfer_url: transfer["cancel"]), data: {confirm: "Are you sure you want to cancel this transfer?"}
 
-        - if false # debug
-          = transfer
+          - if false # debug
+            = transfer

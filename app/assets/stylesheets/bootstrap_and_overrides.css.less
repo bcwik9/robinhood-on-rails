@@ -1,13 +1,13 @@
 @import "twitter/bootstrap/bootstrap";
 
 // Glyphicons are not required by default, uncomment the following lines to enable them.
-//@glyphiconsEotPath: font-url("glyphicons-halflings-regular.eot");
-//@glyphiconsEotPath_iefix: font-url("glyphicons-halflings-regular.eot?#iefix");
-//@glyphiconsWoffPath: font-url("glyphicons-halflings-regular.woff");
-//@glyphiconsTtfPath: font-url("glyphicons-halflings-regular.ttf");
-//@glyphiconsSvgPath: font-url("glyphicons-halflings-regular.svg#glyphicons_halflingsregular");
+@glyphiconsEotPath: font-url("glyphicons-halflings-regular.eot");
+@glyphiconsEotPath_iefix: font-url("glyphicons-halflings-regular.eot?#iefix");
+@glyphiconsWoffPath: font-url("glyphicons-halflings-regular.woff");
+@glyphiconsTtfPath: font-url("glyphicons-halflings-regular.ttf");
+@glyphiconsSvgPath: font-url("glyphicons-halflings-regular.svg#glyphicons_halflingsregular");
 //
-//@import "twitter/bootstrap/glyphicons.less";
+@import "twitter/bootstrap/glyphicons.less";
 
 // Your custom LESS stylesheets goes here
 //
@@ -24,6 +24,7 @@
 @import "dashboard.css.less";
 @import "robinhood.css.less";
 @import "side_menu.css.less";
+@import "quote_form.css.less";
 
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
@@ -36,7 +37,25 @@ body {
     margin-top: 20px;
   }
 
-  .form-control {
+  input, select, .btn {
+    border: none !important;
+    &[type=text] {
+      color: white !important;
+    }
+    &::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+      color:    @light_grey !important;
+    }
+    &:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+      color:    @light_grey !important;
+      opacity:  1;
+    }
+    &::-moz-placeholder { /* Mozilla Firefox 19+ */
+      color:    @light_grey !important;
+      opacity:  1;
+    }
+    &:-ms-input-placeholder { /* Internet Explorer 10-11 */
+      color:    @light_grey !important;
+    }
     &:focus {
       border: none !important;
       box-shadow: none !important;
@@ -51,8 +70,18 @@ body {
     }
   }
 
+  table {
+    td, th {
+      border-color: @dark_grey !important;
+      vertical-align: middle !important;
+    }
+    th { 
+      color: @light_grey;
+    }
+  }
+
   .text-success { color: @green !important; }
-  .success { background-color: @green !important; } 
+  .success, .btn-success { background-color: @green !important; } 
   .text-danger { color: @orange !important; }
-  .danger { background-color: @orange !important; } 
+  .danger, .btn-danger { background-color: @orange !important; } 
 }
