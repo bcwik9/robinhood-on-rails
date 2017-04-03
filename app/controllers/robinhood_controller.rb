@@ -133,7 +133,7 @@ class RobinhoodController < ApplicationController
   def positions
     @investments = {}
     response = robinhood_get "https://api.robinhood.com/positions/?nonzero=true"
-    @positions = get_all_results response, "?nonzero=true"
+    @positions = get_all_results response
 
     @instruments = []
     @positions.each do |position|
@@ -154,11 +154,12 @@ class RobinhoodController < ApplicationController
       data["purchase_cost"] = 0.0
       data["todays_return"] = 0.0
       data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
-      data["value"] = data["quantity"].to_i * data["current_price"]
       filled_orders = @orders.select{|o| o["state"] !~ /cancelled/i && o["instrument"] == data["instrument"]}
       buy_orders = filled_orders.select{|o| o["side"] =~ /buy/i}.sort{|a,b| a["average_price"].to_f <=> b["average_price"].to_f}
       sell_orders = filled_orders - buy_orders
       total_num_shares_to_skip = sell_orders.map{|o| o["quantity"].to_i}.sum
+      data["quantity"] = buy_orders.map{|o| o["quantity"].to_i}.sum - total_num_shares_to_skip
+      data["value"] = data["quantity"].to_i * data["current_price"]
       buy_orders.each do |o|
         purchase_price = (o["average_price"] || o["price"]).to_f
         purchase_quantity = o["quantity"].to_i
@@ -177,6 +178,9 @@ class RobinhoodController < ApplicationController
       data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f}.sum
       data["overall_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
     end
+
+    # remove investments where we no longer hold any shares
+    @investments.delete_if{|symbol,data| data["quantity"].to_i <= 0}
 
     render layout: false
   end
