@@ -5,13 +5,14 @@
       = link_to "Back", root_path, class: "btn btn-default"
     - @cards.each do |card|
       .col-sm-4
-        %h3= card["title"]
-        - if card["time"].present?
-          = DateTime.parse(card["time"]).in_time_zone(user_timezone).strftime("%b %e %Y %l%P")
+        .card
+          %h3= card["title"]
+          - if card["time"].present?
+            = DateTime.parse(card["time"]).in_time_zone(user_timezone).strftime("%b %e %Y %l%P")
+            %br
+          = card["message"]
           %br
-        = card["message"]
-        %br
-        - if card["action"].present? && card["action"] =~ /url=(.+)/
-          = link_to "Read more", URI.unescape($1)
-          %br
-        = link_to "Dismiss", dismiss_card_path(card_url: card["url"])
+          - if card["action"].present? && card["action"] =~ /url=(.+)/
+            = link_to "Read more", URI.unescape($1)
+            %br
+          = link_to "Dismiss", dismiss_card_path(card_url: card["url"])
