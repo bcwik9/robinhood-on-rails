@@ -48,6 +48,9 @@ class RobinhoodController < ApplicationController
 
   def cards
     @cards = robinhood_get("https://api.robinhood.com/midlands/notifications/stack/")["results"]
+    # show newest first
+    now = Time.now.to_s
+    @cards.sort!{|a,b| DateTime.parse(b["time"] || now) <=> DateTime.parse(a["time"] || now)}
   end
 
   def dismiss_card
