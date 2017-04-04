@@ -70,6 +70,19 @@ module Robinhood
     end
   end
 
+  def get_cards
+    @cards = robinhood_get("https://api.robinhood.com/midlands/notifications/stack/")["results"]
+    # show newest first
+    now = Time.now.to_s
+    @cards.sort!{|a,b| DateTime.parse(b["time"] || now) <=> DateTime.parse(a["time"] || now)}
+  end
+  
+  def dismiss_card card_url
+    id = params["card_url"].split('/').last.to_s
+    response = robinhood_post "https://api.robinhood.com/midlands/notifications/stack/#{id}/dismiss/", {}
+    response.empty?
+  end
+
   def refresh_accounts
     session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]
   end

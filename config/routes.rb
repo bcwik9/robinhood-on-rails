@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
   get "cards", to: "robinhood#cards"
   get "dismiss_card", to: "robinhood#dismiss_card"
+  get "dismiss_all_cards", to: "robinhood#dismiss_all_cards"
 
   post "add_to_watchlist", to: "robinhood#add_to_watchlist"
   post "remove_from_watchlist", to: "robinhood#remove_from_watchlist"

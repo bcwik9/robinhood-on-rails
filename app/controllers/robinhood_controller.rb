@@ -47,22 +47,30 @@ class RobinhoodController < ApplicationController
   end
 
   def cards
-    @cards = robinhood_get("https://api.robinhood.com/midlands/notifications/stack/")["results"]
-    # show newest first
-    now = Time.now.to_s
-    @cards.sort!{|a,b| DateTime.parse(b["time"] || now) <=> DateTime.parse(a["time"] || now)}
+    get_cards
   end
 
   def dismiss_card
-    id = params["card_url"].split('/').last.to_s
-    response = robinhood_post "https://api.robinhood.com/midlands/notifications/stack/#{id}/dismiss/", {}
-    success = response.empty?
+    success = dismiss_card params["card_url"]
     if success
       flash[:success] = "Dismissed notification."
     else
       flash[:warning] = "Failed to dismiss notification: #{response.values.join}."
     end
-    
+    redirect_to cards_path
+  end
+
+  def dismiss_all_cards
+    get_cards
+    success = true
+    @cards.each do |card|
+      success = success && dismiss_card(card["url"])
+    end
+    if success
+      flash[:success] = "Dismissed all notifications."
+    else
+      flash[:warning] = "Failed to dismiss notifications: #{response.values.join}."
+    end
     redirect_to cards_path
   end
 

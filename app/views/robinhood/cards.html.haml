@@ -3,6 +3,7 @@
     .col-xs-12
       %h2 Notifications
       = link_to "Back", root_path, class: "btn btn-default"
+      = link_to "Dismiss all", dismiss_all_cards_path, class: "btn btn-default"
     - @cards.each do |card|
       .col-sm-4
         .card
@@ -16,3 +17,7 @@
             = link_to "Read more", URI.unescape($1)
             %br
           = link_to "Dismiss", dismiss_card_path(card_url: card["url"])
+    - if @cards.empty?
+      .col-xs-12
+        %br
+        %p It looks like you don't have any notifications.
