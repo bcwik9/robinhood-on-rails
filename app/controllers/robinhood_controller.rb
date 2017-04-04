@@ -51,8 +51,16 @@ class RobinhoodController < ApplicationController
   end
 
   def dismiss_card
-    response = robinhood_post params["card_url"] + "dismiss/", {}
-    raise response.to_s
+    id = params["card_url"].split('/').last.to_s
+    response = robinhood_post "https://api.robinhood.com/midlands/notifications/stack/#{id}/dismiss/", {}
+    success = response.empty?
+    if success
+      flash[:success] = "Dismissed notification."
+    else
+      flash[:warning] = "Failed to dismiss notification: #{response.values.join}."
+    end
+    
+    redirect_to cards_path
   end
 
   def news
