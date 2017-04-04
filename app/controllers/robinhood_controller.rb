@@ -51,11 +51,11 @@ class RobinhoodController < ApplicationController
   end
 
   def dismiss_card
-    success = dismiss_card params["card_url"]
+    success = dismiss_notification params["card_url"]
     if success
       flash[:success] = "Dismissed notification."
     else
-      flash[:warning] = "Failed to dismiss notification: #{response.values.join}."
+      flash[:warning] = "Failed to dismiss notification."
     end
     redirect_to cards_path
   end
@@ -64,12 +64,12 @@ class RobinhoodController < ApplicationController
     get_cards
     success = true
     @cards.each do |card|
-      success = success && dismiss_card(card["url"])
+      success = success && dismiss_notification(card["url"])
     end
     if success
       flash[:success] = "Dismissed all notifications."
     else
-      flash[:warning] = "Failed to dismiss notifications: #{response.values.join}."
+      flash[:warning] = "Failed to dismiss notifications."
     end
     redirect_to cards_path
   end
