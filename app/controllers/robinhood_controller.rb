@@ -71,7 +71,7 @@ class RobinhoodController < ApplicationController
     else
       flash[:warning] = "Failed to dismiss notifications."
     end
-    redirect_to cards_path
+    redirect_to root_path
   end
 
   def news
