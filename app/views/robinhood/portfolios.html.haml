@@ -8,7 +8,7 @@
       = change_display p["adjusted_equity_previous_close"], p["equity"]
   .col-xs-6.col-sm-4.cash
     .subtext Buying power
-    %h3= price_display session[:robinhood_accounts].map{|a| a["buying_power"]}.sum
+    %h3= price_display @accounts.map{|a| a["buying_power"]}.sum
   - if false # debug
     %ul
     - p.each do |k,v|

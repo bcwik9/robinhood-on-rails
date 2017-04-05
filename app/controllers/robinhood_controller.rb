@@ -4,8 +4,6 @@ class RobinhoodController < ApplicationController
   def login
     response = robinhood_post "https://api.robinhood.com/api-token-auth/", {"username" => params[:username], "password" => params[:password]}
     session[:robinhood_auth_token] = response["token"]
-    session[:robinhood_user] = robinhood_get "https://api.robinhood.com/user/"
-    refresh_accounts
     redirect_to root_path
   end
 
@@ -88,7 +86,7 @@ class RobinhoodController < ApplicationController
       @side = params[:side] || "buy"
       begin
         if @side =~ /buy/i
-          refresh_accounts
+          get_accounts
         else
           positions
         end
@@ -137,14 +135,14 @@ class RobinhoodController < ApplicationController
   end
 
   def portfolios
-    refresh_accounts
+    get_accounts
     get_portfolios
     render layout: false
   end
 
   def portfolio_history
-    refresh_accounts
-    account = session[:robinhood_accounts].first["account_number"]
+    get_accounts
+    account = @accounts.first["account_number"]
     response = robinhood_get "https://api.robinhood.com/portfolios/historicals/#{account}/?span=year&interval=day"
     raise response.to_s
   end
@@ -221,7 +219,7 @@ class RobinhoodController < ApplicationController
       @investments[quote["symbol"]].merge! quote
     end
 
-    refresh_accounts
+    get_accounts
 
     render "quote", layout: false
   end
@@ -252,8 +250,9 @@ class RobinhoodController < ApplicationController
   end
 
   def new_order
+    get_accounts
     data = {
-      account: session[:robinhood_accounts].first["url"],
+      account: @accounts.first["url"],
       instrument: instrument_from_symbol(params["symbol"])["url"],
       symbol: params["symbol"],
       side: params["side"], # buy|sell

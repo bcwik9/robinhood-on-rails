@@ -83,8 +83,12 @@ module Robinhood
     response.empty?
   end
 
-  def refresh_accounts
-    session[:robinhood_accounts] = robinhood_get("https://api.robinhood.com/accounts/")["results"]
+  def get_user
+    @user = robinhood_get "https://api.robinhood.com/user/"
+  end
+
+  def get_accounts
+    @accounts = robinhood_get("https://api.robinhood.com/accounts/")["results"]
   end
 
   def get_all_results response, params=""

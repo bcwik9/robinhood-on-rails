@@ -28,7 +28,7 @@
     %ul
       - @positions.each do |k,v|
         %li= "#{k}: #{v}"
-      - session[:robinhood_accounts].each do |k,v|
+      - @accounts.each do |k,v|
         %li= "#{k}: #{v}"
       - @instruments.each do |k,v|
         %li= "#{k}: #{v}"
