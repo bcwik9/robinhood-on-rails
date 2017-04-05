@@ -17,7 +17,7 @@
         %td.value
           = price_display data["value"]
         %td.change{class: "text-" + up_down(0, data["todays_return"])}
-          = change_display(data["current_price"]*num_shares, data["current_price"]*num_shares + data["todays_return"])
+          = change_display(data["current_price"]*num_shares - data["todays_return"], data["current_price"]*num_shares)
         %td.return-to-date{class: "text-" + up_down(0, data["overall_return"])}
           = change_display(data["purchase_cost"], data["value"] + data["amount_sold"])
         %td= price_display data["current_price"]
