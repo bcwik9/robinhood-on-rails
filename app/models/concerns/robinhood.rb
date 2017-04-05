@@ -59,6 +59,14 @@ module Robinhood
     @history = robinhood_get(url)["historicals"]
   end
 
+  def get_portfolio_history account, interval, opts={}
+    url = "https://api.robinhood.com/portfolios/historicals/#{account}/?interval=#{interval}"
+    opts.each do |k,v|
+      url += "&#{k}=#{v}"
+    end
+    @portfolio_history = robinhood_get(url)
+  end
+
   def get_orders
     @orders = get_all_results robinhood_get("https://api.robinhood.com/orders/")
   end
@@ -89,6 +97,45 @@ module Robinhood
 
   def get_accounts
     @accounts = robinhood_get("https://api.robinhood.com/accounts/")["results"]
+  end
+
+  def price_line_chart
+    get_portfolio_history get_accounts.first["account_number"], "10minute", {span: "week"}
+    columns = [ {role: :none, data: ['number', 'X']} ] # add x axis
+
+    # each stock has a value and a tooltip
+    columns = columns + 
+      [
+       {role: :none, data: ['number', "Stock1"]},
+       {role: :tooltip, data: {type: :string, role: :tooltip}},
+      ]
+
+    rows = []
+    @portfolio_history["equity_historicals"].each_with_index do |h,i|
+      rows[i] ||= [i+1]
+      rows[i] = rows[i] + [h["adjusted_close_equity"].to_f, h["begins_at"]]
+    end
+    
+    options = {
+      #title: "Price chart",
+      hAxis: {
+        #title: 'Date',
+        ticks: 'none', #rows.map{ |r| r.first },
+        gridlines: {color: "transparent"}
+      },
+      vAxis: {
+        #title: 'Price',
+        gridlines: {color: "transparent"}
+      },
+      focusTarget: :category, # show all tooltips for column on hover,
+      #curveType: :function, # curve lines, comment out to disable
+      legend: :none,
+      chartArea: { width: '90%', height: '75%' },
+      series: {"0": {color: "#21ce99"}},
+      backgroundColor: "#090d16"
+    }
+    
+    {columns: columns, rows: rows, options: options}
   end
 
   def get_all_results response, params=""

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get "news", to: "robinhood#news"
   get "dividends", to: "robinhood#dividends"
   get "documents", to: "robinhood#documents"
+  get "price_chart", to: "robinhood#price_chart"
 
   get "transfers", to: "robinhood#transfers"
   post "new_transfer", to: "robinhood#new_transfer"

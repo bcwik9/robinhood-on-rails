@@ -32,6 +32,10 @@ class RobinhoodController < ApplicationController
     get_fundamentals
     render layout: false
   end
+
+  def price_chart
+    @chart_data = price_line_chart
+  end
   
   def movers
     if params[:direction].present?
@@ -143,7 +147,7 @@ class RobinhoodController < ApplicationController
   def portfolio_history
     get_accounts
     account = @accounts.first["account_number"]
-    response = robinhood_get "https://api.robinhood.com/portfolios/historicals/#{account}/?span=year&interval=day"
+    response = get_portfolio_history account, "10minute", {span: "week"}
     raise response.to_s
   end
 
