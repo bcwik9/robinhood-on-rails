@@ -196,7 +196,7 @@ class RobinhoodController < ApplicationController
         compare_price = purchased_today ? purchase_price : data["previous_close"].to_f
         data["todays_return"] += (data["current_price"] - compare_price) * purchase_quantity
       end
-      data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f}.sum
+      data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
       data["overall_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
     end
 
