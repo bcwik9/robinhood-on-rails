@@ -1,5 +1,7 @@
 LineChart = function(e) {
+  var chart_element = $(".chart")[0]
   var chart_data = e.data("chart")
+  var chart_element = $(e.data("target"))[0]
 
   google.charts.load('current', {packages: ['corechart', 'line']});
   google.charts.setOnLoadCallback(drawCurveTypes);
@@ -17,7 +19,7 @@ LineChart = function(e) {
 
       data.addRows(chart_data.rows);
 
-      var chart = new google.visualization.LineChart(e[0]);
+      var chart = new google.visualization.LineChart(chart_element);
       chart.draw(data, chart_data.options);
     }
 }

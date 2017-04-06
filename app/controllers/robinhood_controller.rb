@@ -35,6 +35,7 @@ class RobinhoodController < ApplicationController
 
   def price_chart
     @chart_data = price_line_chart params[:interval], {span: params[:span]}
+    render layout: false
   end
   
   def movers

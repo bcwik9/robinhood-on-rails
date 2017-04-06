@@ -18,6 +18,8 @@
         %br
         %br
       .row
+        #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day"), refresh: 300}}
+      .row
         #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
       .row
         .col-sm-4
@@ -28,6 +30,8 @@
         .col-xs-12
           %h2 Watchlist
         #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
+
+  = javascript_include_tag "https://www.gstatic.com/charts/loader.js"
 - else
   .container
     .row
