@@ -170,7 +170,7 @@ class RobinhoodController < ApplicationController
 
     get_orders
     @investments.each do |symbol,data|
-      data["overall_return"] =  0.0
+      data["all_time_return"] =  0.0 # return including sold shares
       data["value"] = 0.0
       data["purchase_cost"] = 0.0
       data["todays_return"] = 0.0
@@ -197,7 +197,9 @@ class RobinhoodController < ApplicationController
         data["todays_return"] += (data["current_price"] - compare_price) * purchase_quantity
       end
       data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
-      data["overall_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
+      data["shares_held_cost"] = data["average_buy_price"].to_f * data["quantity"]
+      data["shares_held_return"] = data["value"] - data["shares_held_cost"]
+      data["all_time_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
     end
 
     # remove investments where we no longer hold any shares

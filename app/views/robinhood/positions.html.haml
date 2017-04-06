@@ -7,6 +7,7 @@
       %th Value
       %th Today's return
       %th Return
+      %th Return with sells
       %th Price/Share
       %th Sell
     - @investments.each do |symbol,data|
@@ -18,8 +19,10 @@
           = price_display data["value"]
         %td.change{class: "text-" + up_down(0, data["todays_return"])}
           = change_display(data["current_price"]*num_shares - data["todays_return"], data["current_price"]*num_shares)
-        %td.return-to-date{class: "text-" + up_down(0, data["overall_return"])}
-          = change_display(data["purchase_cost"], data["value"] + data["amount_sold"])
+        %td.return-held-shares{class: "text-" + up_down(0, data["shares_held_return"])}
+          = change_display(data["shares_held_cost"], data["shares_held_cost"] + data["shares_held_return"])
+        %td.return-all-time{class: "text-" + up_down(0, data["all_time_return"])}
+          = price_display data["all_time_return"]
         %td= price_display data["current_price"]
         %td= render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
 
