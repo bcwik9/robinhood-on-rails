@@ -99,15 +99,15 @@ module Robinhood
     @accounts = robinhood_get("https://api.robinhood.com/accounts/")["results"]
   end
 
-  def price_line_chart
-    get_portfolio_history get_accounts.first["account_number"], "10minute", {span: "week"}
+  def price_line_chart interval="5minute", opts={span: "day"}
+    get_portfolio_history get_accounts.first["account_number"], interval, opts
     columns = [ {role: :none, data: ['number', 'X']} ] # add x axis
 
     # each stock has a value and a tooltip
     columns = columns + 
       [
-       {role: :none, data: ['number', "Stock1"]},
-       {role: :tooltip, data: {type: :string, role: :tooltip}},
+       {role: :none, data: ['number', "Portfolio"]},
+       {role: :tooltip, data: {type: :string, role: :tooltip}}
       ]
 
     rows = []
