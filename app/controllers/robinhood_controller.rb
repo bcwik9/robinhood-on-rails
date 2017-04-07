@@ -34,7 +34,11 @@ class RobinhoodController < ApplicationController
   end
 
   def price_chart
-    @chart_data = price_line_chart params[:interval], {span: params[:span]}
+    if params[:type] =~ /portfolio/i
+      @chart_data = portfolio_line_chart params[:interval], {span: params[:span]}
+    elsif params[:type] =~ /stock/i
+      @chart_data = stock_line_chart params[:symbol], params[:interval], {span: params[:span]}
+    end
     render layout: false
   end
   

@@ -56,7 +56,7 @@ module Robinhood
     opts.each do |k,v|
       url += "&#{k}=#{v}"
     end
-    @history = robinhood_get(url)["historicals"]
+    @history = robinhood_get url
   end
 
   def get_portfolio_history account, interval, opts={}
@@ -99,7 +99,7 @@ module Robinhood
     @accounts = robinhood_get("https://api.robinhood.com/accounts/")["results"]
   end
 
-  def price_line_chart interval="5minute", opts={span: "day"}
+  def portfolio_line_chart interval="5minute", opts={span: "day"}
     get_portfolio_history get_accounts.first["account_number"], interval, opts
     columns = [ {role: :none, data: ['number', 'X']} ] # add x axis
 
@@ -114,6 +114,45 @@ module Robinhood
     @portfolio_history["equity_historicals"].each_with_index do |h,i|
       rows[i] ||= [i+1]
       rows[i] = rows[i] + [h["adjusted_close_equity"].to_f, h["begins_at"]]
+    end
+    
+    options = {
+      #title: "Price chart",
+      hAxis: {
+        #title: 'Date',
+        ticks: 'none', #rows.map{ |r| r.first },
+        gridlines: {color: "transparent"}
+      },
+      vAxis: {
+        #title: 'Price',
+        gridlines: {color: "transparent"}
+      },
+      focusTarget: :category, # show all tooltips for column on hover,
+      #curveType: :function, # curve lines, comment out to disable
+      legend: :none,
+      chartArea: { width: '90%', height: '75%' },
+      series: {"0": {color: "#21ce99"}},
+      backgroundColor: "#090d16"
+    }
+    
+    {columns: columns, rows: rows, options: options}
+  end
+
+  def stock_line_chart symbol, interval="5minute", opts={span: "day"}
+    get_history symbol, interval, opts
+    columns = [ {role: :none, data: ['number', 'X']} ] # add x axis
+
+    # each stock has a value and a tooltip
+    columns = columns + 
+      [
+       {role: :none, data: ['number', symbol]},
+       {role: :tooltip, data: {type: :string, role: :tooltip}}
+      ]
+
+    rows = []
+    @history["historicals"].each_with_index do |h,i|
+      rows[i] ||= [i+1]
+      rows[i] = rows[i] + [h["close_price"].to_f, h["begins_at"]]
     end
     
     options = {

@@ -18,7 +18,7 @@
         %br
         %br
       .row
-        #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day"), refresh: 300}}
+        #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
       .row
         #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
       .row
