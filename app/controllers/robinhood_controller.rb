@@ -213,6 +213,13 @@ class RobinhoodController < ApplicationController
     render layout: false
   end
 
+  def create_watchlist
+    # This endpoint doesnt work
+    response = create_new_watchlist params[:name]
+    flash[:success] = response.to_s
+    redirect_to root_path
+  end
+
   def watchlist
     @side = :buy
     @watchlists = robinhood_get("https://api.robinhood.com/watchlists/")["results"]

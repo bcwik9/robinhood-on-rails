@@ -15,8 +15,6 @@
     .col-md-10.content
       .row
         #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 300}}
-        %br
-        %br
       .row
         #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
       .row

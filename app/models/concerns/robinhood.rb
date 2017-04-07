@@ -102,6 +102,11 @@ module Robinhood
     @accounts = robinhood_get("https://api.robinhood.com/accounts/")["results"]
   end
 
+  def create_new_watchlist name
+    # this endpoint seemingly doesnt work
+    robinhood_post "https://api.robinhood.com/watchlists/", {name: name}
+  end
+
   def portfolio_line_chart interval="5minute", opts={span: "day"}
     get_portfolio_history get_accounts.first["account_number"], interval, opts
     columns = [ {role: :none, data: ['number', 'X']} ] # add x axis

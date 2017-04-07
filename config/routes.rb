@@ -28,6 +28,7 @@ Rails.application.routes.draw do
 
   post "add_to_watchlist", to: "robinhood#add_to_watchlist"
   post "remove_from_watchlist", to: "robinhood#remove_from_watchlist"
+  post "create_watchlist", to: "robinhood#create_watchlist"
   get "watchlist", to: "robinhood#watchlist"
 
   get "orders", to: "robinhood#orders"
