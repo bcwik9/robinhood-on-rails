@@ -152,7 +152,7 @@ class RobinhoodController < ApplicationController
   def portfolio_history
     get_accounts
     account = @accounts.first["account_number"]
-    response = get_portfolio_history account, "10minute", {span: "week"}
+    response = get_portfolio_history account, params[:interval], {span: params[:span]}
     raise response.to_s
   end
 

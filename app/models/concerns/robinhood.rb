@@ -1,6 +1,9 @@
 module Robinhood
   extend ActiveSupport::Concern
 
+  ROBINHOOD_GREEN = "#21ce99"
+  ROBINHOOD_ORANGE = "#fc4d2d"
+
   def get_portfolios
     @portfolios = get_all_results robinhood_get("https://api.robinhood.com/portfolios/")
   end
@@ -131,7 +134,7 @@ module Robinhood
       #curveType: :function, # curve lines, comment out to disable
       legend: :none,
       chartArea: { width: '90%', height: '75%' },
-      series: {"0": {color: "#21ce99"}},
+      series: {"0": {color: @portfolio_history["total_return"].to_f.positive? ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE}},
       backgroundColor: "#090d16"
     }
     
@@ -150,11 +153,14 @@ module Robinhood
       ]
 
     rows = []
+    last_price = 0.0
     @history["historicals"].each_with_index do |h,i|
       rows[i] ||= [i+1]
       rows[i] = rows[i] + [h["close_price"].to_f, h["begins_at"]]
+      last_price = h["close_price"].to_f
     end
-    
+
+    color = @history["previous_close_price"].to_f < last_price ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE
     options = {
       #title: "Price chart",
       hAxis: {
@@ -170,7 +176,7 @@ module Robinhood
       #curveType: :function, # curve lines, comment out to disable
       legend: :none,
       chartArea: { width: '90%', height: '75%' },
-      series: {"0": {color: "#21ce99"}},
+      series: {"0": {color: color}},
       backgroundColor: "#090d16"
     }
     
