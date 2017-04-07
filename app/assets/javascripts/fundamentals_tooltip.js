@@ -12,6 +12,7 @@ FundamentalsTooltip = function(element) {
       $.get(url, function(data){
         target.attr("title", data)
         target.tooltip("show")
+        Elemental.load(target.siblings(".tooltip"))
       })
     }
     hide_all()

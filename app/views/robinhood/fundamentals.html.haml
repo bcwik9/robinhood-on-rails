@@ -2,7 +2,10 @@
   .fundamentals
     .row
       .col-xs-12
-        = data.delete("description").truncate(250)
+        %div{data: { behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day")}}
+    .row
+      .col-xs-12
+        = data["description"].truncate(250)
         %br
         %br
     .row.text-left
