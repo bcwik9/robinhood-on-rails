@@ -18,6 +18,7 @@
 //= require fundamentals_tooltip
 //= require tooltip_loader
 //= require line_chart
+//= require submenu
 
 //$(document).on("turbolinks:load", function(){
 $(function(){

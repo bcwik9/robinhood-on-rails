@@ -81,6 +81,29 @@ body {
     }
   }
 
+  .nav-tabs {
+    border-bottom-color: @dark_grey;
+
+    li {
+      a {
+        border: none;
+        &:hover, &:focus {
+          background-color: @dark_grey;
+          color: white;
+          border: none;
+        }
+      }
+      &.active a{
+        background-color: @green;
+        border: none;
+        &:hover, &:focus {
+          background-color: @green;
+          border: none;
+        }
+      }
+    }
+  }
+
   .text-success { color: @green !important; }
   .success, .btn-success { background-color: @green !important; } 
   .text-danger { color: @orange !important; }

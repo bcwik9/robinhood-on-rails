@@ -1,9 +1,9 @@
 #fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
 .col-sm-4
   = render "robinhood/quote_form"
-.col-xs-12
+#back.col-xs-12
+  = link_to "Back", root_path, class: "btn btn-default"
   %br
-  #back= link_to "Back", root_path, class: "btn btn-default"
   %br
 .col-xs-12
   .quotes

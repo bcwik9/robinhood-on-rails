@@ -22,11 +22,13 @@
         #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
       .row
         #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
-      .row
-        #positions{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
-      .row
-        .col-xs-12
-          %h2 Watchlist
+      %ul.nav.nav-tabs{data: {behavior: "SubMenu"}}
+        %li.active{role: "presentation"}
+          = link_to "Portfolio", "#", data: {target: "#positions"}
+        %li{role: "presentation"}
+          = link_to "Watchlist", "#", data: {target: ".dashboard-watchlist"}
+      #positions.sub-menu-tab{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
+      .row.dashboard-watchlist.sub-menu-tab
         #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
 
   = javascript_include_tag "https://www.gstatic.com/charts/loader.js"
