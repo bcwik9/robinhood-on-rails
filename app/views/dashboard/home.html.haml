@@ -8,6 +8,7 @@
               = image_tag asset_path("robinhood_logo")
           .main-menu
             .col-xs-12
+              %br
               = render "robinhood/quote_form"
             .menu-item= link_to "Portfolio", root_path
             .menu-item= link_to "Notifications", cards_path
