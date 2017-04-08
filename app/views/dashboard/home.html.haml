@@ -7,6 +7,9 @@
             = link_to root_path do
               = image_tag asset_path("robinhood_logo")
           .main-menu
+            .col-xs-12
+              = render "robinhood/quote_form"
+            .menu-item= link_to "Portfolio", root_path
             .menu-item= link_to "Notifications", cards_path
             .menu-item= link_to "Orders", orders_path
             .menu-item= link_to "Dividends", dividends_path
@@ -19,9 +22,6 @@
         #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
       .row
         #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
-      .row
-        .col-sm-4
-          = render "robinhood/quote_form"
       .row
         #positions{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
       .row

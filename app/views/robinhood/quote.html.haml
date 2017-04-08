@@ -36,3 +36,5 @@
 
     - if @quotes.empty?
       Sorry, no quotes were found for "#{params["symbols"]}".
+
+= javascript_include_tag "https://www.gstatic.com/charts/loader.js" if request.path =~ /quote/i
