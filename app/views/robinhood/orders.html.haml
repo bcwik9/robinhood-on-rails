@@ -1,4 +1,4 @@
-.container
+.container{data: {behavior: "FundamentalsTooltip"}}
   .row
     .col-xs-12
       %h2 Orders
@@ -6,3 +6,5 @@
     - @orders.each do |order|
       .col-xs-4.col-sm-3
         = render "order", order: order
+
+  = javascript_include_tag "https://www.gstatic.com/charts/loader.js"

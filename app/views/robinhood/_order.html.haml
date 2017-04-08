@@ -1,6 +1,6 @@
 - price = order["average_price"] || order["price"]
 .order
-  %h3= stock_link order["instrument"]["symbol"]
+  %h3= stock_link order["instrument"]["symbol"], {class: "symbol", data: {html: true, placement: :right}}
   .total
     = price_display(order["quantity"].to_i * price.to_f)
   .side= order["side"].capitalize
