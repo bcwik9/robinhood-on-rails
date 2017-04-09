@@ -1,5 +1,6 @@
 class RobinhoodController < ApplicationController
   include Robinhood
+  include FinanceCalculator
 
   def login
     response = robinhood_post "https://api.robinhood.com/api-token-auth/", {"username" => params[:username], "password" => params[:password]}
