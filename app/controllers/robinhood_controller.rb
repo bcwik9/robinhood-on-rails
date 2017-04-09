@@ -145,7 +145,13 @@ class RobinhoodController < ApplicationController
 
   def portfolios
     get_accounts
+    get_markets
     get_portfolios
+
+    market = @markets.first
+    @market_open = DateTime.parse(market["opens_at"]) if market["opens_at"].present?
+    @market_open = @market_open && @market_open < Time.now && DateTime.parse(market["closes_at"]) > Time.now
+
     render layout: false
   end
 
