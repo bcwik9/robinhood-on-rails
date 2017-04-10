@@ -1,6 +1,6 @@
 # Robinhood on Rails
 Robinhood on Rails is a simple front end dashboard for the free trading platform [Robinhood](https://robinhood.com/referral/benjamc331/). You're presented with your autorefreshing portfolio after logging in:
-![image](http://imgur.com/xARMfno)
+![image](http://imgur.com/xARMfno.png)
 
 ### Current Features (work in progress)
 - Auto refreshing dashboard
