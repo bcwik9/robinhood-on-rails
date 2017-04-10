@@ -4,14 +4,10 @@ module FinanceCalculator
     i = period
     sma = []
     while i < arr.size do
-      sma << avg(arr[i-period..i])
+      sma << arr[i-period..i].simple_moving_average
       i += 1
     end
     sma
   end
 
-  # average
-  def avg arr
-    arr.sum / arr.size.to_f
-  end
 end

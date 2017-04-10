@@ -188,6 +188,36 @@ module Robinhood
     {columns: columns, rows: rows, options: options}
   end
 
+  def get_price_intersections history
+    close_prices = history["historicals"].map{|h| h["close_price"].to_f}
+    period_one = 50
+    period_two = 200
+    periods = [period_one, period_two].sort!
+    shorter_sma = simple_moving_average(close_prices, periods.first)
+    longer_sma = simple_moving_average(close_prices, periods.last)
+    combined = longer_sma.reverse.map.with_index{|longer,i| {shorter_sma: shorter_sma[(i*-1)-1], longer_sma: longer}}
+    combined.each_with_index do |data,i|
+      data[:current_price] = history["historicals"][(i*-1)-1]["close_price"].to_f
+      data[:date] = history["historicals"][(i*-1)-1]["begins_at"]
+    end
+    combined.reverse!
+    prev_change = combined.first[:shorter_sma] / combined.first[:longer_sma] - 1
+    combined.each_with_index do |data,i|
+      next if i == 0
+      change = data[:shorter_sma] / data[:longer_sma] - 1
+      if prev_change.negative? && change.positive?
+        # upward trend
+        data[:action] = :buy
+      end
+      if prev_change.positive? && change.negative?
+        # downward trend
+        data[:action] = :sell
+      end
+      prev_change = change
+    end
+    raise combined.select{|data| data[:action].present?}.to_s
+  end
+
   def get_all_results response, params=""
     results = response["results"]
     next_page = response["next"]

@@ -21,6 +21,7 @@ gem "haml"
 gem "elementaljs-rails"
 gem "browser"
 gem "font-awesome-rails"
+gem "moving_average"
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
