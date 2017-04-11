@@ -124,6 +124,9 @@ module Robinhood
       rows[i] = rows[i] + [h["adjusted_close_equity"].to_f, h["begins_at"]]
     end
     
+    open_price = @portfolio_history["equity_historicals"].first["adjusted_open_equity"].to_f
+    close_price = @portfolio_history["equity_historicals"].last["adjusted_close_equity"].to_f
+    color = close_price > open_price ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE
     options = {
       #title: "Price chart",
       hAxis: {
@@ -139,7 +142,7 @@ module Robinhood
       #curveType: :function, # curve lines, comment out to disable
       legend: :none,
       chartArea: { width: '90%', height: '75%' },
-      series: {"0": {color: @portfolio_history["total_return"].to_f.positive? ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE}},
+      series: {"0": {color: color}},
       backgroundColor: "#090d16"
     }
     
