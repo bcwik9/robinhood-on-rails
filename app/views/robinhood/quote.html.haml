@@ -1,42 +1,40 @@
-#fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
-#back
-
-  .col-sm-4
-    = render "robinhood/quote_form"
+.col-xs-10
+  #fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
+  #back
+    .col-sm-4
+      = render "robinhood/quote_form"
+    %br
+    %br
   .col-xs-12
-    = link_to "Back", root_path, class: "btn btn-default"
-  %br
-  %br
-.col-xs-12
-  .quotes
-    %table.table
-      %tr
-        %th Symbol
-        %th Price
-        %th Today's change
-        %th Buy
-        %th Watchlist
-      - @quotes.each do |quote|
-        - price = quote["last_trade_price"]
+    .quotes
+      %table.table
         %tr
-          %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
-          %td= price_display price
-          %td.change{class: "text-" + up_down(quote["previous_close"], price)}
-            = change_display(quote["previous_close"], price)
-          %td= render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
-          %td.add-to-watchlist
-            = form_tag add_to_watchlist_path do
-              = hidden_field_tag :symbols, quote["symbol"]
-              = submit_tag "Add to watchlist", class: "btn btn-default"
-          %td.remove-from-watchlist
-            = form_tag remove_from_watchlist_path do
-              = hidden_field_tag :symbol, quote["symbol"]
-              = submit_tag "Remove from watchlist", class: "btn btn-default"
+          %th Symbol
+          %th Price
+          %th Today's change
+          %th Buy
+          %th Watchlist
+        - @quotes.each do |quote|
+          - price = quote["last_trade_price"]
+          %tr
+            %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
+            %td= price_display price
+            %td.change{class: "text-" + up_down(quote["previous_close"], price)}
+              = change_display(quote["previous_close"], price)
+            %td= render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
+            %td.add-to-watchlist
+              = form_tag add_to_watchlist_path do
+                = hidden_field_tag :symbols, quote["symbol"]
+                = submit_tag "Add to watchlist", class: "btn btn-default"
+            %td.remove-from-watchlist
+              = form_tag remove_from_watchlist_path do
+                = hidden_field_tag :symbol, quote["symbol"]
+                = submit_tag "Remove from watchlist", class: "btn btn-default"
 
-          - if false # debug
-            = quote
+            - if false # debug
+              = quote
 
-    - if @quotes.empty?
-      Sorry, no quotes were found for "#{params["symbols"]}".
+      - if @quotes.empty?
+        Sorry, no quotes were found for "#{params["symbols"]}".
 
-= javascript_include_tag "https://www.gstatic.com/charts/loader.js" if request.path =~ /quote/i
+  = javascript_include_tag "https://www.gstatic.com/charts/loader.js" if request.path =~ /quote/i
