@@ -11,4 +11,21 @@
     = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
   %body
     = render "layouts/flash_message"
+    - if session[:robinhood_auth_token].present?
+      .col-md-2.no-padding
+        .side-menu
+          .wrapper
+            .logo
+              = link_to root_path do
+                = image_tag asset_path("robinhood_logo")
+            .main-menu
+              .col-xs-12
+                %br
+                = render "robinhood/quote_form"
+              .menu-item= link_to "Portfolio", root_path
+              .menu-item= link_to "Notifications", cards_path
+              .menu-item= link_to "Orders", orders_path
+              .menu-item= link_to "Dividends", dividends_path
+              .menu-item= link_to "Transfers", transfers_path
+              .menu-item= link_to "Log out", logout_path
     = yield

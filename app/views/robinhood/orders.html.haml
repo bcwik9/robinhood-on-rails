@@ -1,10 +1,7 @@
-.container{data: {behavior: "FundamentalsTooltip"}}
-  .row
-    .col-xs-12
-      %h2 Orders
-      = link_to "Back", root_path, class: "btn btn-default"
-    - @orders.each do |order|
-      .col-xs-4.col-sm-3
-        = render "order", order: order
+.col-xs-10{data: {behavior: "FundamentalsTooltip"}}
+  %h2 Orders
+  - @orders.each do |order|
+    .col-xs-4.col-sm-3
+      = render "order", order: order
 
   = javascript_include_tag "https://www.gstatic.com/charts/loader.js"

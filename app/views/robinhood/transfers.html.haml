@@ -1,8 +1,5 @@
-.container
-  .col-xs-12
-    %h2 ACH transfers and accounts
-    #back= link_to "Back", root_path, class: "btn btn-default"
-    %br
+.col-xs-10
+  %h2 ACH transfers and accounts
   .col-sm-4.col-xs-6
     = link_to "Create a new transfer", "#transfer-form", "data-toggle": :collapse, "aria-controls": "#transfer-form", "aria-expanded": false, class: "btn btn-default"
     #transfer-form.collapse
