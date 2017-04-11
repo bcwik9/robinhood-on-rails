@@ -19,11 +19,19 @@
 
   .main-menu {
     #quote-form {
+      border-bottom: 1px solid @black;
+      margin-bottom: 15px;
+
       .fa-search {
-        top: 29px;
+        top: 23px;
       }
-      input {
-        background-color: @black;
+      .form-group {
+        margin: 0;
+
+        input {
+          text-indent: 26px;
+          height: 60px;
+        }
       }
     }
 
@@ -32,6 +40,10 @@
       padding-top: 5px;
       padding-bottom: 5px;
       padding-left: 15px;
+
+      .active {
+        color: white;
+      }
     }
   }
 }
