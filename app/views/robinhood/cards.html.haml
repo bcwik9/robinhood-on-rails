@@ -1,6 +1,7 @@
 .col-xs-10
   %h2 Notifications
   = link_to "Dismiss all", dismiss_all_cards_path, class: "btn btn-default"
+  %br
   - @cards.each do |card|
     .col-sm-4
       .card
