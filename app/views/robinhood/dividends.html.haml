@@ -1,5 +1,7 @@
 .col-xs-10{data:{behavior: "FundamentalsTooltip"}}
-  %h2 Dividends
+  %h2
+    Dividends
+    %small= (price_display @dividends.map{|d| d["amount"].to_f }.sum) + " total"
   - @dividends.each do |dividend|
     .col-xs-4.col-sm-3
       %h3= price_display dividend["amount"]

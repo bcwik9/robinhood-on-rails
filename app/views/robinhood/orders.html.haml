@@ -1,7 +1,44 @@
 .col-xs-10{data: {behavior: "FundamentalsTooltip"}}
   %h2 Orders
-  - @orders.each do |order|
-    .col-xs-4.col-sm-3
-      = render "order", order: order
+
+  %ul.nav.nav-tabs{data: {behavior: "SubMenu"}}
+    %li.active{role: "presentation"}
+      = link_to "All", "#", data: {target: ".first-tab"}
+    %li{role: "presentation"}
+      = link_to "Buy", "#", data: {target: ".second-tab"}
+    %li{role: "presentation"}
+      = link_to "Sell", "#", data: {target: ".third-tab"}
+    %li{role: "presentation"}
+      = link_to "Filled", "#", data: {target: ".fourth-tab"}
+    %li{role: "presentation"}
+      = link_to "Unfilled", "#", data: {target: ".fifth-tab"}
+    %li{role: "presentation"}
+      = link_to "Cancelled", "#", data: {target: ".sixth-tab"}
+
+  .first-tab.sub-menu-tab
+    - @orders.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order
+  .second-tab.sub-menu-tab
+    - @orders.select{|o| o["side"] =~ /buy/i}.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order
+  .third-tab.sub-menu-tab
+    - @orders.select{|o| o["side"] =~ /sell/i}.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order
+  .fourth-tab.sub-menu-tab
+    - @orders.select{|o| o["state"] =~ /filled/i}.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order
+  .fifth-tab.sub-menu-tab
+    - @orders.select{|o| o["state"] !~ /(filled|cancelled)/i}.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order
+  .sixth-tab.sub-menu-tab
+    - @orders.select{|o| o["state"] =~ /cancelled/i}.each do |order|
+      .col-xs-4.col-sm-3
+        = render "order", order: order
+
 
   = javascript_include_tag "https://www.gstatic.com/charts/loader.js"
