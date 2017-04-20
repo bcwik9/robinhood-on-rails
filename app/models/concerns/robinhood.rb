@@ -1,8 +1,17 @@
 module Robinhood
   extend ActiveSupport::Concern
 
+  # colors
   ROBINHOOD_GREEN = "#21ce99"
   ROBINHOOD_ORANGE = "#fc4d2d"
+
+  def set_account_token username, password, security_code=nil
+    opts = {"username" => username, "password" => password}
+    opts["mfa_code"] = security_code if security_code.present?
+    response = robinhood_post "https://api.robinhood.com/api-token-auth/", opts
+    session[:robinhood_auth_token] = response["token"] if !response["mfa_required"]
+    response
+  end
 
   def get_portfolios
     @portfolios = get_all_results robinhood_get("https://api.robinhood.com/portfolios/")
