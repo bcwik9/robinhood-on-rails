@@ -3,9 +3,10 @@ class RobinhoodController < ApplicationController
   include FinanceCalculator
 
   def login
-    response = robinhood_post "https://api.robinhood.com/api-token-auth/", {"username" => params[:username], "password" => params[:password]}
-    session[:robinhood_auth_token] = response["token"]
-    redirect_to root_path
+    response = set_account_token params[:username], params[:password], params[:security_code]
+    flash[:info] = "Please provide the security code that was sent via text." if response["mfa_required"]
+    flash[:warning] = response["non_field_errors"].join if response["non_field_errors"].present?
+    redirect_to root_path(mfa_required: response["mfa_required"])
   end
 
   def logout
