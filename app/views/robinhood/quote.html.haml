@@ -3,7 +3,7 @@
   #back
     %h2 Buy and watch stocks
   .col-xs-12
-    .quotes
+    .quotes{data: {behavior: "HideOnClick"}}
       %table.table
         %tr
           %th Symbol
@@ -11,9 +11,9 @@
           %th Today's change
           %th Buy
           %th Watchlist
-        - @quotes.each do |quote|
+        - @quotes.each_with_index do |quote,i|
           - price = quote["last_trade_price"]
-          %tr
+          %tr{class: "hide-#{i}"}
             %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
             %td= price_display price
             %td.change{class: "text-" + up_down(quote["previous_close"], price)}
@@ -24,9 +24,9 @@
                 = hidden_field_tag :symbols, quote["symbol"]
                 = submit_tag "Add to watchlist", class: "btn btn-default"
             %td.remove-from-watchlist
-              = form_tag remove_from_watchlist_path do
+              = form_tag remove_from_watchlist_path, remote: true do
                 = hidden_field_tag :symbol, quote["symbol"]
-                = submit_tag "Remove from watchlist", class: "btn btn-default"
+                = submit_tag "Remove from watchlist", class: "btn btn-default hide-on-click", data: {target: ".hide-#{i}"}
 
             - if false # debug
               = quote

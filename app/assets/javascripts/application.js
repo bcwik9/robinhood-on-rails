@@ -19,6 +19,7 @@
 //= require tooltip_loader
 //= require line_chart
 //= require submenu
+//= require hide_on_click
 
 //$(document).on("turbolinks:load", function(){
 $(function(){
