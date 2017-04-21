@@ -1,6 +1,6 @@
 # Robinhood on Rails
 Robinhood on Rails is a simple front end dashboard for the free trading platform [Robinhood](https://robinhood.com/referral/benjamc331/). You're presented with your autorefreshing portfolio after logging in:
-![image](http://imgur.com/a/CSYnU.png)
+![image](http://imgur.com/D7cGygL.png)
 
 ## DISCLAIMER
 I am not affiliated with Robinhood or its associates. I am in no way responsible for any losses incurred through using this code or application. This app relies on the private API as found [here](https://github.com/sanko/Robinhood) (special thanks to sanko for providing documentation). It isn't recommended to use this since the API is private and can change unexpectedly at any time, and is not officially supported. Using any kind of unpublished API for investing is risky, and you should thoroughly review any code involving any kind of money or investment published on the web to ensure the creator isn't doing something malicious. It's your money, after all. Your safest bet is to use the sanctioned phone app. Having said that, creating this app has been a lot of fun and I use it a lot more than I use the phone app.
