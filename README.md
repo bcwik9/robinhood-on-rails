@@ -51,9 +51,9 @@ $ docker run --rm -dt -p 3000:3000 robinhood-on-rails
 
 This will run the server on your host-machine's port 3000.
 
-### Who am I
+## Who am I
 I am not affiliated with Robinhood or any of its associates. This is just a project I find fun. More info at [bencwik.com](http://bencwik.com)
 
-### Influences and references
+## Influences and references
 Thanks to Jeffrey Smith for his [designs](https://dribbble.com/shots/2619026-Robinhood-Web-App-Concept-V2) which I based a lot of the front end work off of.
 Thanks to sanko for their work [documenting Robinhood's API](https://github.com/sanko/Robinhood)
