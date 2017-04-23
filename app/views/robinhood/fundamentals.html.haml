@@ -40,3 +40,6 @@
       .col-xs-6 PE ratio
       .col-xs-6
         = data["pe_ratio"].present? ? set_num_decimals(data["pe_ratio"]) : "-"
+      .col-xs-6 Earnings date
+      .col-xs-6
+        = data["earnings"]["report"]["date"]

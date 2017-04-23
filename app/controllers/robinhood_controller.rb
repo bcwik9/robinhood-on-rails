@@ -31,7 +31,10 @@ class RobinhoodController < ApplicationController
   end
 
   def fundamentals
-    get_fundamentals
+    get_fundamentals params["symbols"].split(",")
+    @fundamentals.each do |symbol,data|
+      data["earnings"] = next_earnings_report symbol
+    end
     render layout: false
   end
 
@@ -48,9 +51,8 @@ class RobinhoodController < ApplicationController
     if params[:direction].present?
       @movers = get_sp500_movers(params[:direction])["results"]
     else
-      @up_and_down = get_sp500_movers("up")["results"]
-      @up_and_down += get_sp500_movers("down")["results"]
-      @movers = @up_and_down
+      @movers = get_sp500_movers("up")["results"]
+      @movers += get_sp500_movers("down")["results"]
     end
     render layout: false
   end

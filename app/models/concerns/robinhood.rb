@@ -57,6 +57,20 @@ module Robinhood
     @movers = robinhood_get "https://api.robinhood.com/midlands/movers/sp500/?direction=#{direction}"
   end
 
+  # days have a range of  1 to 21, but 21 days is a LOT! typically don't do > 7
+  def get_companies_reporting_earnings_within days
+    @earnings = robinhood_get("https://api.robinhood.com/marketdata/earnings/?range=#{days}day")["results"]
+  end
+
+  def get_earnings symbol
+    @earnings = robinhood_get("https://api.robinhood.com/marketdata/earnings/?symbol=#{symbol}")["results"]
+  end
+
+  def next_earnings_report symbol
+    get_earnings symbol
+    @earnings = @earnings.find{|e| DateTime.parse(e["report"]["date"]) > Time.now}
+  end
+
   # GET /quotes/historicals/$symbol/[?interval=$i&span=$s&bounds=$b] interval=week|day|10minute|5minute|null(all) span=day|week|year|5year|all bounds=extended|regular|trading
   # only certain combos work, such as:
   # get_history :AAPL, "5minute", {span: "day"}
@@ -83,7 +97,7 @@ module Robinhood
     @orders = get_all_results robinhood_get("https://api.robinhood.com/orders/")
   end
 
-  def get_fundamentals symbols=params["symbols"].split(",")
+  def get_fundamentals symbols
     @fundamentals ||= {}
     symbols.each_with_index do |symbol,i|
       @fundamentals[symbol.upcase] = robinhood_get("https://api.robinhood.com/fundamentals/?symbols=#{symbol.upcase}")["results"].try(:first)
