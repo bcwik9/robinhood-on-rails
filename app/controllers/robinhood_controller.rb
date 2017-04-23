@@ -4,6 +4,25 @@ class RobinhoodController < ApplicationController
 
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
+
+    if user_logged_in_to_robinhood?
+      get_user
+      database_user = RobinhoodUser.find_by robinhood_id: @user["id"]
+      # create new user if it doesn't exist
+      if database_user.nil?
+        database_user = RobinhoodUser.create!(
+                              robinhood_id: @user["id"],
+                              username: @user["username"],
+                              first_name: @user["first_name"],
+                              last_name: @user["last_name"]
+                              )
+        get_accounts.each do |a|
+          database_user.robinhood_accounts.create! account_number: a["account_number"]
+        end
+      end
+      session[:current_user] = database_user.id
+    end
+
     flash[:info] = "Please provide the security code that was sent via text." if response["mfa_required"]
     flash[:warning] = response["non_field_errors"].join if response["non_field_errors"].present?
     redirect_to root_path(mfa_required: response["mfa_required"])
@@ -11,6 +30,7 @@ class RobinhoodController < ApplicationController
 
   def logout
     reset_session
+    @current_user = nil
     redirect_to root_path
   end
 
@@ -158,8 +178,7 @@ class RobinhoodController < ApplicationController
   end
 
   def portfolio_history
-    get_accounts
-    account = @accounts.first["account_number"]
+    account = current_user.robinhood_accounts.first["account_number"]
     response = get_portfolio_history account, params[:interval], {span: params[:span]}
     raise response.to_s
   end
