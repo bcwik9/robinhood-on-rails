@@ -5,22 +5,17 @@ class RobinhoodController < ApplicationController
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
 
-    if user_logged_in_to_robinhood?
-      get_user
-      database_user = RobinhoodUser.find_by robinhood_id: @user["id"]
-      # create new user if it doesn't exist
-      if database_user.nil?
-        database_user = RobinhoodUser.create!(
-                              robinhood_id: @user["id"],
-                              username: @user["username"],
-                              first_name: @user["first_name"],
-                              last_name: @user["last_name"]
-                              )
-        get_accounts.each do |a|
-          database_user.robinhood_accounts.create! account_number: a["account_number"]
-        end
+    if user_logged_in_to_robinhood? && current_user.nil?
+      # first time user has logged in, create a database record and add their accounts
+      RobinhoodUser.create!(
+                            robinhood_id: @user["id"],
+                            username: @user["username"],
+                            first_name: @user["first_name"],
+                            last_name: @user["last_name"]
+                            )
+      get_accounts.each do |a|
+        current_user.robinhood_accounts.create! account_number: a["account_number"]
       end
-      session[:current_user] = database_user.id
     end
 
     flash[:info] = "Please provide the security code that was sent via text." if response["mfa_required"]
@@ -178,24 +173,34 @@ class RobinhoodController < ApplicationController
   end
 
   def portfolio_history
-    account = current_user.robinhood_accounts.first["account_number"]
+    account = current_user.main_account["account_number"]
     response = get_portfolio_history account, params[:interval], {span: params[:span]}
     raise response.to_s
   end
 
   def positions
     @investments = {}
-    response = robinhood_get "https://api.robinhood.com/positions/?nonzero=true"
-    @positions = get_all_results response
-
     @instruments = []
+    get_positions
     @positions.each do |position|
-      instrument = robinhood_get position["instrument"]
+      instrument = Instrument.find_by url: position["instrument"]
+      if instrument.nil?
+        instrument_data =  robinhood_get position["instrument"]
+        instrument = Instrument.create!(
+                           name: instrument_data["name"],
+                           url: instrument_data["url"],
+                           quote_url: instrument_data["quote"],
+                           symbol: instrument_data["symbol"],
+                           fundamentals_url: instrument_data["fundamentals"],
+                           robinhood_id: instrument_data["id"]
+                           )
+      end
       @instruments << instrument
-      @investments[instrument["symbol"]] = position.merge instrument
+      position["instrument"] = instrument
+      @investments[instrument["symbol"]] = position
     end
 
-    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
+    get_quotes @investments.keys
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
@@ -237,6 +242,11 @@ class RobinhoodController < ApplicationController
     # remove investments where we no longer hold any shares
     @investments.delete_if{|symbol,data| data["quantity"].to_i <= 0}
 
+    stock_lists = current_user.stock_lists.where(group: :portfolio)
+    if stock_lists.present?
+      # TODO Group by stock list, and show in view somehow
+    end
+
     render layout: false
   end
 
@@ -249,17 +259,28 @@ class RobinhoodController < ApplicationController
 
   def watchlist
     @side = :buy
-    @watchlists = robinhood_get("https://api.robinhood.com/watchlists/")["results"]
+    get_watchlists
     default_watchlist = robinhood_get @watchlists.first["url"]
     @instruments = []
     @investments = {}
-    default_watchlist["results"].each do |instrument|
-      instrument_data = robinhood_get instrument["instrument"]
-      @instruments << instrument_data
-      @investments[instrument_data["symbol"]] = instrument_data
+    get_all_results(default_watchlist).each do |stock|
+      instrument = Instrument.find_by url: stock["instrument"]
+      if instrument.nil?
+        instrument_data = robinhood_get stock["instrument"]
+        instrument = Instrument.create!(
+                                        name: instrument_data["name"],
+                                        url: instrument_data["url"],
+                                        quote_url: instrument_data["quote"],
+                                        symbol: instrument_data["symbol"],
+                                        fundamentals_url: instrument_data["fundamentals"],
+                                        robinhood_id: instrument_data["id"]
+                                        )
+      end
+      @instruments << instrument
+      @investments[instrument.symbol] = {instrument: instrument}
     end
 
-    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
+    @quotes = get_quotes @investments.keys
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end

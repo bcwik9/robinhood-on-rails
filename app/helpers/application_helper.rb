@@ -3,6 +3,10 @@ module ApplicationHelper
     # TODO make this a setting?
     'Eastern Time (US & Canada)'
   end
+
+  def user_logged_in_to_robinhood?
+    session[:robinhood_auth_token].present? && session[:robinhood_id].present?
+  end
   
   def price_display amount
     "$#{set_num_decimals amount}"
