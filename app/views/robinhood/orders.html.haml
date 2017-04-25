@@ -11,7 +11,7 @@
     %li{role: "presentation"}
       = link_to "Filled", "#", data: {target: ".fourth-tab"}
     %li{role: "presentation"}
-      = link_to "Unfilled", "#", data: {target: ".fifth-tab"}
+      = link_to "Pending", "#", data: {target: ".fifth-tab"}
     %li{role: "presentation"}
       = link_to "Cancelled", "#", data: {target: ".sixth-tab"}
 
@@ -28,11 +28,11 @@
       .col-xs-4.col-sm-3
         = render "order", order: order
   .fourth-tab.sub-menu-tab
-    - @orders.select{|o| o["state"] =~ /filled/i}.each do |order|
+    - @orders.select{|o| o["state"] =~ /^filled/i}.each do |order|
       .col-xs-4.col-sm-3
         = render "order", order: order
   .fifth-tab.sub-menu-tab
-    - @orders.select{|o| o["state"] !~ /(filled|cancelled)/i}.each do |order|
+    - @orders.select{|o| o["state"] !~ /^(filled|cancelled)/i}.each do |order|
       .col-xs-4.col-sm-3
         = render "order", order: order
   .sixth-tab.sub-menu-tab

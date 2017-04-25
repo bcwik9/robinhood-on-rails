@@ -12,8 +12,8 @@
   .quantity
     = order["quantity"].to_i
     = "Share".pluralize(order["quantity"].to_i)
-  .status{class: order["state"] =~ /filled/i ? "text-success" : "text-danger"}
-    = order["state"].capitalize
+  .status{class: order["state"] =~ /^filled/i ? "text-success" : "text-danger"}
+    = order["state"].capitalize.sub("_", " ")
   .fees
     = price_display order["fees"]
     fee
