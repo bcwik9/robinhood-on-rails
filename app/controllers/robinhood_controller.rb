@@ -211,15 +211,15 @@ class RobinhoodController < ApplicationController
       data["purchase_cost"] = 0.0
       data["todays_return"] = 0.0
       data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
-      filled_orders = @orders.select{|o| o["state"] !~ /cancelled/i && o["instrument"] == data["instrument"]}
-      buy_orders = filled_orders.select{|o| o["side"] =~ /buy/i}.reverse
-      sell_orders = filled_orders - buy_orders
-      total_num_shares_to_skip = sell_orders.map{|o| o["quantity"].to_i}.sum
-      data["quantity"] = buy_orders.map{|o| o["quantity"].to_i}.sum - total_num_shares_to_skip
+      instrument_orders = @orders.select{|o| o["instrument"] == data["instrument"] && !o["executions"].empty?}
+      buy_orders = instrument_orders.select{|o| o["side"] =~ /buy/i}.reverse
+      sell_orders = instrument_orders - buy_orders
+      total_num_shares_to_skip = sell_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum }.sum
+      data["quantity"] = buy_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum}.sum - total_num_shares_to_skip
       data["value"] = data["quantity"].to_i * data["current_price"]
       buy_orders.each do |o|
         purchase_price = (o["average_price"] || o["price"]).to_f
-        purchase_quantity = o["quantity"].to_i
+        purchase_quantity = o["executions"].map{|e| e["quantity"].to_i}.sum
         data["purchase_cost"] += purchase_price * purchase_quantity
 
         # factor in if the user has sold some of the purchased shares
@@ -232,7 +232,7 @@ class RobinhoodController < ApplicationController
         compare_price = purchased_today ? purchase_price : data["previous_close"].to_f
         data["todays_return"] += (data["current_price"] - compare_price) * purchase_quantity
       end
-      data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
+      data["amount_sold"] = sell_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
       data["shares_held_cost"] = data["average_buy_price"].to_f * data["quantity"]
       data["shares_held_return"] = data["value"] - data["shares_held_cost"]
       data["all_time_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
