@@ -249,6 +249,10 @@ class RobinhoodController < ApplicationController
     render layout: false
   end
 
+  def reorder_positions
+    raise "TODO implement"
+  end
+
   def create_watchlist
     # This endpoint doesnt work
     response = create_new_watchlist params[:name]
