@@ -28,7 +28,7 @@
       .col-xs-4.col-sm-3
         = render "order", order: order
   .fourth-tab.sub-menu-tab
-    - @orders.select{|o| o["state"] =~ /filled/i}.each do |order|
+    - @orders.select{|o| !o["executions"].empty?}.each do |order|
       .col-xs-4.col-sm-3
         = render "order", order: order
   .fifth-tab.sub-menu-tab

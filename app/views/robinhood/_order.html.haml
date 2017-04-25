@@ -10,8 +10,8 @@
     = price_display price
     per share
   .quantity
-    = order["quantity"].to_i
-    = "Share".pluralize(order["quantity"].to_i)
+    = order["filled_quantity"] + " / " + order["quantity"].to_i.to_s
+    = "share".pluralize(order["quantity"].to_i)
   .status{class: order["state"] =~ /filled/i ? "text-success" : "text-danger"}
     = order["state"].capitalize
   .fees
