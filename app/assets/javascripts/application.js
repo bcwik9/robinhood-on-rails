@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery-ui/widgets/sortable
 //= require twitter/bootstrap
 //= require elemental
 //= require deferred_loader
@@ -20,6 +21,7 @@
 //= require line_chart
 //= require submenu
 //= require hide_on_click
+//= require sortable_table
 
 //$(document).on("turbolinks:load", function(){
 $(function(){
