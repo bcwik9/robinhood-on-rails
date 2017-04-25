@@ -5,7 +5,7 @@ module ApplicationHelper
   end
   
   def price_display amount
-    "$#{set_num_decimals amount}"
+    "$#{set_num_decimals amount}".sub("$-", "-$")
   end
 
   def up_down start_amount, end_amount
@@ -15,7 +15,7 @@ module ApplicationHelper
   def change_display start_amount, end_amount
     change = set_num_decimals(end_amount.to_f - start_amount.to_f).to_f
     gain = change.positive? ? "+" : ""
-    "#{price_display change} (#{gain}#{set_num_decimals change/start_amount.to_f*100}%)".sub("$-", "-$")
+    "#{price_display change} (#{gain}#{set_num_decimals change/start_amount.to_f*100}%)"
   end
 
   def stock_link symbol, opts={}
