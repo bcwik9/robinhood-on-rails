@@ -246,6 +246,14 @@ module Robinhood
     raise combined.select{|data| data[:action].present?}.to_s
   end
 
+  def get_instruments query
+    @instruments = get_all_results robinhood_get("https://api.robinhood.com/instruments/?query=#{query}")
+  end
+
+  def instrument_from_symbol symbol
+    robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
+  end
+
   def get_all_results response, params=""
     results = response["results"]
     next_page = response["next"]
@@ -284,10 +292,6 @@ module Robinhood
     request = Net::HTTP::Get.new(uri.request_uri, initheader=robinhood_headers)
     response = http.request(request)
     JSON.parse(response.body)
-  end
-
-  def instrument_from_symbol symbol
-    robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
   end
 
   private
