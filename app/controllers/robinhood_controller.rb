@@ -247,15 +247,18 @@ class RobinhoodController < ApplicationController
     render layout: false
   end
 
+  def delete_stock_list
+    current_user.stock_lists.find(params[:id]).try(:delete)
+    render nothing: true
+  end
+
   def reorder_positions
     list = current_user.stock_lists.find params[:id]
     if list.present?
       instrument = Instrument.find params[:instrument_id]
       group_lists = current_user.stock_lists.where(group: list.group)
       group_lists.each do |l|
-        if l.instruments.include? instrument
-          l.instruments.delete instrument
-        end
+        l.instruments.delete instrument if l.instruments.include? instrument
       end
       list.instruments << instrument
       list.save!
