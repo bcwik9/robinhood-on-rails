@@ -241,16 +241,27 @@ class RobinhoodController < ApplicationController
     # remove investments where we no longer hold any shares
     @investments.delete_if{|symbol,data| data["quantity"].to_i <= 0}
 
-    stock_lists = current_user.stock_lists.where(group: :portfolio)
-    if stock_lists.present?
-      # TODO Group by stock list, and show in view somehow
-    end
-
+    @stock_lists = current_user.update_stock_list :portfolio, @instruments
+    @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
+    
     render layout: false
   end
 
   def reorder_positions
-    raise "TODO implement"
+    list = current_user.stock_lists.find params[:id]
+    if list.present?
+      instrument = Instrument.find params[:instrument_id]
+      group_lists = current_user.stock_lists.where(group: list.group)
+      group_lists.each do |l|
+        if l.instruments.include? instrument
+          l.instruments.delete instrument
+        end
+      end
+      list.instruments << instrument
+      list.save!
+    end
+    
+    render nothing: true
   end
 
   def create_watchlist

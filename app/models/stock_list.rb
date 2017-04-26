@@ -1,6 +1,6 @@
 class StockList < ApplicationRecord
   belongs_to :robinhood_account
-  has_and_belongs_to_many :intruments
+  has_and_belongs_to_many :instruments
 
-  validates :group, presence: true, uniqueness: { scope: :robinhood_account}
+  validates :name, uniqueness: { scope: [:robinhood_account, :group]}
 end
