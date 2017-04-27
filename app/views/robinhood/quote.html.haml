@@ -1,4 +1,4 @@
-.col-xs-10
+%div{class: request.path =~ /quote/i ? "col-xs-10" : ""}
   #fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
   #back
     %h2 Buy and watch stocks
@@ -26,7 +26,7 @@
             %td.remove-from-watchlist
               = form_tag remove_from_watchlist_path, remote: true do
                 = hidden_field_tag :symbol, quote["symbol"]
-                = submit_tag "Remove from watchlist", class: "btn btn-default hide-on-click", data: {target: ".hide-#{i}"}
+                = submit_tag "X", class: "btn btn-default hide-on-click", data: {target: ".hide-#{i}"}
 
             - if false # debug
               = quote
