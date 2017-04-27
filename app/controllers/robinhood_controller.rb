@@ -253,6 +253,7 @@ class RobinhoodController < ApplicationController
   end
 
   def reorder_positions
+    instrument_order = Instrument.find(params[:instrument_order])
     list = current_user.stock_lists.find params[:id]
     if list.present?
       instrument = Instrument.find params[:instrument_id]
@@ -260,8 +261,8 @@ class RobinhoodController < ApplicationController
       group_lists.each do |l|
         l.instruments.delete instrument if l.instruments.include? instrument
       end
-      list.instruments << instrument
-      list.save!
+      list.instruments.clear
+      list.update! instruments: instrument_order
     end
     
     render nothing: true
