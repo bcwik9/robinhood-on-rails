@@ -1,7 +1,7 @@
-- @markets.each do |market|
-  - open = DateTime.parse(market["opens_at"]) if market["opens_at"].present?
-  - open = open && open < Time.now && DateTime.parse(market["closes_at"]) > Time.now
-  - time_display = open ? "closes in " : "opens in "
-  .col-xs-6
-    = market["acronym"]
-    = time_display + distance_of_time_in_words(Time.now, open ? market["closes_at"] : market["opens_at"])
+- market = @markets.first
+- open = DateTime.parse(market["opens_at"]) if market["opens_at"].present?
+- open = open && open < Time.now && DateTime.parse(market["closes_at"]) > Time.now
+- time_display = open ? "close in " : "open in "
+.col-xs-6
+  Markets
+  = time_display + distance_of_time_in_words(Time.now, open ? market["closes_at"] : market["opens_at"])
