@@ -65,7 +65,12 @@ body {
 
   input[type=text], input[type=password], input[type=number], select {
     background-color: @dark_grey !important;
-    color: white;
+    color: white !important;
+  }
+
+  input[type=submit], .btn {
+    background-color: @dark_grey;
+    color: @light_grey;
   }
 
   a {
