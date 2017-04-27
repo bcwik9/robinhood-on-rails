@@ -252,6 +252,12 @@ class RobinhoodController < ApplicationController
     render nothing: true
   end
 
+  def add_stock_list
+    current_user.main_account.stock_lists.create! group: params[:group], name: params[:name]
+    flash[:success] = "Added section."
+    redirect_to root_path
+  end
+
   def reorder_positions
     instrument_order = Instrument.find(params[:instrument_order])
     list = current_user.stock_lists.find params[:id]
