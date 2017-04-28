@@ -12,7 +12,7 @@
         = card["message"]
         %br
         - if card["action"].present? && card["action"] =~ /url=(.+)/
-          = link_to "Read more", URI.unescape($1)
+          = link_to "Read more", URI.unescape($1), target: "_blank"
           %br
         = link_to "Dismiss", dismiss_card_path(card_url: card["url"])
   - if @cards.empty?

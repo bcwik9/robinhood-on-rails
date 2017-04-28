@@ -10,6 +10,47 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 20170426005748) do
+
+  create_table "instruments", force: :cascade do |t|
+    t.string   "url"
+    t.string   "symbol"
+    t.string   "quote_url"
+    t.string   "fundamentals_url"
+    t.string   "robinhood_id"
+    t.string   "name"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "instruments_stock_lists", id: false, force: :cascade do |t|
+    t.integer "instrument_id", null: false
+    t.integer "stock_list_id", null: false
+  end
+
+  create_table "robinhood_accounts", force: :cascade do |t|
+    t.string   "account_number"
+    t.integer  "robinhood_user_id"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  create_table "robinhood_users", force: :cascade do |t|
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "username"
+    t.string   "email"
+    t.string   "robinhood_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "stock_lists", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "robinhood_account_id"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.string   "group"
+  end
 
 end

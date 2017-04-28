@@ -1,9 +1,8 @@
 .col-xs-10
   #fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
-  #back
-    %h2 Buy and watch stocks
+  %h2 Buy and watch stocks
   .col-xs-12
-    .quotes{data: {behavior: "HideOnClick"}}
+    .quotes
       %table.table
         %tr
           %th Symbol
@@ -13,7 +12,7 @@
           %th Watchlist
         - @quotes.each_with_index do |quote,i|
           - price = quote["last_trade_price"]
-          %tr{class: "hide-#{i}"}
+          %tr
             %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
             %td= price_display price
             %td.change{class: "text-" + up_down(quote["previous_close"], price)}
@@ -22,11 +21,7 @@
             %td.add-to-watchlist
               = form_tag add_to_watchlist_path do
                 = hidden_field_tag :symbols, quote["symbol"]
-                = submit_tag "Add to watchlist", class: "btn btn-default"
-            %td.remove-from-watchlist
-              = form_tag remove_from_watchlist_path, remote: true do
-                = hidden_field_tag :symbol, quote["symbol"]
-                = submit_tag "Remove from watchlist", class: "btn btn-default hide-on-click", data: {target: ".hide-#{i}"}
+                = submit_tag "+", class: "btn btn-default"
 
             - if false # debug
               = quote
@@ -34,4 +29,4 @@
       - if @quotes.empty?
         Sorry, no quotes were found for "#{params["symbols"]}".
 
-  = javascript_include_tag "https://www.gstatic.com/charts/loader.js" if request.path =~ /quote/i
+  = javascript_include_tag "https://www.gstatic.com/charts/loader.js"

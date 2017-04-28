@@ -9,12 +9,36 @@ module Robinhood
     opts = {"username" => username, "password" => password}
     opts["mfa_code"] = security_code if security_code.present?
     response = robinhood_post "https://api.robinhood.com/api-token-auth/", opts
-    session[:robinhood_auth_token] = response["token"] if !response["mfa_required"]
+    if !response["mfa_required"]
+      session[:robinhood_auth_token] = response["token"]
+      get_user
+      session[:robinhood_id] = @user["id"]
+    end
     response
+  end
+
+  def get_positions
+    @positions = get_all_results(robinhood_get "https://api.robinhood.com/positions/?nonzero=true")
+  end
+
+  def reorder_portfolio_positions instrument_ids
+    robinhood_get("https://api.robinhood.com/positions/?ordering=#{instrument_ids.join ','}")
   end
 
   def get_portfolios
     @portfolios = get_all_results robinhood_get("https://api.robinhood.com/portfolios/")
+  end
+
+  def get_watchlists
+    @watchlists = get_all_results robinhood_get("https://api.robinhood.com/watchlists/")
+  end
+
+  def reorder_watchlist name, instrument_ids
+    robinhood_post("https://api.robinhood.com/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")})
+  end
+
+  def get_quotes symbols
+    @quotes = get_all_results robinhood_get("https://api.robinhood.com/quotes/?symbols=#{symbols.join(',')}")
   end
 
   def get_dividends
@@ -244,6 +268,14 @@ module Robinhood
     raise combined.select{|data| data[:action].present?}.to_s
   end
 
+  def get_instruments query
+    @instruments = get_all_results robinhood_get("https://api.robinhood.com/instruments/?query=#{query}")
+  end
+
+  def instrument_from_symbol symbol
+    robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
+  end
+
   def get_all_results response, params=""
     results = response["results"]
     next_page = response["next"]
@@ -260,8 +292,8 @@ module Robinhood
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     headers = {"Accept" => 'application/json'}
-    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if user_logged_in_to_robinhood?
-    request = Net::HTTP::Post.new(uri.request_uri, initheader=headers)
+    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if session[:robinhood_auth_token].present?
+    request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers)
     request.set_form_data(data)
     response = http.request(request)
     JSON.parse(response.body)
@@ -271,9 +303,7 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    headers = {"Accept" => 'application/json'}
-    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if user_logged_in_to_robinhood?
-    request = Net::HTTP::Delete.new(uri.request_uri, initheader=headers)
+    request = Net::HTTP::Delete.new(uri.request_uri, initheader=robinhood_headers)
     response = http.request(request)
   end
 
@@ -281,14 +311,16 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    headers = {"Accept" => 'application/json'}
-    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if user_logged_in_to_robinhood?
-    request = Net::HTTP::Get.new(uri.request_uri, initheader=headers)
+    request = Net::HTTP::Get.new(uri.request_uri, initheader=robinhood_headers)
     response = http.request(request)
     JSON.parse(response.body)
   end
 
-  def instrument_from_symbol symbol
-    robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
+  private
+
+  def robinhood_headers
+    headers = {"Accept" => 'application/json'}
+    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if session[:robinhood_auth_token].present?
+    headers
   end
 end

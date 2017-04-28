@@ -63,6 +63,16 @@ body {
     }
   }
 
+  input[type=text], input[type=password], input[type=number], select {
+    background-color: @dark_grey !important;
+    color: white !important;
+  }
+
+  input[type=submit], .btn {
+    background-color: @dark_grey;
+    color: @light_grey;
+  }
+
   a {
     color: @light_grey;
     &:focus, &:hover {

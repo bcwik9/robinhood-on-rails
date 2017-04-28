@@ -6,7 +6,6 @@ FundamentalsTooltip = function(element) {
     symbols.tooltip("hide")
   }
 
-
   var init = function() {
     symbols.on("shown.bs.tooltip", function(e) {
       Elemental.load($(e.target).siblings(".tooltip"))

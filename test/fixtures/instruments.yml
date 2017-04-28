@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  url: MyString
+  symbol: MyString
+  quote_url: MyString
+  fundamentals_url: MyString
+  robinhood_id: MyString
+  name: MyString
+
+two:
+  url: MyString
+  symbol: MyString
+  quote_url: MyString
+  fundamentals_url: MyString
+  robinhood_id: MyString
+  name: MyString

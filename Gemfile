@@ -18,6 +18,7 @@ gem 'therubyracer', platforms: :ruby
 gem "less-rails"
 gem "twitter-bootstrap-rails"
 gem "haml"
+gem "jquery-ui-rails"
 gem "elementaljs-rails"
 gem "browser"
 gem "font-awesome-rails"

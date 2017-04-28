@@ -1,0 +1,37 @@
+#fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
+.col-xs-12
+  .quotes{data: {behavior: "HideOnClick"}}
+    - @stock_lists.each do |list|
+      %div{class: "list-#{list.id}"}
+        - if list.name.present?
+          %h4
+            = list.name
+            %small
+              = link_to "x", delete_stock_list_path(id: list.id), remote: true, class: "hide-on-click", data: {target: ".list-#{list.id}"}
+
+        %table.table.sortable-table{data: {id: list.id, sort_target: ".watchlist-item"}}
+          %tr
+            %th Symbol
+            %th Price
+            %th Today's change
+            %th Buy
+            %th Watchlist
+          - list.instruments.each do |instrument|
+            - quote = @investments[instrument.symbol]
+            - price = quote["last_trade_price"]
+            %tr.watchlist-item{class: "watchlist-hide-#{instrument.id}", data: { instrument_id: instrument.id}}
+              %td= stock_link(instrument.symbol, {class: "symbol", data:{ html: true, placement: :right}})
+              %td= price_display price
+              %td.change{class: "text-" + up_down(quote["previous_close"], price)}
+                = change_display(quote["previous_close"], price)
+              %td= render "robinhood/order_form", symbol: instrument.symbol, side: @side, price: price, num_shares: (@investments.present? ? @investments[instrument.symbol]["quantity"] : nil)
+              %td.remove-from-watchlist
+                = form_tag remove_from_watchlist_path, remote: true do
+                  = hidden_field_tag :symbol, instrument.symbol
+                  = submit_tag "X", class: "btn btn-default hide-on-click", data: {target: ".watchlist-hide-#{instrument.id}"}
+
+    = render "stock_list_form", group: :watchlist
+    %br
+    %br
+    %br
+    %br

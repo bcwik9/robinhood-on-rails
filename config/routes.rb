@@ -7,7 +7,6 @@ Rails.application.routes.draw do
 
   get "portfolios", to: "robinhood#portfolios"
   get "portfolio_history", to: "robinhood#portfolio_history"
-  get "positions", to: "robinhood#positions"
   get "quote", to: "robinhood#quote"
   get "markets", to: "robinhood#markets"
   get "fundamentals", to: "robinhood#fundamentals"
@@ -17,6 +16,9 @@ Rails.application.routes.draw do
   get "dividends", to: "robinhood#dividends"
   get "documents", to: "robinhood#documents"
   get "price_chart", to: "robinhood#price_chart"
+
+  get "positions", to: "robinhood#positions"
+  post "reorder_positions", to: "robinhood#reorder_positions"
 
   get "transfers", to: "robinhood#transfers"
   post "new_transfer", to: "robinhood#new_transfer"
@@ -34,4 +36,7 @@ Rails.application.routes.draw do
   get "orders", to: "robinhood#orders"
   post "new_order", to: "robinhood#new_order"
   get "cancel_order", to: "robinhood#cancel_order"
+
+  get "delete_stock_list", to: "robinhood#delete_stock_list"
+  post "add_stock_list", to: "robinhood#add_stock_list"
 end

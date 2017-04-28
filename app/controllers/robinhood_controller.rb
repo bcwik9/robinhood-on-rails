@@ -4,6 +4,20 @@ class RobinhoodController < ApplicationController
 
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
+
+    if user_logged_in_to_robinhood? && current_user.nil?
+      # first time user has logged in, create a database record and add their accounts
+      RobinhoodUser.create!(
+                            robinhood_id: @user["id"],
+                            username: @user["username"],
+                            first_name: @user["first_name"],
+                            last_name: @user["last_name"]
+                            )
+      get_accounts.each do |a|
+        current_user.robinhood_accounts.create! account_number: a["account_number"]
+      end
+    end
+
     flash[:info] = "Please provide the security code that was sent via text." if response["mfa_required"]
     flash[:warning] = response["non_field_errors"].join if response["non_field_errors"].present?
     redirect_to root_path(mfa_required: response["mfa_required"])
@@ -11,6 +25,7 @@ class RobinhoodController < ApplicationController
 
   def logout
     reset_session
+    @current_user = nil
     redirect_to root_path
   end
 
@@ -103,13 +118,12 @@ class RobinhoodController < ApplicationController
         else
           positions
         end
-        quote_url = "https://api.robinhood.com/quotes/?symbols="
-        @quotes = robinhood_get(quote_url + params["symbols"].upcase)["results"]
+        get_quotes params["symbols"].upcase
         @quotes.delete_if{|q| q.nil?}
       rescue Exception => e
         if(!@quotes || @quotes.empty?)
-          instruments = robinhood_get("https://api.robinhood.com/instruments/?query=#{params["symbols"].upcase}")["results"]
-          @quotes = instruments.map{|instrument| robinhood_get instrument["quote"]}
+          get_instruments params["symbols"].upcase
+          @quotes = @instruments.map{|instrument| robinhood_get instrument["quote"]}
         end
       ensure
         @quotes ||= {}
@@ -160,25 +174,34 @@ class RobinhoodController < ApplicationController
   end
 
   def portfolio_history
-    get_accounts
-    account = @accounts.first["account_number"]
+    account = current_user.main_account["account_number"]
     response = get_portfolio_history account, params[:interval], {span: params[:span]}
     raise response.to_s
   end
 
   def positions
     @investments = {}
-    response = robinhood_get "https://api.robinhood.com/positions/?nonzero=true"
-    @positions = get_all_results response
-
     @instruments = []
+    get_positions
     @positions.each do |position|
-      instrument = robinhood_get position["instrument"]
+      instrument = Instrument.find_by url: position["instrument"]
+      if instrument.nil?
+        instrument_data =  robinhood_get position["instrument"]
+        instrument = Instrument.create!(
+                           name: instrument_data["name"],
+                           url: instrument_data["url"],
+                           quote_url: instrument_data["quote"],
+                           symbol: instrument_data["symbol"],
+                           fundamentals_url: instrument_data["fundamentals"],
+                           robinhood_id: instrument_data["id"]
+                           )
+      end
       @instruments << instrument
-      @investments[instrument["symbol"]] = position.merge instrument
+      position["instrument"] = instrument
+      @investments[instrument["symbol"]] = position
     end
 
-    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
+    get_quotes @investments.keys
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
@@ -190,15 +213,15 @@ class RobinhoodController < ApplicationController
       data["purchase_cost"] = 0.0
       data["todays_return"] = 0.0
       data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
-      filled_orders = @orders.select{|o| o["state"] !~ /cancelled/i && o["instrument"] == data["instrument"]}
-      buy_orders = filled_orders.select{|o| o["side"] =~ /buy/i}.reverse
-      sell_orders = filled_orders - buy_orders
-      total_num_shares_to_skip = sell_orders.map{|o| o["quantity"].to_i}.sum
-      data["quantity"] = buy_orders.map{|o| o["quantity"].to_i}.sum - total_num_shares_to_skip
+      instrument_orders = @orders.select{|o| o["instrument"] == data["instrument"] && !o["executions"].empty?}
+      buy_orders = instrument_orders.select{|o| o["side"] =~ /buy/i}.reverse
+      sell_orders = instrument_orders - buy_orders
+      total_num_shares_to_skip = sell_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum }.sum
+      data["quantity"] = buy_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum}.sum - total_num_shares_to_skip
       data["value"] = data["quantity"].to_i * data["current_price"]
       buy_orders.each do |o|
         purchase_price = (o["average_price"] || o["price"]).to_f
-        purchase_quantity = o["quantity"].to_i
+        purchase_quantity = o["executions"].map{|e| e["quantity"].to_i}.sum
         data["purchase_cost"] += purchase_price * purchase_quantity
 
         # factor in if the user has sold some of the purchased shares
@@ -211,7 +234,7 @@ class RobinhoodController < ApplicationController
         compare_price = purchased_today ? purchase_price : data["previous_close"].to_f
         data["todays_return"] += (data["current_price"] - compare_price) * purchase_quantity
       end
-      data["amount_sold"] = sell_orders.map{|o|o["quantity"].to_i * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
+      data["amount_sold"] = sell_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
       data["shares_held_cost"] = data["average_buy_price"].to_f * data["quantity"]
       data["shares_held_return"] = data["value"] - data["shares_held_cost"]
       data["all_time_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
@@ -220,7 +243,40 @@ class RobinhoodController < ApplicationController
     # remove investments where we no longer hold any shares
     @investments.delete_if{|symbol,data| data["quantity"].to_i <= 0}
 
+    @stock_lists = current_user.update_stock_list :portfolio, @instruments
+    @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
+    
     render layout: false
+  end
+
+  def delete_stock_list
+    current_user.stock_lists.find(params[:id]).try(:delete)
+    render nothing: true
+  end
+
+  def add_stock_list
+    current_user.main_account.stock_lists.create! group: params[:group], name: params[:name]
+    flash[:success] = "Added section."
+    redirect_to root_path
+  end
+
+  def reorder_positions
+    instrument_order = Instrument.find(params[:instrument_order])
+    list = current_user.stock_lists.find params[:id]
+    if list.present?
+      robinhood_instruments = Instrument.find(params[:robinhood_order]).pluck(:robinhood_id)
+      reorder_portfolio_positions robinhood_instruments  if list.group == "portfolio"
+      reorder_watchlist :Default, robinhood_instruments  if list.group == "watchlist"
+      instrument = Instrument.find params[:instrument_id]
+      group_lists = current_user.stock_lists.where(group: list.group)
+      group_lists.each do |l|
+        l.instruments.delete instrument if l.instruments.include? instrument
+      end
+      list.instruments.clear
+      list.update! instruments: instrument_order
+    end
+    
+    render nothing: true
   end
 
   def create_watchlist
@@ -232,24 +288,38 @@ class RobinhoodController < ApplicationController
 
   def watchlist
     @side = :buy
-    @watchlists = robinhood_get("https://api.robinhood.com/watchlists/")["results"]
+    get_watchlists
     default_watchlist = robinhood_get @watchlists.first["url"]
     @instruments = []
     @investments = {}
-    default_watchlist["results"].each do |instrument|
-      instrument_data = robinhood_get instrument["instrument"]
-      @instruments << instrument_data
-      @investments[instrument_data["symbol"]] = instrument_data
+    get_all_results(default_watchlist).each do |stock|
+      instrument = Instrument.find_by url: stock["instrument"]
+      if instrument.nil?
+        instrument_data = robinhood_get stock["instrument"]
+        instrument = Instrument.create!(
+                                        name: instrument_data["name"],
+                                        url: instrument_data["url"],
+                                        quote_url: instrument_data["quote"],
+                                        symbol: instrument_data["symbol"],
+                                        fundamentals_url: instrument_data["fundamentals"],
+                                        robinhood_id: instrument_data["id"]
+                                        )
+      end
+      @instruments << instrument
+      @investments[instrument.symbol] = {instrument: instrument}
     end
 
-    @quotes = robinhood_get("https://api.robinhood.com/quotes/?symbols=#{@investments.keys.join(',')}")["results"]
+    @quotes = get_quotes @investments.keys
     @quotes.each do |quote|
       @investments[quote["symbol"]].merge! quote
     end
 
     get_accounts
 
-    render "quote", layout: false
+    @stock_lists = current_user.update_stock_list :watchlist, @instruments
+    @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
+
+    render layout: false
   end
 
   def add_to_watchlist
@@ -274,6 +344,7 @@ class RobinhoodController < ApplicationController
     get_orders
     @orders.each do |order|
       order["instrument"] = robinhood_get order["instrument"]
+      order["filled_quantity"] = order["executions"].map{|e| e["quantity"].to_i}.sum.to_s
     end
   end
 
