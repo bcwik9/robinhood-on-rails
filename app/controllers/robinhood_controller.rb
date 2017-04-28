@@ -5,19 +5,6 @@ class RobinhoodController < ApplicationController
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
 
-    if user_logged_in_to_robinhood? && current_user.nil?
-      # first time user has logged in, create a database record and add their accounts
-      RobinhoodUser.create!(
-                            robinhood_id: @user["id"],
-                            username: @user["username"],
-                            first_name: @user["first_name"],
-                            last_name: @user["last_name"]
-                            )
-      get_accounts.each do |a|
-        current_user.robinhood_accounts.create! account_number: a["account_number"]
-      end
-    end
-
     flash[:info] = "Please provide the security code that was sent via text." if response["mfa_required"]
     flash[:warning] = response["non_field_errors"].join if response["non_field_errors"].present?
     redirect_to root_path(mfa_required: response["mfa_required"])
@@ -184,18 +171,7 @@ class RobinhoodController < ApplicationController
     @instruments = []
     get_positions
     @positions.each do |position|
-      instrument = Instrument.find_by url: position["instrument"]
-      if instrument.nil?
-        instrument_data =  robinhood_get position["instrument"]
-        instrument = Instrument.create!(
-                           name: instrument_data["name"],
-                           url: instrument_data["url"],
-                           quote_url: instrument_data["quote"],
-                           symbol: instrument_data["symbol"],
-                           fundamentals_url: instrument_data["fundamentals"],
-                           robinhood_id: instrument_data["id"]
-                           )
-      end
+      instrument = find_or_create_instrument position["instrument"]
       @instruments << instrument
       position["instrument"] = instrument
       @investments[instrument["symbol"]] = position
@@ -293,18 +269,7 @@ class RobinhoodController < ApplicationController
     @instruments = []
     @investments = {}
     get_all_results(default_watchlist).each do |stock|
-      instrument = Instrument.find_by url: stock["instrument"]
-      if instrument.nil?
-        instrument_data = robinhood_get stock["instrument"]
-        instrument = Instrument.create!(
-                                        name: instrument_data["name"],
-                                        url: instrument_data["url"],
-                                        quote_url: instrument_data["quote"],
-                                        symbol: instrument_data["symbol"],
-                                        fundamentals_url: instrument_data["fundamentals"],
-                                        robinhood_id: instrument_data["id"]
-                                        )
-      end
+      instrument = find_or_create_instrument stock["instrument"]
       @instruments << instrument
       @investments[instrument.symbol] = {instrument: instrument}
     end
