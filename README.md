@@ -7,8 +7,11 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ## Current features (work in progress)
 - Realtime, auto-refreshing portfolio dashboard
+  - Custom "folder" labels (stock organizing dividers)
 - Watchlist
   - Add and remove stocks
+  - Custom "folders" labels (stock organizing dividers)
+- Reorganizing/ordering stocks via drag 'n drop automatically syncs with Robinhood phone app
 - Price charts
 - Fundamentals tooltips
 - Orders
