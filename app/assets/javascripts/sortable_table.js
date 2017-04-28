@@ -2,20 +2,23 @@ SortableTables = function(element) {
 
   var update_list = function(target, drag_target) {
     id = target.data("id")
+    sort_target = target.data("sort-target")
     instrument_order = []
-    investments_order = []
-    $.each(target.find(".sortable-item"), function(index,e) {
+    robinhood_order = []
+    $.each(target.find(sort_target), function(index,e) {
       instrument_order.push($(e).data("instrument-id"))
     })
-    $.each($(".investment"), function(index,e) {
-      investments_order.push($(e).data("instrument-id"))
+    $.each($(sort_target), function(index,e) {
+      robinhood_order.push($(e).data("instrument-id"))
     })
-    $.post("reorder_positions", {id: id, instrument_id: drag_target.data("instrument-id"), instrument_order: instrument_order, investments_order: investments_order})
+    $.post("reorder_positions", {id: id, instrument_id: drag_target.data("instrument-id"), instrument_order: instrument_order, robinhood_order: robinhood_order})
   }
 
   var init = function() {
-    $(".sortable-table").sortable({
-        items: ".sortable-item",
+    $.each($(".sortable-table"), function(index,t) {
+      table = $(t)
+      table.sortable({
+        items: table.data("sort-target"),
         connectWith: ".sortable-table",
         receive: function(event,ui) {
           // item moved to a different list
@@ -27,6 +30,7 @@ SortableTables = function(element) {
             update_list($(event.target), $(ui.item))
           }
         }
+      })
     })
   }
 

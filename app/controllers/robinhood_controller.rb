@@ -262,7 +262,9 @@ class RobinhoodController < ApplicationController
     instrument_order = Instrument.find(params[:instrument_order])
     list = current_user.stock_lists.find params[:id]
     if list.present?
-      reorder_portfolio_positions Instrument.find(params[:investments_order]).pluck(:robinhood_id) if list.group == "portfolio"
+      robinhood_instruments = Instrument.find(params[:robinhood_order]).pluck(:robinhood_id)
+      reorder_portfolio_positions robinhood_instruments  if list.group == "portfolio"
+      reorder_watchlist :Default, robinhood_instruments  if list.group == "watchlist"
       instrument = Instrument.find params[:instrument_id]
       group_lists = current_user.stock_lists.where(group: list.group)
       group_lists.each do |l|
@@ -312,7 +314,10 @@ class RobinhoodController < ApplicationController
 
     get_accounts
 
-    render "quote", layout: false
+    @stock_lists = current_user.update_stock_list :watchlist, @instruments
+    @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
+
+    render layout: false
   end
 
   def add_to_watchlist

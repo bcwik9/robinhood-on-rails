@@ -33,6 +33,10 @@ module Robinhood
     @watchlists = get_all_results robinhood_get("https://api.robinhood.com/watchlists/")
   end
 
+  def reorder_watchlist name, instrument_ids
+    robinhood_post("https://api.robinhood.com/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")})
+  end
+
   def get_quotes symbols
     @quotes = get_all_results robinhood_get("https://api.robinhood.com/quotes/?symbols=#{symbols.join(',')}")
   end
