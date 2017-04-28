@@ -39,11 +39,7 @@
               %td= render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
 
   .col-xs-12
-    = form_tag add_stock_list_path, class: "form-inline" do
-      = hidden_field_tag :group, :portfolio
-      .form-group
-        = text_field_tag :name, nil, placeholder: "Add a section folder", class: "form-control", required: true
-      = submit_tag "Add section", class: "hidden"
+    = render "stock_list_form", group: :portfolio
 
     %br
     %br
