@@ -262,7 +262,7 @@ class RobinhoodController < ApplicationController
     instrument_order = Instrument.find(params[:instrument_order])
     list = current_user.stock_lists.find params[:id]
     if list.present?
-      reorder_portfolio_positions Instrument.find(params[:all_instruments]).pluck(:robinhood_id) if list.group == "portfolio"
+      reorder_portfolio_positions Instrument.find(params[:investments_order]).pluck(:robinhood_id) if list.group == "portfolio"
       instrument = Instrument.find params[:instrument_id]
       group_lists = current_user.stock_lists.where(group: list.group)
       group_lists.each do |l|
