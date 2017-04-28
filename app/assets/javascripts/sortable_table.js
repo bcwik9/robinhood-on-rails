@@ -3,10 +3,14 @@ SortableTables = function(element) {
   var update_list = function(target, drag_target) {
     id = target.data("id")
     instrument_order = []
+    all_instruments = []
     $.each(target.find(".investment"), function(index,e) {
       instrument_order.push($(e).data("instrument-id"))
     })
-    $.post("reorder_positions", {id: id, instrument_id: drag_target.data("instrument-id"), instrument_order: instrument_order})
+    $.each($(".investment"), function(index,e) {
+      all_instruments.push($(e).data("instrument-id"))
+    })
+    $.post("reorder_positions", {id: id, instrument_id: drag_target.data("instrument-id"), instrument_order: instrument_order, all_instruments: all_instruments})
   }
 
   var init = function() {

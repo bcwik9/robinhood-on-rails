@@ -21,6 +21,10 @@ module Robinhood
     @positions = get_all_results(robinhood_get "https://api.robinhood.com/positions/?nonzero=true")
   end
 
+  def reorder_portfolio_positions instrument_ids
+    robinhood_get("https://api.robinhood.com/positions/?ordering=#{instrument_ids.join ','}")
+  end
+
   def get_portfolios
     @portfolios = get_all_results robinhood_get("https://api.robinhood.com/portfolios/")
   end
