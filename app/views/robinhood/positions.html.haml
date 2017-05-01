@@ -23,6 +23,7 @@
           - list.instruments.each do |instrument|
             - symbol = instrument.symbol
             - data = @investments[symbol]
+            - next unless data.present?
             - num_shares = data["quantity"].to_i
             %tr.investment{data: {instrument_id: instrument.id}}
               %td= stock_link(symbol, {class: "symbol", data:{ html: true, placement: :right}})
