@@ -92,7 +92,7 @@ module Robinhood
 
   def next_earnings_report symbol
     get_earnings symbol
-    @earnings = @earnings.find{|e| DateTime.parse(e["report"]["date"]) >= Time.now.beginning_of_day}
+    @earnings = @earnings.find{|e| DateTime.parse(e["report"]["date"]) >= Time.now.beginning_of_day if e["report"].present?}
   end
 
   # GET /quotes/historicals/$symbol/[?interval=$i&span=$s&bounds=$b] interval=week|day|10minute|5minute|null(all) span=day|week|year|5year|all bounds=extended|regular|trading
