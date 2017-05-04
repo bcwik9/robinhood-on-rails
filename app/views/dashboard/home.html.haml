@@ -2,7 +2,19 @@
   #dashboard
     .col-md-10.content
       .row
-        #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 60}}
+        .col-xs-6
+          #markets{data: {behavior: "DeferredLoader", path: markets_path, refresh: 60}}
+        .col-xs-6
+          #chart-controls.pull-right
+            Chart range:
+            %span{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), target: "#price-chart", trigger: "click"}}
+              = link_to "Day", "#"
+            %span{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "10minute", span: "week", type: "portfolio"), target: "#price-chart", trigger: "click"}}
+              = link_to "Week", "#"
+            %span{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "day", span: "year", type: "portfolio"), target: "#price-chart", trigger: "click"}}
+              = link_to "Year", "#"
+            %span{data: {behavior: "DeferredLoader", path: price_chart_path(span: "all", type: "portfolio"), target: "#price-chart", trigger: "click"}}
+              = link_to "All", "#"
       .row
         #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
       .row

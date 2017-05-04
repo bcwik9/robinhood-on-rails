@@ -161,7 +161,7 @@ class RobinhoodController < ApplicationController
   end
 
   def portfolio_history
-    account = current_user.main_account["account_number"]
+    account = current_user.main_account.account_number
     response = get_portfolio_history account, params[:interval], {span: params[:span]}
     raise response.to_s
   end
