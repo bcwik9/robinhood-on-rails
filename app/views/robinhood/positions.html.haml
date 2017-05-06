@@ -25,7 +25,7 @@
             - data = @investments[symbol]
             - next unless data.present?
             - num_shares = data["quantity"].to_i
-            %tr.investment{data: {instrument_id: instrument.id}}
+            %tr.investment.fundamentals-tooltip{data: {instrument_id: instrument.id}}
               %td= stock_link(symbol, {class: "symbol", data:{ html: true, placement: :right}})
               %td.num-shares= num_shares
               %td.value

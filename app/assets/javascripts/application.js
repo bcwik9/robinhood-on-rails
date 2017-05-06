@@ -22,6 +22,7 @@
 //= require submenu
 //= require hide_on_click
 //= require sortable_table
+//= require stocktwits_loader.min
 
 //$(document).on("turbolinks:load", function(){
 $(function(){

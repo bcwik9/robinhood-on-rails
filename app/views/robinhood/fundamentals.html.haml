@@ -1,46 +1,54 @@
 - @fundamentals.each do |symbol,data|
   .fundamentals
     .row
-      .col-xs-12
-        %div{data: { behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "stock", symbol: symbol)}}
-    .row
-      .col-xs-12
-        %br
-        = data["description"].truncate(250)
-        %br
-        %br
-    .row.text-left
-      .col-xs-6 Open
-      .col-xs-6
-        = price_display data["open"]
-      .col-xs-6 High
-      .col-xs-6
-        = price_display data["high"]
-      .col-xs-6 Low
-      .col-xs-6
-        = price_display data["low"]
-      .col-xs-6 Volume
-      .col-xs-6
-        = set_num_decimals data["volume"]
-      .col-xs-6 Average volume
-      .col-xs-6
-        = set_num_decimals data["average_volume"]
-      .col-xs-6 52 week high
-      .col-xs-6
-        = price_display data["high_52_weeks"]
-      .col-xs-6 52 week low
-      .col-xs-6
-        = price_display data["low_52_weeks"]
-      .col-xs-6 Dividend yield
-      .col-xs-6
-        = data["dividend_yield"].present? ? set_num_decimals(data["dividend_yield"]) + "%" : "-"
-      .col-xs-6 Market cap
-      .col-xs-6
-        = set_num_decimals data["market_cap"]
-      .col-xs-6 PE ratio
-      .col-xs-6
-        = data["pe_ratio"].present? ? set_num_decimals(data["pe_ratio"]) : "-"
-      - if data["earnings"].present?
-        .col-xs-6 Earnings date
-        .col-xs-6
-          = data["earnings"]["report"]["date"]
+      .col-xs-5
+        .row
+          .col-xs-12
+            %div{data: { behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "stock", symbol: symbol)}}
+        .row
+          .col-xs-12
+            %br
+            = data["description"].truncate(250)
+            %br
+            %br
+        .row.text-left
+          .col-xs-6 Open
+          .col-xs-6
+            = price_display data["open"]
+          .col-xs-6 High
+          .col-xs-6
+            = price_display data["high"]
+          .col-xs-6 Low
+          .col-xs-6
+            = price_display data["low"]
+          .col-xs-6 Volume
+          .col-xs-6
+            = set_num_decimals data["volume"]
+          .col-xs-6 Average volume
+          .col-xs-6
+            = set_num_decimals data["average_volume"]
+          .col-xs-6 52 week high
+          .col-xs-6
+            = price_display data["high_52_weeks"]
+          .col-xs-6 52 week low
+          .col-xs-6
+            = price_display data["low_52_weeks"]
+          .col-xs-6 Dividend yield
+          .col-xs-6
+            = data["dividend_yield"].present? ? set_num_decimals(data["dividend_yield"]) + "%" : "-"
+          .col-xs-6 Market cap
+          .col-xs-6
+            = set_num_decimals data["market_cap"]
+          .col-xs-6 PE ratio
+          .col-xs-6
+            = data["pe_ratio"].present? ? set_num_decimals(data["pe_ratio"]) : "-"
+          - if data["earnings"].present?
+            .col-xs-6 Earnings date
+            .col-xs-6
+              = data["earnings"]["report"]["date"]
+      .col-xs-7
+        #stocktwits-widget-news
+        :javascript
+          $(function() {
+            STWT.Widget({container: 'stocktwits-widget-news', symbol: '#{symbol}', width: '300', height: '400', limit: '15', scrollbars: '0', streaming: '1', title: '#{symbol}', style: {link_color: '82929f', link_hover_color: 'white', header_text_color: 'ffffff', border_color: '222428', border_color_2: '82929f', divider_color: '82929f', divider_type: 'solid', box_color: '222428', stream_color: '222428', text_color: 'ffffff', time_color: '82929f', username_color: 'white'}});
+          })
