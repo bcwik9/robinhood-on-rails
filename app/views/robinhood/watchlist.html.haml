@@ -19,7 +19,7 @@
           - list.instruments.each do |instrument|
             - quote = @investments[instrument.symbol]
             - price = quote["last_trade_price"]
-            %tr.watchlist-item{class: "watchlist-hide-#{instrument.id}", data: { instrument_id: instrument.id}}
+            %tr.watchlist-item.fundamentals-tooltip{class: "watchlist-hide-#{instrument.id}", data: { instrument_id: instrument.id}}
               %td= stock_link(instrument.symbol, {class: "symbol", data:{ html: true, placement: :right}})
               %td= price_display price
               %td.change{class: "text-" + up_down(quote["previous_close"], price)}

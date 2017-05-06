@@ -12,7 +12,7 @@
           %th Watchlist
         - @quotes.each_with_index do |quote,i|
           - price = quote["last_trade_price"]
-          %tr
+          %tr.fundamentals-tooltip
             %td= stock_link(quote["symbol"], {class: "symbol", data:{ html: true, placement: :right}})
             %td= price_display price
             %td.change{class: "text-" + up_down(quote["previous_close"], price)}

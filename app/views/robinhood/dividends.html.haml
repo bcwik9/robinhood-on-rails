@@ -3,7 +3,7 @@
     Dividends
     %small= (price_display @dividends.map{|d| d["amount"].to_f }.sum) + " total"
   - @dividends.each do |dividend|
-    .col-xs-4.col-sm-3
+    .col-xs-4.col-sm-3.fundamentals-tooltip
       %h3= price_display dividend["amount"]
       = stock_link dividend["instrument"]["symbol"], {class: "symbol", data: {html: true, placement: :right}}
       %br
