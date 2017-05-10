@@ -60,7 +60,7 @@ $ docker build --tag robinhood-on-rails .
 
 Then you can run the server:
 ```shell
-$ docker run --rm -dt -p 3000:3000 robinhood-on-rails
+$ docker run -dt -p 3000:3000 robinhood-on-rails
 ```
 
 This will run the server on your host-machine's port 3000.
