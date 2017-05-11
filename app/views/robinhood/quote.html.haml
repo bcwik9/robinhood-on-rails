@@ -17,7 +17,7 @@
             %td= price_display price
             %td.change{class: "text-" + up_down(quote["previous_close"], price)}
               = change_display(quote["previous_close"], price)
-            %td= render "robinhood/order_form", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
+            %td= render "robinhood/order_form_modal", symbol: quote["symbol"], side: @side, price: price, num_shares: (@investments.present? ? @investments[quote["symbol"]]["quantity"] : nil)
             %td.add-to-watchlist
               = form_tag add_to_watchlist_path do
                 = hidden_field_tag :symbols, quote["symbol"]

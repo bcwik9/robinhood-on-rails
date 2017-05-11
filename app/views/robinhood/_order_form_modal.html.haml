@@ -1,0 +1,32 @@
+- if side =~ /buy/i
+  - max = (@accounts.first["buying_power"].to_f/price.to_f).to_i
+  - return if max <= 0
+
+= link_to side.capitalize, "#", data: {toggle: :modal, target: ".#{side}#{symbol.gsub('.','')}"}, class: "btn btn-default"
+
+.modal.fade{role: "dialog", tabindex: "-1", class: "#{side}#{symbol.gsub('.','')}"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4.modal-title #{side.capitalize} #{symbol}
+
+      #order-form
+        = form_tag new_order_path, class: "form-inline" do
+          = hidden_field_tag :symbol, symbol
+          = hidden_field_tag :side, side
+          = hidden_field_tag :price, set_num_decimals(price)
+
+          .modal-body
+            .form-group
+              = label_tag "Number of shares"
+              - if side =~ /buy/i
+                - max = (@accounts.first["buying_power"].to_f/price.to_f).to_i
+                = number_field_tag :quantity, 1, min: 1, max: max, class: "form-control"
+              - else
+                = number_field_tag :quantity, 1, min: 1, max: num_shares, class: "form-control"
+
+          .modal-footer
+            %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Cancel
+            = submit_tag "Place order", class: "btn btn-default", data: {confirm: "Are you sure you want to #{side} #{symbol}?"}
