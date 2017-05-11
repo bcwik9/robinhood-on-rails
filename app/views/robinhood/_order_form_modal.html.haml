@@ -1,8 +1,8 @@
 - if side =~ /buy/i
   - max = (@accounts.first["buying_power"].to_f/price.to_f).to_i
-  - return if max <= 0
+  - return if max <= 0 # dont have enough money to buy any shares
 
-= link_to side.capitalize, "#", data: {toggle: :modal, target: ".#{side}#{symbol.gsub('.','')}"}, class: "btn btn-default"
+.stop-deferred-loader= link_to side.capitalize, "#", data: {toggle: :modal, target: ".#{side}#{symbol.gsub('.','')}"}, class: "btn btn-default"
 
 .modal.fade{role: "dialog", tabindex: "-1", class: "#{side}#{symbol.gsub('.','')}"}
   .modal-dialog{:role => "document"}

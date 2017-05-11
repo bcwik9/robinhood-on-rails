@@ -16,12 +16,14 @@
 //= require twitter/bootstrap
 //= require elemental
 //= require deferred_loader
+//= require prevent_deferred_loader
 //= require fundamentals_tooltip
 //= require tooltip_loader
 //= require line_chart
 //= require submenu
 //= require hide_on_click
 //= require sortable_table
+
 //= require stocktwits_loader.min
 
 //$(document).on("turbolinks:load", function(){

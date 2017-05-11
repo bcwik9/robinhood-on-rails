@@ -1,7 +1,8 @@
 .row
-  #fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
-  #sortable-tables{data: {behavior: "SortableTables"}}
-  #hide-on-click{data: {behavior: "HideOnClick"}}
+  .fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
+  .sortable-tables{data: {behavior: "SortableTables"}}
+  .hide-on-click{data: {behavior: "HideOnClick"}}
+  .prevent-deferred-loader{data: {behavior: "PreventDeferredLoader"}}
   .col-xs-12
     - @stock_lists.each do |list|
       %div{class: "list-#{list.id}"}
