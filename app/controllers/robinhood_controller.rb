@@ -142,7 +142,7 @@ class RobinhoodController < ApplicationController
     if success
       flash[:success] = "Successfully canceled transfer."
     else
-      flash[:warning] = "Failed to cancel transfer: #{response.values.join}."
+      flash[:warning] = "Failed to cancel transfer: #{response.values.join}"
     end
 
     redirect_to transfers_path
@@ -332,7 +332,7 @@ class RobinhoodController < ApplicationController
     if success
       flash[:success] = "Successfully placed order."
     else
-      flash[:warning] = "Failed to place order: #{response.values.join}."
+      flash[:warning] = "Failed to place order: #{response.values.join}"
     end
 
     redirect_to orders_path
@@ -344,7 +344,7 @@ class RobinhoodController < ApplicationController
     if success
       flash[:success] = "Successfully canceled order."
     else
-      flash[:warning] = "Failed to cancel order: #{response.values.join}."
+      flash[:warning] = "Failed to cancel order: #{response.values.join}"
     end
 
     redirect_to orders_path

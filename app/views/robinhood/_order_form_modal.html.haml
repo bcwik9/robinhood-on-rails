@@ -1,7 +1,3 @@
-- if side =~ /buy/i
-  - max = (@accounts.first["buying_power"].to_f/price.to_f).to_i
-  - return if max <= 0 # dont have enough money to buy any shares
-
 .stop-deferred-loader= link_to side.capitalize, "#", data: {toggle: :modal, target: ".#{side}#{symbol.gsub('.','')}"}, class: "btn btn-default"
 
 .modal.fade{role: "dialog", tabindex: "-1", class: "#{side}#{symbol.gsub('.','')}"}
@@ -19,13 +15,15 @@
           = hidden_field_tag :price, set_num_decimals(price)
 
           .modal-body
-            .form-group
-              = label_tag "Number of shares"
-              - if side =~ /buy/i
-                - max = (@accounts.first["buying_power"].to_f/price.to_f).to_i
-                = number_field_tag :quantity, 1, min: 1, max: max, class: "form-control"
-              - else
-                = number_field_tag :quantity, 1, min: 1, max: num_shares, class: "form-control"
+            .row
+              .col-xs-6
+                .form-group
+                  = label_tag "Number of shares"
+                  = number_field_tag :quantity, 1, min: 1, class: "form-control"
+              .col-xs-6
+                .form-group
+                  = label_tag "Price"
+                  = number_field_tag :price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"
 
           .modal-footer
             %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Cancel
