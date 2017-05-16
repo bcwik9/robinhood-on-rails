@@ -7,7 +7,7 @@
       .modal-header
         %h4.modal-title #{side.capitalize} #{symbol}
 
-      #order-form{data: {behavior: "OrderForm"}, class: "order_form_#{target}"}
+      #order-form{data: {behavior: "OrderForm", side: side}, class: "order_form_#{target}"}
         = form_tag new_order_path, class: "form-inline" do
           = hidden_field_tag :symbol, symbol
           = hidden_field_tag :side, side
