@@ -23,6 +23,7 @@
 //= require submenu
 //= require hide_on_click
 //= require sortable_table
+//= require order_form
 
 //= require stocktwits_loader.min
 

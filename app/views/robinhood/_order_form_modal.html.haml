@@ -1,26 +1,37 @@
-.stop-deferred-loader= link_to side.capitalize, "#", data: {toggle: :modal, target: ".#{side}#{symbol.gsub('.','')}"}, class: "btn btn-default"
+- target = "#{side}#{symbol.gsub('.','')}"
+.stop-deferred-loader= link_to side.capitalize, "#", data: {toggle: :modal, target: ".#{target}"}, class: "btn btn-default"
 
-.modal.fade{role: "dialog", tabindex: "-1", class: "#{side}#{symbol.gsub('.','')}"}
+.modal.fade{role: "dialog", tabindex: "-1", class: target}
   .modal-dialog{:role => "document"}
     .modal-content
       .modal-header
         %h4.modal-title #{side.capitalize} #{symbol}
 
-      #order-form
+      #order-form{data: {behavior: "OrderForm"}, class: "order_form_#{target}"}
         = form_tag new_order_path, class: "form-inline" do
           = hidden_field_tag :symbol, symbol
           = hidden_field_tag :side, side
 
           .modal-body
             .row
-              .col-xs-6
+              .col-xs-2
+                .form-group
+                  = label_tag "Order type"
+                  = select_tag :type, options_for_select(["Market", "Limit", "Stop loss", "Stop limit"]), class: "form-control"
+              .col-xs-5
                 .form-group
                   = label_tag "Number of shares"
                   = number_field_tag :quantity, 1, min: 1, class: "form-control"
-              .col-xs-6
+              .col-xs-5
                 .form-group
                   = label_tag "Price"
                   = number_field_tag :price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"
+            .row
+              .col-xs-12
+                %br
+                %br
+                %p.order-description
+                  A market order is good for the day and is placed at the best possible price.
 
           .modal-footer
             %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Cancel
