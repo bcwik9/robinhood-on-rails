@@ -1,7 +1,6 @@
-.fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
-.prevent-deferred-loader{data: {behavior: "PreventDeferredLoader"}}
+.list-dependencies{data: {behavior: "DashboardList"}}
 .col-xs-12
-  .quotes{data: {behavior: "HideOnClick"}}
+  .quotes
     - @stock_lists.each do |list|
       %div{class: "list-#{list.id}"}
         - if list.name.present?

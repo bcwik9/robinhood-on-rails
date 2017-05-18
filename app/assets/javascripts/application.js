@@ -24,6 +24,7 @@
 //= require hide_on_click
 //= require sortable_table
 //= require order_form
+//= require dashboard_list
 
 //= require stocktwits_loader.min
 
