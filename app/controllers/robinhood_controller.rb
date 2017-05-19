@@ -327,17 +327,18 @@ class RobinhoodController < ApplicationController
       trigger: trigger
     }
     data[:stop_price] = params["stop_price"].to_f if trigger == "stop"
-    data[:price] = params["price"].to_f if type == "limit"
+    data[:price] = params["price"].to_f if type == "limit" || params["side"] == "buy"
+    data[:price] = params["stop_price"].to_f if params["side"] == "buy" && params["type"] =~ /stop loss/i
 
     response = place_order data
     success = response["id"].present?
     if success
       flash[:success] = "Successfully placed order."
+      redirect_to orders_path
     else
       flash[:warning] = "Failed to place order: #{response.values.join}"
+      redirect_to request.referrer
     end
-
-    redirect_to orders_path
   end
 
   def cancel_order
