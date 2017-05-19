@@ -9,6 +9,15 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+### 5/18/2017
+- Added additional order support
+  - Market order
+  - Limit order
+  - Stop loss order
+  - Stop limit order
+- Added details to order history page
+- Various refactor improvements and bugfixes
+
 #### 5/5/2017
 - Added [Stocktwits](https://stocktwits.com/) integration
 
@@ -26,7 +35,7 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Fundamentals tooltips
 - [Stocktwits](https://stocktwits.com/) integration
 - Orders
-  - Basic buy and sell at last trade price
+  - Supports market, limit, stop loss, and stop limit orders for buying and selling
   - Cancel pending orders
 - Transfers
   - Basic deposit and withdraw from existing ACH accounts
