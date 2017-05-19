@@ -1,16 +1,18 @@
 DeferredLoader = function(element) {
 
   var update_content = function() {
-    $.get(element.data("path"), function(data) {
-      target = element.data("target")
-      if(target){
-        target = $(target)
-      } else {
-        target = element
-      }
-      target.html(data);
-      Elemental.load(target.html())
-    })
+    if(!element.data("dontupdate")){
+      $.get(element.data("path"), function(data) {
+        target = element.data("target")
+        if(target){
+          target = $(target)
+        } else {
+          target = element
+        }
+        target.html(data);
+        Elemental.load(target.html())
+      })
+    }
   }
 
   trigger = element.data("trigger")

@@ -1,7 +1,5 @@
 .row
-  #fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
-  #sortable-tables{data: {behavior: "SortableTables"}}
-  #hide-on-click{data: {behavior: "HideOnClick"}}
+  .list-dependencies{data: {behavior: "DashboardList"}}
   .col-xs-12
     - @stock_lists.each do |list|
       %div{class: "list-#{list.id}"}
@@ -37,7 +35,7 @@
               %td.return-all-time{class: "text-" + up_down(0, data["all_time_return"])}
                 = price_display data["all_time_return"]
               %td= price_display data["current_price"]
-              %td= render "robinhood/order_form", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
+              %td= render "robinhood/order_form_modal", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
 
   .col-xs-12
     = render "stock_list_form", group: :portfolio

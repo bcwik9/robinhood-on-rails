@@ -1,6 +1,6 @@
-#fundamentals-tooltip-loader{data: {behavior: "FundamentalsTooltip"}}
+.list-dependencies{data: {behavior: "DashboardList"}}
 .col-xs-12
-  .quotes{data: {behavior: "HideOnClick"}}
+  .quotes
     - @stock_lists.each do |list|
       %div{class: "list-#{list.id}"}
         - if list.name.present?
@@ -24,7 +24,7 @@
               %td= price_display price
               %td.change{class: "text-" + up_down(quote["previous_close"], price)}
                 = change_display(quote["previous_close"], price)
-              %td= render "robinhood/order_form", symbol: instrument.symbol, side: @side, price: price, num_shares: (@investments.present? ? @investments[instrument.symbol]["quantity"] : nil)
+              %td= render "robinhood/order_form_modal", symbol: instrument.symbol, side: @side, price: price, num_shares: (@investments.present? ? @investments[instrument.symbol]["quantity"] : nil)
               %td.remove-from-watchlist
                 = form_tag remove_from_watchlist_path, remote: true do
                   = hidden_field_tag :symbol, instrument.symbol

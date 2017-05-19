@@ -142,7 +142,7 @@ class RobinhoodController < ApplicationController
     if success
       flash[:success] = "Successfully canceled transfer."
     else
-      flash[:warning] = "Failed to cancel transfer: #{response.values.join}."
+      flash[:warning] = "Failed to cancel transfer: #{response.values.join}"
     end
 
     redirect_to transfers_path
@@ -314,28 +314,31 @@ class RobinhoodController < ApplicationController
   end
 
   def new_order
-    get_accounts
+    type = params["type"] =~ /limit/i ? "limit" : "market"
+    trigger = params["type"] =~ /stop/i ? "stop" : "immediate"
     data = {
-      account: @accounts.first["url"],
+      account: current_user.main_account.url,
       instrument: instrument_from_symbol(params["symbol"])["url"],
       symbol: params["symbol"],
       side: params["side"], # buy|sell
       quantity: params["quantity"],
-      price: params["price"].to_f,
-      type: "market",
-      time_in_force: "gfd",
-      trigger: "immediate"
+      type: type,
+      time_in_force: params["time_in_force"],
+      trigger: trigger
     }
+    data[:stop_price] = params["stop_price"].to_f if trigger == "stop"
+    data[:price] = params["price"].to_f if type == "limit" || params["side"] == "buy"
+    data[:price] = params["stop_price"].to_f if params["side"] == "buy" && params["type"] =~ /stop loss/i
 
-    response = robinhood_post "https://api.robinhood.com/orders/", data
+    response = place_order data
     success = response["id"].present?
     if success
       flash[:success] = "Successfully placed order."
+      redirect_to orders_path
     else
-      flash[:warning] = "Failed to place order: #{response.values.join}."
+      flash[:warning] = "Failed to place order: #{response.values.join}"
+      redirect_to request.referrer
     end
-
-    redirect_to orders_path
   end
 
   def cancel_order
@@ -344,7 +347,7 @@ class RobinhoodController < ApplicationController
     if success
       flash[:success] = "Successfully canceled order."
     else
-      flash[:warning] = "Failed to cancel order: #{response.values.join}."
+      flash[:warning] = "Failed to cancel order: #{response.values.join}"
     end
 
     redirect_to orders_path

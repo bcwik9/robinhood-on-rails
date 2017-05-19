@@ -1,14 +1,23 @@
 - price = order["average_price"] || order["price"]
+- type = "Market" if order["trigger"] == "immediate" && order["type"] == "market"
+- type = "Limit" if order["trigger"] == "immediate" && order["type"] == "limit"
+- type = "Stop loss" if order["trigger"] == "stop" && order["type"] == "market"
+- type = "Stop limit" if order["trigger"] == "stop" && order["type"] == "limit"
 .order.fundamentals-tooltip
   %h3= stock_link order["instrument"]["symbol"], {class: "symbol", data: {html: true, placement: :right}}
   .total
     = price_display(order["quantity"].to_i * price.to_f)
-  .side= order["side"].capitalize
+  .type= "#{type} #{order["side"]}"
   .order-date= DateTime.parse(order["updated_at"]).in_time_zone(user_timezone).strftime("%b %e %Y %l%P")
   .expected-date= "Expected " + order["executions"].first["settlement_date"] if order["side"] =~ /sell/i && !order["executions"].empty?
   .price
-    = price_display price
-    per share
+    - if price.present?
+      = price_display price
+      per share
+  .stop_price
+    - if order["stop_price"].present?
+      = price_display order["stop_price"]
+      stop
   .quantity
     = order["filled_quantity"] + " / " + order["quantity"].to_i.to_s
     = "Share".pluralize(order["quantity"].to_i)

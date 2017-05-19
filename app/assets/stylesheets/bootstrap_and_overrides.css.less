@@ -41,6 +41,18 @@ body {
     margin-top: 20px;
   }
 
+  .modal {
+    .modal-header {
+      border-bottom: 1px solid @dark_grey;
+    }
+    .modal-content {
+      background-color: @black;
+    }
+    .modal-footer {
+      border-top: 1px solid @dark_grey;
+    }
+  }
+
   input, select, .btn {
     border: none !important;
     &::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -60,6 +72,20 @@ body {
     &:focus {
       border: none !important;
       box-shadow: none !important;
+    }
+    &.btn-success {
+      background-color: @dark_grey !important;
+      &:hover {
+        background-color: @green !important;
+        color: @dark_grey;
+      }
+    }
+    &.btn-danger {
+      background-color: @dark_grey !important;
+      &:hover {
+        background-color: @orange !important;
+        color: @dark_grey;
+      }
     }
   }
 
