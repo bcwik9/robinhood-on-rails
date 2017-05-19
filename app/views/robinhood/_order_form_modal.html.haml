@@ -14,25 +14,35 @@
 
           .modal-body
             .row
-              .col-xs-2
+              .col-xs-3
                 .form-group
                   = label_tag "Order type"
                   = select_tag :type, options_for_select(["Market", "Limit", "Stop loss", "Stop limit"]), class: "form-control"
-              .col-xs-5
-                .form-group
-                  = label_tag "Number of shares"
-                  = number_field_tag :quantity, 1, min: 1, class: "form-control"
-              .col-xs-5
-                .form-group
-                  = label_tag "Price"
-                  = number_field_tag :price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"
-            .row
-              .col-xs-12
-                %br
-                %br
+              .col-xs-9
                 %p.order-description
                   A market order is good for the day and is placed at the best possible price.
 
+            %br
+            .row
+              .col-xs-6
+                .form-group
+                  = label_tag "Number of shares"
+                  = number_field_tag :quantity, 1, min: 1, class: "form-control"
+              .col-xs-6
+                .form-group
+                  = label_tag "Price"
+                  = number_field_tag :price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"
+            %br
+            .row
+              .col-xs-6
+                .form-group
+                  = label_tag "Time in force"
+                  = select_tag :time_in_force, options_for_select([ ["Good for day", "gfd"], ["Good til canceled", "gtc"] ]), class: "form-control"
+              .col-xs-6
+                .form-group
+                  = label_tag "Limit"
+                  = number_field_tag :limit, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"               
+
           .modal-footer
-            %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Cancel
-            = submit_tag "Place order", class: "btn btn-default", data: {confirm: "Are you sure you want to #{side} #{symbol}?"}
+            %button.btn.btn-danger{"data-dismiss" => "modal", :type => "button"} Cancel
+            = submit_tag "Place order", class: "btn btn-success", data: {confirm: "Are you sure you want to #{side} #{symbol}?"}

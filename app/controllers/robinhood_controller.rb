@@ -307,6 +307,7 @@ class RobinhoodController < ApplicationController
 
   def orders
     get_orders
+    raise @orders.to_s
     @orders.each do |order|
       order["instrument"] = robinhood_get order["instrument"]
       order["filled_quantity"] = order["executions"].map{|e| e["quantity"].to_i}.sum.to_s
@@ -315,6 +316,7 @@ class RobinhoodController < ApplicationController
 
   def new_order
     get_accounts
+    type = params["type"] =~ /(market|loss)/i ? "market" : "limit"
     data = {
       account: @accounts.first["url"],
       instrument: instrument_from_symbol(params["symbol"])["url"],
@@ -322,12 +324,12 @@ class RobinhoodController < ApplicationController
       side: params["side"], # buy|sell
       quantity: params["quantity"],
       price: params["price"].to_f,
-      type: "market",
-      time_in_force: "gfd",
-      trigger: "immediate"
+      type: type,
+      time_in_force: params["time_in_force"],
+      trigger: params["trigger"]
     }
 
-    response = robinhood_post "https://api.robinhood.com/orders/", data
+    response = place_order data
     success = response["id"].present?
     if success
       flash[:success] = "Successfully placed order."

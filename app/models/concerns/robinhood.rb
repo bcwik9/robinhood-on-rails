@@ -121,6 +121,10 @@ module Robinhood
     @orders = get_all_results robinhood_get("https://api.robinhood.com/orders/")
   end
 
+  def place_order data
+    robinhood_post "https://api.robinhood.com/orders/", data
+  end
+
   def get_fundamentals symbols
     @fundamentals ||= {}
     symbols.each_with_index do |symbol,i|
