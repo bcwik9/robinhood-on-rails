@@ -1,6 +1,10 @@
 OrderForm = function(element) {
   var element = $("."+element.attr("class"))
   var side = element.data("side")
+  var price = element.data("price")
+  var price_input = element.find("#price")
+  var market_price = price_input.siblings(".market-placeholder")
+  var stop_input = element.find("#stop_price").parent()
 
   var get_order_description = function(type) {
     if(side === "buy") {
@@ -32,11 +36,38 @@ OrderForm = function(element) {
     element.find(".order-description").text(description)  
   }
 
+  var update_input_states = function(type) {
+    set_price_input_state(false)
+    stop_input.hide()
+    if(type == "Limit") {
+      set_price_input_state(true)
+    } else if(type == "Stop loss") {
+      stop_input.show()
+    } else if(type == "Stop limit"){
+      set_price_input_state(true)
+      stop_input.show()
+    }
+  }
+
+  var set_price_input_state = function(enabled) {
+    if(enabled) {
+      price_input.show()
+      market_price.hide()
+    } else {
+      price_input.hide()
+      market_price.show()
+    }
+  }
+
   var init = function() {
     order_select_field = element.find("select[name=type]")
-    update_order_description(order_select_field.val())
+    type = order_select_field.val()
+    update_order_description(type)
+    update_input_states(type)
+
     order_select_field.on("change", function(event){
       type = $(event.target).val()
+      update_input_states(type)
       update_order_description(type)
     })
   }

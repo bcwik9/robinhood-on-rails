@@ -7,12 +7,16 @@
       .modal-header
         %h4.modal-title #{side.capitalize} #{symbol}
 
-      #order-form{data: {behavior: "OrderForm", side: side}, class: "order_form_#{target}"}
+      #order-form{data: {behavior: "OrderForm", side: side, price: set_num_decimals(price)}, class: "order_form_#{target}"}
         = form_tag new_order_path, class: "form-inline" do
           = hidden_field_tag :symbol, symbol
           = hidden_field_tag :side, side
 
           .modal-body
+            .row
+              .col-xs-12
+                %h5 Current price per share: #{price_display price}
+            %br
             .row
               .col-xs-3
                 .form-group
@@ -20,7 +24,6 @@
                   = select_tag :type, options_for_select(["Market", "Limit", "Stop loss", "Stop limit"]), class: "form-control"
               .col-xs-9
                 %p.order-description
-                  A market order is good for the day and is placed at the best possible price.
 
             %br
             .row
@@ -32,6 +35,8 @@
                 .form-group
                   = label_tag "Price"
                   = number_field_tag :price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"
+                  .market-placeholder
+                    Best available
             %br
             .row
               .col-xs-6
@@ -40,8 +45,8 @@
                   = select_tag :time_in_force, options_for_select([ ["Good for day", "gfd"], ["Good til canceled", "gtc"] ]), class: "form-control"
               .col-xs-6
                 .form-group
-                  = label_tag "Limit"
-                  = number_field_tag :limit, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"               
+                  = label_tag "Stop price"
+                  = number_field_tag :stop_price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"               
 
           .modal-footer
             %button.btn.btn-danger{"data-dismiss" => "modal", :type => "button"} Cancel
