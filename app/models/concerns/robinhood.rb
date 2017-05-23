@@ -282,7 +282,7 @@ module Robinhood
   end
 
   def get_splits instrument_id
-    Rails.cache.fetch("#{instrument_id}_splits", expires_in: 12.hours) do
+    @splits = Rails.cache.fetch("#{instrument_id}_splits", expires_in: 12.hours) do
       get_all_results robinhood_get("https://api.robinhood.com/instruments/#{instrument_id}/splits/")
     end
   end
