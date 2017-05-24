@@ -9,7 +9,10 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
-### 5/18/2017
+#### 5/23/2017
+- Added support for splits
+
+#### 5/18/2017
 - Added additional order support
   - Market order
   - Limit order
