@@ -242,6 +242,7 @@ module Robinhood
     {columns: columns, rows: rows, options: options}
   end
 
+  # TODO move this elsewhere
   def get_price_intersections history
     close_prices = history["historicals"].map{|h| h["close_price"].to_f}
     period_one = 50
@@ -278,6 +279,12 @@ module Robinhood
 
   def instrument_from_symbol symbol
     robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
+  end
+
+  def get_splits instrument_id
+    @splits = Rails.cache.fetch("#{instrument_id}_splits", expires_in: 12.hours) do
+      get_all_results robinhood_get("https://api.robinhood.com/instruments/#{instrument_id}/splits/")
+    end
   end
 
   def get_all_results response, params=""

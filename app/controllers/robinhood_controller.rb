@@ -179,39 +179,62 @@ class RobinhoodController < ApplicationController
 
     get_quotes @investments.keys
     @quotes.each do |quote|
+      quote.delete "instrument" # we already have it
       @investments[quote["symbol"]].merge! quote
     end
 
     get_orders
     @investments.each do |symbol,data|
       data["all_time_return"] =  0.0 # return including sold shares
-      data["value"] = 0.0
       data["purchase_cost"] = 0.0
+      data["amount_sold"] = 0.0
       data["todays_return"] = 0.0
       data["current_price"] = (data["last_extended_hours_trade_price"] || data["last_trade_price"]).to_f
-      instrument_orders = @orders.select{|o| o["instrument"] == data["instrument"] && !o["executions"].empty?}
-      buy_orders = instrument_orders.select{|o| o["side"] =~ /buy/i}.reverse
+      instrument_orders = @orders.select{|o| o["instrument"] == data["instrument"].url && !o["executions"].empty?}
+      buy_orders = instrument_orders.select{|o| o["side"] =~ /buy/i}
       sell_orders = instrument_orders - buy_orders
       total_num_shares_to_skip = sell_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum }.sum
-      data["quantity"] = buy_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum}.sum - total_num_shares_to_skip
-      data["value"] = data["quantity"].to_i * data["current_price"]
-      buy_orders.each do |o|
-        purchase_price = (o["average_price"] || o["price"]).to_f
-        purchase_quantity = o["executions"].map{|e| e["quantity"].to_i}.sum
-        data["purchase_cost"] += purchase_price * purchase_quantity
 
-        # factor in if the user has sold some of the purchased shares
-        num_shares_to_skip = [purchase_quantity, total_num_shares_to_skip].min
-        purchase_quantity -= num_shares_to_skip
-        total_num_shares_to_skip -= num_shares_to_skip
-        next if purchase_quantity <= 0
-
-        purchased_today = DateTime.parse(o["created_at"]) > Date.today
-        compare_price = purchased_today ? purchase_price : data["previous_close"].to_f
-        data["todays_return"] += (data["current_price"] - compare_price) * purchase_quantity
+      get_splits data["instrument"].robinhood_id
+      @splits.each{|split| split["updated_at"] = split["execution_date"]}
+      current_shares_owned = 0
+      # process orders oldest to newest
+      orders_and_splits = (instrument_orders + @splits).sort{|a,b| DateTime.parse(a["updated_at"]) <=> DateTime.parse(b["updated_at"])}
+      orders_and_splits.each do |o|
+        if o["url"] =~ /order/i
+          price = (o["average_price"] || o["price"]).to_f
+          quantity = o["executions"].map{|e| e["quantity"].to_i}.sum
+          if o["side"] =~ /buy/i
+            data["purchase_cost"] += price * quantity
+            current_shares_owned += quantity
+          else
+            data["amount_sold"] += (price * quantity - o["fees"].to_f)
+            current_shares_owned -= quantity
+          end
+        else 
+          # split
+          current_shares_owned = (current_shares_owned / o["divisor"].to_f * o["multiplier"].to_f).to_i
+        end
       end
-      data["amount_sold"] = sell_orders.map{|o| o["executions"].map{|e| e["quantity"].to_i}.sum * (o["average_price"] || o["price"]).to_f - o["fees"].to_f}.sum
-      data["shares_held_cost"] = data["average_buy_price"].to_f * data["quantity"]
+      data["quantity"] = current_shares_owned # override quantity from robinhood
+
+      # calculate todays return (basically check if anything was bought today)
+      todays_buy_orders = buy_orders.select{|o| o["executions"].any?{|e| DateTime.parse(e["timestamp"]) > Date.today}}
+      todays_buy_orders.each do |o|
+        price = (o["average_price"] || o["price"]).to_f
+        o["executions"].each do |e|
+          executed_shares = e["quantity"].to_i
+          current_shares_owned -= executed_shares
+          # check if user bought some shares then sold them
+          # example: buy 2 shares, sell 1 share in same day
+          executed_shares += current_shares_owned if current_shares_owned < 0
+          data["todays_return"] += (data["current_price"] - price) * executed_shares
+        end
+      end
+      data["todays_return"] += (data["current_price"] - data["previous_close"].to_f) * current_shares_owned if current_shares_owned > 0
+
+      data["value"] = data["quantity"].to_i * data["current_price"]
+      data["shares_held_cost"] = data["average_buy_price"].to_f * data["quantity"].to_i
       data["shares_held_return"] = data["value"] - data["shares_held_cost"]
       data["all_time_return"] = data["value"] - data["purchase_cost"] + data["amount_sold"]
     end
