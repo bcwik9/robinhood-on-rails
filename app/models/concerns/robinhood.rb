@@ -190,7 +190,9 @@ module Robinhood
     rows = []
     @portfolio_history["equity_historicals"].each_with_index do |h,i|
       rows[i] ||= [i+1]
-      rows[i] = rows[i] + [h["adjusted_close_equity"].to_f, h["begins_at"]]
+      price = h["adjusted_close_equity"].to_f
+      date = h["begins_at"].in_time_zone("Eastern Time (US & Canada)").strftime '%m/%d/%y %l:%M%P'
+      rows[i] = rows[i] + [price, "$#{price} on #{date}"]
     end
     
     open_price = @portfolio_history["equity_historicals"].first["adjusted_open_equity"].to_f
