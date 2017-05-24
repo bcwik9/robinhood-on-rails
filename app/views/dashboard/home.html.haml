@@ -11,6 +11,8 @@
               = link_to "Day", "#"
             %span{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "10minute", span: "week", type: "portfolio"), target: "#price-chart", trigger: "click"}}
               = link_to "Week", "#"
+            %span{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "day", span: "month", type: "portfolio"), target: "#price-chart", trigger: "click"}}
+              = link_to "Month", "#"
             %span{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "day", span: "year", type: "portfolio"), target: "#price-chart", trigger: "click"}}
               = link_to "Year", "#"
             %span{data: {behavior: "DeferredLoader", path: price_chart_path(span: "all", type: "portfolio"), target: "#price-chart", trigger: "click"}}
