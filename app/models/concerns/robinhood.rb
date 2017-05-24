@@ -102,19 +102,37 @@ module Robinhood
   # get_history :AAPL, "day", {span: "year"}
   # get_history :AAPL, "week", {span: "5year"}
   def get_history symbol, interval, opts={}
+    is_month = opts[:span] =~ /month/i
+    if is_month
+      # month isn't supported? use year instead
+      interval = "day"
+      opts[:span] = "year"
+    end
     url = "https://api.robinhood.com/quotes/historicals/#{symbol}/?interval=#{interval}"
     opts.each do |k,v|
       url += "&#{k}=#{v}"
     end
     @history = robinhood_get url
+    if is_month
+      @history["historicals"] = @history["historicals"].select{ |data| DateTime.parse(data["begins_at"]) > 1.month.ago}
+    end
   end
 
   def get_portfolio_history account, interval, opts={}
+    is_month = opts[:span] =~ /month/i
+    if is_month
+      # month isn't supported? use year instead
+      interval = "day"
+      opts[:span] = "year"
+    end
     url = "https://api.robinhood.com/portfolios/historicals/#{account}/?interval=#{interval}"
     opts.each do |k,v|
       url += "&#{k}=#{v}"
     end
     @portfolio_history = robinhood_get(url)
+    if is_month
+      @portfolio_history["equity_historicals"] = @portfolio_history["equity_historicals"].select{ |data| DateTime.parse(data["begins_at"]) > 1.month.ago}
+    end
   end
 
   def get_orders
@@ -172,7 +190,9 @@ module Robinhood
     rows = []
     @portfolio_history["equity_historicals"].each_with_index do |h,i|
       rows[i] ||= [i+1]
-      rows[i] = rows[i] + [h["adjusted_close_equity"].to_f, h["begins_at"]]
+      price = h["adjusted_close_equity"].to_f
+      date = h["begins_at"].in_time_zone("Eastern Time (US & Canada)").strftime '%m/%d/%y %l:%M%P'
+      rows[i] = rows[i] + [price, "$#{price} on #{date}"]
     end
     
     open_price = @portfolio_history["equity_historicals"].first["adjusted_open_equity"].to_f
