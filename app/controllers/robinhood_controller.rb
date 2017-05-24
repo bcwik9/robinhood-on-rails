@@ -207,16 +207,6 @@ class RobinhoodController < ApplicationController
           if o["side"] =~ /buy/i
             data["purchase_cost"] += price * quantity
             current_shares_owned += quantity
-
-            # calculate todays return
-            num_shares_to_skip = [quantity, total_num_shares_to_skip].min
-            quantity -= num_shares_to_skip
-            total_num_shares_to_skip -= num_shares_to_skip
-            next if quantity <= 0
-
-            purchased_today = DateTime.parse(o["created_at"]) > Date.today
-            compare_price = purchased_today ? price : data["previous_close"].to_f
-            data["todays_return"] += (data["current_price"] - compare_price) * quantity
           else
             data["amount_sold"] += (price * quantity - o["fees"].to_f)
             current_shares_owned -= quantity
@@ -227,6 +217,21 @@ class RobinhoodController < ApplicationController
         end
       end
       data["quantity"] = current_shares_owned # override quantity from robinhood
+
+      # calculate todays return (basically check if anything was bought today)
+      todays_buy_orders = buy_orders.select{|o| o["executions"].any?{|e| DateTime.parse(e["timestamp"]) > Date.today}}
+      todays_buy_orders.each do |o|
+        price = (o["average_price"] || o["price"]).to_f
+        o["executions"].each do |e|
+          executed_shares = e["quantity"].to_i
+          current_shares_owned -= executed_shares
+          # check if user bought some shares then sold them
+          # example: buy 2 shares, sell 1 share in same day
+          executed_shares += current_shares_owned if current_shares_owned < 0
+          data["todays_return"] += (data["current_price"] - price) * executed_shares
+        end
+      end
+      data["todays_return"] += (data["current_price"] - data["previous_close"].to_f) * current_shares_owned if current_shares_owned > 0
 
       data["value"] = data["quantity"].to_i * data["current_price"]
       data["shares_held_cost"] = data["average_buy_price"].to_f * data["quantity"].to_i
