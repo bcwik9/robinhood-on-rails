@@ -197,6 +197,7 @@ module Robinhood
     
     open_price = @portfolio_history["equity_historicals"].first["adjusted_open_equity"].to_f
     close_price = @portfolio_history["equity_historicals"].last["adjusted_close_equity"].to_f
+    raise (close_price - open_price).to_s
     color = close_price > open_price ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE
     options = {
       #title: "Price chart",

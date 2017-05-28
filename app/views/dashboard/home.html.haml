@@ -19,6 +19,7 @@
               = link_to "All", "#"
       .row
         #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
+      %br
       .row
         #portfolios{data: {behavior: "DeferredLoader", path: portfolios_path, refresh: 15}}
       %ul.nav.nav-tabs{data: {behavior: "SubMenu"}}
