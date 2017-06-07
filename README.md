@@ -27,7 +27,7 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 #### 5/3/2017
 - Added historical (week, year, all) porfolio price charts
 
-### Current features (work in progress)
+### Current features
 - Realtime, auto-refreshing portfolio dashboard
   - Custom "folder" labels (stock organizing dividers)
 - Watchlist
@@ -46,6 +46,12 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Dividends
 - Notifications
   - View and dismiss
+  
+### Future features
+- Settings
+- Custom stock alerts
+- Future dividends
+- Volume charts
 
 ## Usage
 You have the choice of a basic installation or Docker (see instructions below).
