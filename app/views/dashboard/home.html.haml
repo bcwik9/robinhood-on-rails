@@ -17,6 +17,7 @@
               = link_to "Year", "#"
             %span{data: {behavior: "DeferredLoader", path: price_chart_path(span: "all", type: "portfolio"), target: "#price-chart", trigger: "click"}}
               = link_to "All", "#"
+
       .row
         #price-chart{data: {behavior: "DeferredLoader", path: price_chart_path(interval: "5minute", span: "day", type: "portfolio"), refresh: 300}}
       %br
