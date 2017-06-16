@@ -10,7 +10,7 @@ DeferredLoader = function(element) {
           target = element
         }
         target.html(data);
-        Elemental.load(target.html())
+        Elemental.load(target)
       })
     }
   }

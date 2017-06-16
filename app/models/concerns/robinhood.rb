@@ -190,14 +190,15 @@ module Robinhood
     rows = []
     @portfolio_history["equity_historicals"].each_with_index do |h,i|
       rows[i] ||= [i+1]
-      price = h["adjusted_close_equity"].to_f
+      price = (opts[:span] == "day" ? h["adjusted_open_equity"] : h["adjusted_close_equity"]).to_f
       date = h["begins_at"].in_time_zone("Eastern Time (US & Canada)").strftime '%m/%d/%y %l:%M%P'
       rows[i] = rows[i] + [price, "$#{price} on #{date}"]
     end
     
-    open_price = @portfolio_history["equity_historicals"].first["adjusted_open_equity"].to_f
-    close_price = @portfolio_history["equity_historicals"].last["adjusted_close_equity"].to_f
-    color = close_price > open_price ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE
+    previous_close_price = @portfolio_history["adjusted_previous_close_equity"].to_f
+    previous_close_price = @portfolio_history["equity_historicals"].first["adjusted_open_equity"].to_f if previous_close_price == 0.0
+    most_recent_price = @portfolio_history["equity_historicals"].last["adjusted_open_equity"].to_f
+    color = most_recent_price > previous_close_price ? ROBINHOOD_GREEN : ROBINHOOD_ORANGE
     options = {
       #title: "Price chart",
       hAxis: {
