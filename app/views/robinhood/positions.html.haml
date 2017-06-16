@@ -16,6 +16,7 @@
             %th Today's return
             %th Return
             %th Return with sells
+            %th Avg buy price
             %th Price/Share
             %th Sell
           - list.instruments.each do |instrument|
@@ -34,6 +35,7 @@
                 = change_display(data["shares_held_cost"], data["shares_held_cost"] + data["shares_held_return"])
               %td.return-all-time{class: "text-" + up_down(0, data["all_time_return"])}
                 = price_display data["all_time_return"]
+              %td.avg-buy-price= price_display data["average_buy_price"]
               %td= price_display data["current_price"]
               %td= render "robinhood/order_form_modal", symbol: data["symbol"], side: :sell, price: data["current_price"], num_shares: num_shares
 
