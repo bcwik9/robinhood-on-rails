@@ -17,7 +17,7 @@ module ApplicationHelper
   end
 
   def change_display start_amount, end_amount
-    change = set_num_decimals(end_amount.to_f - start_amount.to_f).to_f
+    change = set_num_decimals(end_amount.to_f - start_amount.to_f, {delimiter: ''}).to_f
     gain = change.positive? ? "+" : ""
     "#{price_display change} (#{gain}#{set_num_decimals change/start_amount.to_f*100}%)"
   end
@@ -44,7 +44,9 @@ module ApplicationHelper
     link_to symbols.join(" vs "), "https://www.google.com/finance?q=#{symbols.join(',')}", target: :_blank
   end
 
-  def set_num_decimals amount, decimal_points=2
-    number_with_precision amount, precision: decimal_points, delimiter: ','
+  def set_num_decimals amount, opts={}
+    opts[:precision] ||= 2
+    opts[:delimiter] ||= ','
+    number_with_precision amount, precision: opts[:precision], delimiter: opts[:delimiter]
   end
 end

@@ -7,7 +7,7 @@
       .modal-header
         %h4.modal-title #{side.capitalize} #{symbol}
 
-      #order-form{data: {behavior: "OrderForm", side: side, price: set_num_decimals(price)}, class: "order_form_#{target}"}
+      #order-form{data: {behavior: "OrderForm", side: side, price: set_num_decimals(price, delimiter: '')}, class: "order_form_#{target}"}
         = form_tag new_order_path, class: "form-inline" do
           = hidden_field_tag :symbol, symbol
           = hidden_field_tag :side, side
@@ -34,7 +34,7 @@
               .col-xs-6
                 .form-group
                   = label_tag "Price"
-                  = number_field_tag :price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"
+                  = number_field_tag :price, set_num_decimals(price, delimiter: ''), step: 0.01, min: 0.01, class: "form-control"
                   .market-placeholder
                     Best available
             %br
@@ -46,7 +46,7 @@
               .col-xs-6
                 .form-group
                   = label_tag "Stop price"
-                  = number_field_tag :stop_price, set_num_decimals(price), step: 0.01, min: 0.01, class: "form-control"               
+                  = number_field_tag :stop_price, set_num_decimals(price, delimiter: ''), step: 0.01, min: 0.01, class: "form-control"               
 
           .modal-footer
             %button.btn.btn-danger{"data-dismiss" => "modal", :type => "button"} Cancel
