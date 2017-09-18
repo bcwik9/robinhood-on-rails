@@ -1,15 +1,10 @@
 FROM ruby:2.2.2
 
-WORKDIR $HOME/
+ADD . $HOME/robinhood-on-rails
+WORKDIR $HOME/robinhood-on-rails
 
-RUN git clone https://github.com/bcwik9/robinhood-on-rails.git
-RUN cd robinhood-on-rails
-
-
-COPY Gemfile* $HOME/
 RUN bundle install
 
-ADD . $HOME
 RUN bundle exec rake db:create db:migrate
 
 #CMD ["bundle", "exec", "rails", "server"]
