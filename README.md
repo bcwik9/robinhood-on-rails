@@ -55,6 +55,7 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Custom stock alerts
 - Future dividends
 - Volume charts
+- Improving performance of Orders page
 
 ## Usage
 You have the choice of a basic installation or Docker (see instructions below).
