@@ -9,6 +9,9 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+#### 10/23/2017
+- Bug fix for correcting the buying power for instant accounts
+
 #### 7/20/2017
 - Bug fix for displaying correct numbers in the "Return" column when the return is > $1000
 
