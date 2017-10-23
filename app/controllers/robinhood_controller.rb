@@ -156,6 +156,8 @@ class RobinhoodController < ApplicationController
     market = @markets.first
     @market_open = DateTime.parse(market["opens_at"]) if market["opens_at"].present?
     @market_open = @market_open && @market_open < Time.now && DateTime.parse(market["closes_at"]) > Time.now
+    # instant accounts use margin_balances. cash just uses buying power
+    @buying_power = @accounts.map{|a| a["margin_balances"].present? ? a["margin_balances"]["overnight_buying_power"] : a["buying_power"]}.sum
 
     render layout: false
   end
