@@ -17,9 +17,10 @@ module ApplicationHelper
   end
 
   def change_display start_amount, end_amount
-    change = set_num_decimals(end_amount.to_f - start_amount.to_f, {delimiter: ''}).to_f
+    change = end_amount.to_f - start_amount.to_f
+    percent_change = set_num_decimals(change / start_amount.to_f * 100)
     gain = change.positive? ? "+" : ""
-    "#{price_display change} (#{gain}#{set_num_decimals change/start_amount.to_f*100}%)"
+    "#{price_display change} (#{gain}#{percent_change}%)"
   end
 
   def stock_link symbol, opts={}
@@ -47,6 +48,7 @@ module ApplicationHelper
   def set_num_decimals amount, opts={}
     opts[:precision] ||= 2
     opts[:delimiter] ||= ','
-    number_with_precision amount, precision: opts[:precision], delimiter: opts[:delimiter]
+    opts[:separator] ||= '.'
+    number_with_precision amount, precision: opts[:precision], separator: opts[:separator], delimiter: opts[:delimiter]
   end
 end
