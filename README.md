@@ -54,6 +54,7 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
   - View and dismiss
   
 ### Future features
+- Estimates
 - Settings
 - Custom stock alerts
 - Future dividends
