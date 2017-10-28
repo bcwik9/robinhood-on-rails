@@ -17,6 +17,9 @@ Rails.application.routes.draw do
   get "documents", to: "robinhood#documents"
   get "price_chart", to: "robinhood#price_chart"
 
+# Marcos stuff
+  get "equity_bags", to: "robinhood#equity_bags"
+
   get "positions", to: "robinhood#positions"
   post "reorder_positions", to: "robinhood#reorder_positions"
 
