@@ -122,7 +122,7 @@ class RobinhoodController < ApplicationController
 
   def transfers
     get_transfers
-    @ach_accounts = robinhood_get("https://api.robinhood.com/ach/relationships/")["results"]
+    get_ach_accounts
   end
 
   def new_transfer
@@ -329,6 +329,27 @@ class RobinhoodController < ApplicationController
     flash[:success] = "Removed #{params["symbol"]} from watchlist."
     redirect_to root_path
   end
+  
+  def crypto_watchlist
+    @side = :buy
+    get_crypto_watchlists
+    @watchlist = @crypto_watchlists.first
+
+    @instruments = []
+    #@investments = {}
+    @watchlist['currency_pair_ids'].each do |pair_id|
+      instrument = find_or_create_crypto_pair pair_id
+      @instruments << instrument
+      #@investments[instrument.symbol] = {instrument: instrument}
+    end
+
+    get_accounts
+
+    @stock_lists = current_user.update_stock_list "crypto_watchlist_#{@watchlist['name']}", @instruments
+    @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
+
+    render layout: false    
+  end
 
   def orders
     get_orders
@@ -376,5 +397,16 @@ class RobinhoodController < ApplicationController
     end
 
     redirect_to orders_path
+  end
+
+  def api
+    set_oauth_token
+    @url = params["url"] || 'https://api.robinhood.com/'
+    get_user unless params["url"].present?
+    @data = robinhood_get @url
+  end
+
+  def experiments
+    get_experiments
   end
 end

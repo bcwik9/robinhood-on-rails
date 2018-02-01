@@ -28,6 +28,20 @@ class ApplicationController < ActionController::Base
     instrument
   end
 
+  def find_or_create_crypto_pair pair_id
+    instrument = Instrument.find_by robinhood_id: pair_id
+    if instrument.nil?
+      data = get_crypto_pair pair_id
+      instrument = Instrument.create!(
+                                      name: data["name"],
+                                      symbol: data["symbol"],
+                                      robinhood_id: data["id"],
+                                      url: "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/#{data["id"]}/"
+                                      )
+    end
+    instrument
+  end
+
   private
 
   def check_for_new_user
@@ -64,6 +78,16 @@ class ApplicationController < ActionController::Base
         instruments << instrument
       end
       current_user.main_account.stock_lists.create! group: :watchlist, instruments: instruments
+
+      # load crypto watchlist
+      get_crypto_watchlists
+      default_watchlist = @crypto_watchlists.first
+      instruments = []
+      default_watchlist["currency_pair_ids"].each do |pair_id|
+        instrument = find_or_create_crypto_pair pair_id
+        instruments << instrument
+      end
+      current_user.main_account.stock_lists.create! group: "crypto_watchlist_#{default_watchlist["name"]}", instruments: instruments
     end
   end
 
