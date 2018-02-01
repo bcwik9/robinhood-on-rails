@@ -333,6 +333,8 @@ module Robinhood
     end
   end
 
+  # CRYPTO
+
   def get_crypto_watchlists
     @crypto_watchlists = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/")
   end
@@ -344,6 +346,20 @@ module Robinhood
   def get_crypto_pair id
     robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/#{id}/"
   end
+
+  def get_cryptocurrencies
+    @cryptocurrencies = robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currencies/"
+  end
+
+  def get_cryptocurrency id
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currencies/#{id}/"
+  end
+
+  def get_crypto_orders
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/orders/"
+  end
+
+  # GENERAL
 
   def get_all_results response, params=""
     results = response["results"]
