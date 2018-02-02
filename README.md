@@ -9,6 +9,11 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+#### 2/3/2018
+- Added cryptocurrency (bitcoin, ethereum, litecoin, ripple, etc) watchlist support
+- Added rough API explorer portal
+- Updated token to Oauth2
+
 #### 10/23/2017
 - Bug fix for correcting the buying power for instant accounts
 
