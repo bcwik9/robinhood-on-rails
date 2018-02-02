@@ -270,6 +270,14 @@ class RobinhoodController < ApplicationController
       robinhood_instruments = Instrument.find(params[:robinhood_order]).pluck(:robinhood_id)
       reorder_portfolio_positions robinhood_instruments  if list.group == "portfolio"
       reorder_watchlist :Default, robinhood_instruments  if list.group == "watchlist"
+      # TODO this isnt working
+      if false && list.group =~ /crypto_watchlist_(.+)/i
+        name = list.name || $1
+        get_crypto_watchlists
+        crypto_list = @crypto_watchlists.find{|l| l["name"] == name}
+        response = reorder_crypto_watchlist crypto_list["id"], robinhood_instruments
+        raise response.to_s
+      end
       instrument = Instrument.find params[:instrument_id]
       group_lists = current_user.stock_lists.where(group: list.group)
       group_lists.each do |l|

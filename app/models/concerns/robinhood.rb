@@ -361,6 +361,16 @@ module Robinhood
     @crypto_watchlists = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/")
   end
 
+  def get_crypto_watchlist id
+    robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/")
+  end
+
+  def reorder_crypto_watchlist id, pair_ids
+    # TODO This isnt working
+    #robinhood_post("#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/reorder/", {currency_pair_ids: pair_ids.join(",")})
+    robinhood_patch "#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/", {currency_pair_ids: pair_ids.join(",")}
+  end
+
   def get_crypto_pairs
     @crypto_pairs = robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/"
   end
@@ -405,6 +415,19 @@ module Robinhood
     request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers(url))
     request.set_form_data(data)
     response = http.request(request)
+    JSON.parse(response.body)
+  end
+
+  def robinhood_patch url, data
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Patch.new(uri.request_uri, initheader=robinhood_headers(url))
+    request.set_form_data(data)
+    request['content-type'] = 'application/json'
+    #raise request.to_json.to_s
+    response = http.request(request)
+    raise response.body.to_json.to_s
     JSON.parse(response.body)
   end
 
