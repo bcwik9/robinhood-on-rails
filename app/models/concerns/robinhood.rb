@@ -366,9 +366,8 @@ module Robinhood
   end
 
   def reorder_crypto_watchlist id, pair_ids
-    # TODO This isnt working
-    #robinhood_post("#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/reorder/", {currency_pair_ids: pair_ids.join(",")})
-    robinhood_patch "#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/", {currency_pair_ids: pair_ids.join(",")}
+    # TODO not working
+    robinhood_patch "#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/", {currency_pair_ids: pair_ids}
   end
 
   def get_crypto_pairs

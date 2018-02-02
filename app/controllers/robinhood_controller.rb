@@ -267,7 +267,7 @@ class RobinhoodController < ApplicationController
     instrument_order = Instrument.find(params[:instrument_order])
     list = current_user.stock_lists.find params[:id]
     if list.present?
-      robinhood_instruments = Instrument.find(params[:robinhood_order]).pluck(:robinhood_id)
+      robinhood_instruments = instrument_order.pluck(:robinhood_id)
       reorder_portfolio_positions robinhood_instruments  if list.group == "portfolio"
       reorder_watchlist :Default, robinhood_instruments  if list.group == "watchlist"
       # TODO this isnt working
