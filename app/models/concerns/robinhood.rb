@@ -21,10 +21,32 @@ module Robinhood
     response
   end
 
+  def oauth_token_valid?
+    session[:robinhood_oauth].present? && session[:robinhood_oauth_expiration].present? && session[:robinhood_oauth_expiration] > Time.now
+  end
+
   def set_oauth_token
-    session.delete(:robinhood_oauth)
+    return if oauth_token_valid?
+    if session[:robinhood_oauth_refresh].present?
+      # TODO not working....
+      #refresh_oauth_token
+      #return
+    end
     response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/migrate_token/", {}
+    return unless response["access_token"].present?
     session[:robinhood_oauth] = response["access_token"]
+    session[:robinhood_oauth_expiration] = Time.now + response["expires_in"].seconds
+    session[:robinhood_oauth_refresh] = response["refresh_token"]
+  end
+
+  def refresh_oauth_token
+    # TODO this doesnt seem to be working
+    return unless session[:robinhood_oauth_refresh].present?
+    response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/token/", {
+      grant_type: 'refresh_token',
+      refresh_token: session[:robinhood_oauth_refresh]
+    }
+    raise response.to_s
   end
 
   def get_positions
@@ -347,6 +369,10 @@ module Robinhood
     robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/#{id}/"
   end
 
+  def get_crypto_pair_quotes ids
+    @crypto_quotes = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/marketdata/forex/quotes/?ids=#{ids.join(',')}")
+  end
+
   def get_cryptocurrencies
     @cryptocurrencies = robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currencies/"
   end
@@ -376,7 +402,7 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers)
+    request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers(url))
     request.set_form_data(data)
     response = http.request(request)
     JSON.parse(response.body)
@@ -386,7 +412,7 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    request = Net::HTTP::Delete.new(uri.request_uri, initheader=robinhood_headers)
+    request = Net::HTTP::Delete.new(uri.request_uri, initheader=robinhood_headers(url))
     response = http.request(request)
   end
 
@@ -394,16 +420,16 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    request = Net::HTTP::Get.new(uri.request_uri, initheader=robinhood_headers)
+    request = Net::HTTP::Get.new(uri.request_uri, initheader=robinhood_headers(url))
     response = http.request(request)
     JSON.parse(response.body)
   end
 
   private
 
-  def robinhood_headers
+  def robinhood_headers url
     headers = {"Accept" => 'application/json'}
-    if session[:robinhood_oauth].present?
+    if oauth_token_valid? && url !~ /migrate_token/i
       headers["Authorization"] = "Bearer #{session[:robinhood_oauth]}"
     elsif session[:robinhood_auth_token].present?
       headers["Authorization"] = "Token #{session[:robinhood_auth_token]}"

@@ -2,6 +2,8 @@ class RobinhoodController < ApplicationController
   include Robinhood
   include FinanceCalculator
 
+  before_filter :set_oauth_token, except: [:login, :logout]
+
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
 
@@ -342,6 +344,7 @@ class RobinhoodController < ApplicationController
       @instruments << instrument
       #@investments[instrument.symbol] = {instrument: instrument}
     end
+    get_crypto_pair_quotes @watchlist['currency_pair_ids']
 
     get_accounts
 
@@ -400,7 +403,6 @@ class RobinhoodController < ApplicationController
   end
 
   def api
-    set_oauth_token
     @url = params["url"] || 'https://api.robinhood.com/'
     get_user unless params["url"].present?
     @data = robinhood_get @url

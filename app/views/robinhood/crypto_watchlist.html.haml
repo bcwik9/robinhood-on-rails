@@ -11,19 +11,23 @@
 
         %table.table.sortable-table{data: {id: list.id, sort_target: ".watchlist-item"}}
           %tr
-            %th Pair
+            %th From
+            %th To
             %th Price
             %th Today's change
             %th Buy
             %th Watchlist
           - list.instruments.each do |instrument|
-            - #quote = @investments[instrument.symbol]
-            - #price = quote["last_trade_price"]
+            - quote = @crypto_quotes.find{|q| q["id"] == instrument.robinhood_id}
+            - price = quote["mark_price"]
+            - from_pair = $1.downcase if instrument["name"] =~ /^(.+) to /
+            - to_pair = $1.downcase if instrument["name"] =~ / to (.+)$/
             %tr.watchlist-item.fundamentals-tooltip{class: "watchlist-hide-#{instrument.id}", data: { instrument_id: instrument.id}}
-              %td= instrument.symbol #stock_link(instrument.symbol, {class: "symbol", data:{ html: true, placement: :right}})
-              %td= #price_display price
-              %td.change{class: ""}
-                = #change_display(quote["previous_close"], price)
+              %td= crypto_link(from_pair, {class: "symbol", data:{ html: true, placement: :right}})
+              %td= to_pair =~ /us\s*dollar/i ? to_pair.titleize.pluralize : crypto_link(to_pair, {class: "symbol", data:{ html: true, placement: :right}})
+              %td= price_display price
+              %td.change{class: "text-" + up_down(quote["open_price"], price)}
+                = change_display(quote["open_price"], price)
               %td= #render "robinhood/order_form_modal", symbol: instrument.symbol, side: @side, price: price, num_shares: (@investments.present? ? @investments[instrument.symbol]["quantity"] : nil)
               %td.remove-from-watchlist
                 - if false

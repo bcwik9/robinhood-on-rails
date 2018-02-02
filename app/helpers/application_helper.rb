@@ -45,6 +45,11 @@ module ApplicationHelper
     link_to symbols.join(" vs "), "https://www.google.com/finance?q=#{symbols.join(',')}", target: :_blank
   end
 
+  def crypto_link name, opts={}
+    opts[:target] = :_blank
+    link_to name.titleize, "https://coinmarketcap.com/currencies/#{name}", opts
+  end
+
   def set_num_decimals amount, opts={}
     opts[:precision] ||= 2
     opts[:delimiter] ||= ','
