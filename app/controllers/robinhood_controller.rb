@@ -331,8 +331,9 @@ class RobinhoodController < ApplicationController
       @investments[instrument.symbol] = {instrument: instrument}
     end
 
-    @quotes = get_quotes @investments.keys
+    get_quotes @investments.keys
     @quotes.each do |quote|
+      next if quote.blank?
       @investments[quote["symbol"]].merge! quote
     end
 
