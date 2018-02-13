@@ -71,23 +71,26 @@ class ApplicationController < ActionController::Base
       
       # load watchlist
       get_watchlists
-      default_watchlist = robinhood_get @watchlists.first["url"]
+      default_watchlist = @watchlists.first
+      default_watchlist_data = robinhood_get default_watchlist["url"]
       instruments = []
-      get_all_results(default_watchlist).each do |stock|
+      get_all_results(default_watchlist_data).each do |stock|
         instrument = find_or_create_instrument stock["instrument"]
         instruments << instrument
       end
-      current_user.main_account.stock_lists.create! group: :watchlist, instruments: instruments
+      current_user.main_account.stock_lists.create! group: default_watchlist["name"], instruments: instruments
 
       # load crypto watchlist
-      get_crypto_watchlists
-      default_watchlist = @crypto_watchlists.first
-      instruments = []
-      default_watchlist["currency_pair_ids"].each do |pair_id|
-        instrument = find_or_create_crypto_pair pair_id
-        instruments << instrument
+      if false
+        get_crypto_watchlists
+        default_watchlist = @crypto_watchlists.first
+        instruments = []
+        default_watchlist["currency_pair_ids"].each do |pair_id|
+          instrument = find_or_create_crypto_pair pair_id
+          instruments << instrument
+        end
+        current_user.main_account.stock_lists.create! group: "crypto_watchlist_#{default_watchlist["name"]}", instruments: instruments
       end
-      current_user.main_account.stock_lists.create! group: "crypto_watchlist_#{default_watchlist["name"]}", instruments: instruments
     end
   end
 

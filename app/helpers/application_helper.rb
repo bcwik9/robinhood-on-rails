@@ -47,7 +47,7 @@ module ApplicationHelper
 
   def crypto_link name, opts={}
     opts[:target] = :_blank
-    link_to name.titleize, "https://coinmarketcap.com/currencies/#{name}", opts
+    link_to name.titleize, "https://coinmarketcap.com/currencies/#{name.gsub(" ", "-")}", opts
   end
 
   def set_num_decimals amount, opts={}

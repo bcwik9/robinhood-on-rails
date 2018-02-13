@@ -74,6 +74,14 @@ module Robinhood
     robinhood_post("#{ROBINHOOD_API_URL}/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")})
   end
 
+  def add_symbols_to watchlist_name, symbols
+    robinhood_post "#{ROBINHOOD_API_URL}/watchlists/#{watchlist_name}/bulk_add/", {symbols: symbols.join(",")}
+  end
+
+  def remove_symbol_from watchlist_name, id
+    robinhood_delete "#{ROBINHOOD_API_URL}/watchlists/#{watchlist_name}/#{id}/"
+  end
+
   def get_quotes symbols
     @quotes = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/quotes/?symbols=#{symbols.join(',')}")
   end
@@ -365,13 +373,12 @@ module Robinhood
     robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/")
   end
 
-  def reorder_crypto_watchlist id, pair_ids
-    # TODO not working
+  def set_crypto_watchlist id, pair_ids
     robinhood_patch "#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/", {currency_pair_ids: pair_ids}
   end
 
   def get_crypto_pairs
-    @crypto_pairs = robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/"
+    @crypto_pairs = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/currency_pairs/")
   end
   
   def get_crypto_pair id
@@ -390,8 +397,16 @@ module Robinhood
     robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currencies/#{id}/"
   end
 
+  def get_crypto_halts
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/halts/"
+  end
+
+  def get_crypto_history id
+    robinhood_get "#{ROBINHOOD__CRYPTO_URL}/marketdata/forex/historicals/#{id}/"
+  end
+
   def get_crypto_orders
-    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/orders/"
+    @crypto_orders = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/orders/")
   end
 
   # GENERAL
@@ -422,11 +437,9 @@ module Robinhood
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Patch.new(uri.request_uri, initheader=robinhood_headers(url))
-    request.set_form_data(data)
+    request.body = data.to_json
     request['content-type'] = 'application/json'
-    #raise request.to_json.to_s
     response = http.request(request)
-    raise response.body.to_json.to_s
     JSON.parse(response.body)
   end
 
