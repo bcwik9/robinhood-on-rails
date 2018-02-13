@@ -422,6 +422,14 @@ module Robinhood
     @crypto_orders = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/orders/")
   end
 
+  def activate_crypto_account data
+    robinhood_post "#{ROBINHOOD_CRYPTO_URL}/activations/", data
+  end
+
+  def get_crypto_account_activations
+    @crypto_activations = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/activations/")
+  end
+
   # GENERAL
 
   def get_all_results response, params=""
