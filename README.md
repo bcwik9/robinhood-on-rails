@@ -97,4 +97,5 @@ I am not affiliated with Robinhood or any of its associates. This is just a proj
 
 ## Influences and references
 Thanks to Jeffrey Smith for his [designs](https://dribbble.com/shots/2619026-Robinhood-Web-App-Concept-V2) which I based a lot of the front end work off of.
-Thanks to sanko for their work [documenting Robinhood's API](https://github.com/sanko/Robinhood)
+Thanks to sanko for their work [documenting Robinhood's API](https://github.com/sanko/Robinhood).
+Last but not least thanks to [Robinhood](https://robinhood.com/referral/benjamc331/) for their app!
