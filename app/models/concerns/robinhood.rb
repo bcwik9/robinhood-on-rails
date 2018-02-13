@@ -220,6 +220,7 @@ module Robinhood
     @accounts = robinhood_get("#{ROBINHOOD_API_URL}/accounts/")["results"]
   end
 
+  # TODO this should probably move elsewhere
   def portfolio_line_chart interval="5minute", opts={span: "day"}
     get_portfolio_history get_accounts.first["account_number"], interval, opts
     columns = [ {role: :none, data: ['number', 'X']} ] # add x axis
