@@ -71,7 +71,7 @@ module Robinhood
   end
 
   def reorder_watchlist name, instrument_ids
-    robinhood_post("#{ROBINHOOD_API_URL}/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")})
+    robinhood_post "#{ROBINHOOD_API_URL}/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")}
   end
 
   def add_symbols_to watchlist_name, symbols
@@ -365,6 +365,18 @@ module Robinhood
 
   # CRYPTO
 
+  def get_crypto_portfolios
+    @crypto_portfolios = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/portfolios/")
+  end
+
+  def get_crypto_portfolio id
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/portfolios/#{id}/"
+  end
+
+  def get_crypto_holdings
+    @crypto_holdings = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/holdings/")
+  end
+
   def get_crypto_watchlists
     @crypto_watchlists = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/")
   end
@@ -427,7 +439,9 @@ module Robinhood
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers(url))
-    request.set_form_data(data)
+    #request.set_form_data(data)
+    request.body = data.to_json
+    request['content-type'] = 'application/json'
     response = http.request(request)
     JSON.parse(response.body)
   end

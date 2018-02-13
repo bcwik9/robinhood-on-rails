@@ -9,7 +9,7 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
-#### 2/3/2018
+#### 2/13/2018
 - Added cryptocurrency (bitcoin, ethereum, litecoin, ripple, etc) watchlist support
 - Added rough API explorer portal
 - Updated token to Oauth2
@@ -57,6 +57,9 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Dividends
 - Notifications
   - View and dismiss
+- Cryptocurrency
+  - Search and view prices for cryptocurrencies
+  - Watchlist management
   
 ### Future features
 - Estimates
