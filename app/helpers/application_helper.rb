@@ -5,7 +5,7 @@ module ApplicationHelper
   end
 
   def user_logged_in_to_robinhood?
-    session[:robinhood_auth_token].present? && session[:robinhood_id].present?
+    session[:robinhood_oauth].present? && session[:robinhood_id].present?
   end
   
   def price_display amount

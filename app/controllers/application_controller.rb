@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   before_filter :check_for_new_user
 
   def user_logged_in_to_robinhood?
-    @logged_in ||= session[:robinhood_auth_token].present? && session[:robinhood_id].present?
+    @logged_in ||= session[:robinhood_oauth].present? && session[:robinhood_id].present?
   end
 
   def current_user

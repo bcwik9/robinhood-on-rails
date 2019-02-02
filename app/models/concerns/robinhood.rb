@@ -2,6 +2,7 @@ module Robinhood
   extend ActiveSupport::Concern
 
   # endpoints
+  ROBINHOOD_URL = "https://robinhood.com"
   ROBINHOOD_API_URL = "https://api.robinhood.com"
   ROBINHOOD_CRYPTO_URL = "https://nummus.robinhood.com"
 
@@ -9,12 +10,33 @@ module Robinhood
   ROBINHOOD_GREEN = "#21ce99"
   ROBINHOOD_ORANGE = "#fc4d2d"
 
+  def get_login_variables
+    response = `curl #{ROBINHOOD_URL}/login/`
+    raw_vars = response.scan(/(window\.\w+\s*=\s*'?\S+'?;)+/).flatten
+    parsed_vars = {}
+    raw_vars.each do |v|
+      if v =~ /window\.(\w+)\s*=\s*'(\S+)'/i
+        parsed_vars[$1] = $2
+      end
+    end
+    parsed_vars
+  end
+
   def set_account_token username, password, security_code=nil
-    opts = {"username" => username, "password" => password}
+    if session[:robinhood_oauth_client_id].blank?
+      login_vars = get_login_variables
+      session[:robinhood_oauth_client_id] = login_vars['oauthClientId']
+    end
+    opts = {
+      username: username,
+      password: password,
+      grant_type: 'password',
+      client_id: session[:robinhood_oauth_client_id]
+    }
     opts["mfa_code"] = security_code if security_code.present?
-    response = robinhood_post "#{ROBINHOOD_API_URL}/api-token-auth/", opts
+    response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/token/", opts
     if !response["mfa_required"]
-      session[:robinhood_auth_token] = response["token"]
+      set_oauth_token response
       get_user
       session[:robinhood_id] = @user["id"]
     end
@@ -25,14 +47,13 @@ module Robinhood
     session[:robinhood_oauth].present? && session[:robinhood_oauth_expiration].present? && session[:robinhood_oauth_expiration] > Time.now
   end
 
-  def set_oauth_token
+  def set_oauth_token response
     return if oauth_token_valid?
     if session[:robinhood_oauth_refresh].present?
       # TODO not working....
       #refresh_oauth_token
       #return
     end
-    response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/migrate_token/", {}
     return unless response["access_token"].present?
     session[:robinhood_oauth] = response["access_token"]
     session[:robinhood_oauth_expiration] = Time.now + response["expires_in"].seconds
@@ -489,8 +510,6 @@ module Robinhood
     headers = {"Accept" => 'application/json'}
     if oauth_token_valid? && url !~ /migrate_token/i
       headers["Authorization"] = "Bearer #{session[:robinhood_oauth]}"
-    elsif session[:robinhood_auth_token].present?
-      headers["Authorization"] = "Token #{session[:robinhood_auth_token]}"
     end
     headers
   end

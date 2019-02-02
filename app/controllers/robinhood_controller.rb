@@ -2,7 +2,7 @@ class RobinhoodController < ApplicationController
   include Robinhood
   include FinanceCalculator
 
-  before_filter :set_oauth_token, except: [:login, :logout]
+  #before_filter :set_oauth_token, except: [:login, :logout]
 
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
