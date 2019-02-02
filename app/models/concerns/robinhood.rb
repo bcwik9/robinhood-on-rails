@@ -1,56 +1,122 @@
 module Robinhood
   extend ActiveSupport::Concern
 
+  # endpoints
+  ROBINHOOD_URL = "https://robinhood.com"
+  ROBINHOOD_API_URL = "https://api.robinhood.com"
+  ROBINHOOD_CRYPTO_URL = "https://nummus.robinhood.com"
+
   # colors
   ROBINHOOD_GREEN = "#21ce99"
   ROBINHOOD_ORANGE = "#fc4d2d"
 
+  def get_login_variables
+    response = `curl #{ROBINHOOD_URL}/login/`
+    raw_vars = response.scan(/(window\.\w+\s*=\s*'?\S+'?;)+/).flatten
+    parsed_vars = {}
+    raw_vars.each do |v|
+      if v =~ /window\.(\w+)\s*=\s*'(\S+)'/i
+        parsed_vars[$1] = $2
+      end
+    end
+    parsed_vars
+  end
+
   def set_account_token username, password, security_code=nil
-    opts = {"username" => username, "password" => password}
+    if session[:robinhood_oauth_client_id].blank?
+      login_vars = get_login_variables
+      session[:robinhood_oauth_client_id] = login_vars['oauthClientId']
+    end
+    opts = {
+      username: username,
+      password: password,
+      grant_type: 'password',
+      client_id: session[:robinhood_oauth_client_id]
+    }
     opts["mfa_code"] = security_code if security_code.present?
-    response = robinhood_post "https://api.robinhood.com/api-token-auth/", opts
+    response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/token/", opts
     if !response["mfa_required"]
-      session[:robinhood_auth_token] = response["token"]
+      set_oauth_token response
       get_user
       session[:robinhood_id] = @user["id"]
     end
     response
   end
 
+  def oauth_token_valid?
+    session[:robinhood_oauth].present? && session[:robinhood_oauth_expiration].present? && session[:robinhood_oauth_expiration] > Time.now
+  end
+
+  def set_oauth_token response
+    return if oauth_token_valid?
+    if session[:robinhood_oauth_refresh].present?
+      # TODO not working....
+      #refresh_oauth_token
+      #return
+    end
+    return unless response["access_token"].present?
+    session[:robinhood_oauth] = response["access_token"]
+    session[:robinhood_oauth_expiration] = Time.now + response["expires_in"].seconds
+    session[:robinhood_oauth_refresh] = response["refresh_token"]
+  end
+
+  def refresh_oauth_token
+    # TODO this doesnt seem to be working
+    return unless session[:robinhood_oauth_refresh].present?
+    response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/token/", {
+      grant_type: 'refresh_token',
+      refresh_token: session[:robinhood_oauth_refresh]
+    }
+    raise response.to_s
+  end
+
   def get_positions
-    @positions = get_all_results(robinhood_get "https://api.robinhood.com/positions/?nonzero=true")
+    @positions = get_all_results(robinhood_get "#{ROBINHOOD_API_URL}/positions/?nonzero=true")
   end
 
   def reorder_portfolio_positions instrument_ids
-    robinhood_get("https://api.robinhood.com/positions/?ordering=#{instrument_ids.join ','}")
+    robinhood_get("#{ROBINHOOD_API_URL}/positions/?ordering=#{instrument_ids.join ','}")
   end
 
   def get_portfolios
-    @portfolios = get_all_results robinhood_get("https://api.robinhood.com/portfolios/")
+    @portfolios = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/portfolios/")
   end
 
   def get_watchlists
-    @watchlists = get_all_results robinhood_get("https://api.robinhood.com/watchlists/")
+    @watchlists = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/watchlists/")
+  end
+
+  def create_new_watchlist name
+    # this endpoint seemingly doesnt work
+    robinhood_post "#{ROBINHOOD_API_URL}/watchlists/", {name: name}
   end
 
   def reorder_watchlist name, instrument_ids
-    robinhood_post("https://api.robinhood.com/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")})
+    robinhood_post "#{ROBINHOOD_API_URL}/watchlists/#{name}/reorder/", {uuids: instrument_ids.join(",")}
+  end
+
+  def add_symbols_to watchlist_name, symbols
+    robinhood_post "#{ROBINHOOD_API_URL}/watchlists/#{watchlist_name}/bulk_add/", {symbols: symbols.join(",")}
+  end
+
+  def remove_symbol_from watchlist_name, id
+    robinhood_delete "#{ROBINHOOD_API_URL}/watchlists/#{watchlist_name}/#{id}/"
   end
 
   def get_quotes symbols
-    @quotes = get_all_results robinhood_get("https://api.robinhood.com/quotes/?symbols=#{symbols.join(',')}")
+    @quotes = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/quotes/?symbols=#{symbols.join(',')}")
   end
 
   def get_dividends
-    @dividends = get_all_results robinhood_get "https://api.robinhood.com/dividends/"
+    @dividends = get_all_results robinhood_get "#{ROBINHOOD_API_URL}/dividends/"
   end
 
   def get_documents
-    @documents = get_all_results robinhood_get "https://api.robinhood.com/documents/"
+    @documents = get_all_results robinhood_get "#{ROBINHOOD_API_URL}/documents/"
   end
 
   def get_markets
-    @markets = get_all_results robinhood_get("https://api.robinhood.com/markets/")
+    @markets = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/markets/")
     @markets.delete_if{|m| m["mic"] !~ /(xnys|xnas)/i }
     @markets.each do |market|
       market.merge! robinhood_get(market["todays_hours"])
@@ -70,24 +136,28 @@ module Robinhood
   end
 
   def get_transfers
-    @transfers = get_all_results robinhood_get("https://api.robinhood.com/ach/transfers/")
+    @transfers = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/ach/transfers/")
+  end
+
+  def get_ach_accounts
+    @ach_accounts = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/ach/relationships/")
   end
 
   def get_news symbol
-    @news = robinhood_get "https://api.robinhood.com/midlands/news/#{symbol.upcase}/"
+    @news = robinhood_get "#{ROBINHOOD_API_URL}/midlands/news/#{symbol.upcase}/"
   end
 
   def get_sp500_movers direction
-    @movers = robinhood_get "https://api.robinhood.com/midlands/movers/sp500/?direction=#{direction}"
+    @movers = robinhood_get "#{ROBINHOOD_API_URL}/midlands/movers/sp500/?direction=#{direction}"
   end
 
   # days have a range of  1 to 21, but 21 days is a LOT! typically don't do > 7
   def get_companies_reporting_earnings_within days
-    @earnings = robinhood_get("https://api.robinhood.com/marketdata/earnings/?range=#{days}day")["results"]
+    @earnings = robinhood_get("#{ROBINHOOD_API_URL}/marketdata/earnings/?range=#{days}day")["results"]
   end
 
   def get_earnings symbol
-    @earnings = robinhood_get("https://api.robinhood.com/marketdata/earnings/?symbol=#{symbol}")["results"]
+    @earnings = robinhood_get("#{ROBINHOOD_API_URL}/marketdata/earnings/?symbol=#{symbol}")["results"]
   end
 
   def next_earnings_report symbol
@@ -108,7 +178,7 @@ module Robinhood
       interval = "day"
       opts[:span] = "year"
     end
-    url = "https://api.robinhood.com/quotes/historicals/#{symbol}/?interval=#{interval}"
+    url = "#{ROBINHOOD_API_URL}/quotes/historicals/#{symbol}/?interval=#{interval}"
     opts.each do |k,v|
       url += "&#{k}=#{v}"
     end
@@ -125,7 +195,7 @@ module Robinhood
       interval = "day"
       opts[:span] = "year"
     end
-    url = "https://api.robinhood.com/portfolios/historicals/#{account}/?interval=#{interval}"
+    url = "#{ROBINHOOD_API_URL}/portfolios/historicals/#{account}/?interval=#{interval}"
     opts.each do |k,v|
       url += "&#{k}=#{v}"
     end
@@ -136,22 +206,22 @@ module Robinhood
   end
 
   def get_orders
-    @orders = get_all_results robinhood_get("https://api.robinhood.com/orders/")
+    @orders = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/orders/")
   end
 
   def place_order data
-    robinhood_post "https://api.robinhood.com/orders/", data
+    robinhood_post "#{ROBINHOOD_API_URL}/orders/", data
   end
 
   def get_fundamentals symbols
     @fundamentals ||= {}
     symbols.each_with_index do |symbol,i|
-      @fundamentals[symbol.upcase] = robinhood_get("https://api.robinhood.com/fundamentals/?symbols=#{symbol.upcase}")["results"].try(:first)
+      @fundamentals[symbol.upcase] = robinhood_get("#{ROBINHOOD_API_URL}/fundamentals/?symbols=#{symbol.upcase}")["results"].try(:first)
     end
   end
 
   def get_cards
-    @cards = robinhood_get("https://api.robinhood.com/midlands/notifications/stack/")["results"]
+    @cards = robinhood_get("#{ROBINHOOD_API_URL}/midlands/notifications/stack/")["results"]
     # show newest first
     now = Time.now.to_s
     @cards.sort!{|a,b| DateTime.parse(b["time"] || now) <=> DateTime.parse(a["time"] || now)}
@@ -159,23 +229,19 @@ module Robinhood
   
   def dismiss_notification notification_url
     id = notification_url.split('/').last.to_s
-    response = robinhood_post "https://api.robinhood.com/midlands/notifications/stack/#{id}/dismiss/", {}
+    response = robinhood_post "#{ROBINHOOD_API_URL}/midlands/notifications/stack/#{id}/dismiss/", {}
     response.empty?
   end
 
   def get_user
-    @user = robinhood_get "https://api.robinhood.com/user/"
+    @user = robinhood_get "#{ROBINHOOD_API_URL}/user/"
   end
 
   def get_accounts
-    @accounts = robinhood_get("https://api.robinhood.com/accounts/")["results"]
+    @accounts = robinhood_get("#{ROBINHOOD_API_URL}/accounts/")["results"]
   end
 
-  def create_new_watchlist name
-    # this endpoint seemingly doesnt work
-    robinhood_post "https://api.robinhood.com/watchlists/", {name: name}
-  end
-
+  # TODO this should probably move elsewhere
   def portfolio_line_chart interval="5minute", opts={span: "day"}
     get_portfolio_history get_accounts.first["account_number"], interval, opts
     columns = [ {role: :none, data: ['number', 'X']} ] # add x axis
@@ -191,7 +257,7 @@ module Robinhood
     @portfolio_history["equity_historicals"].each_with_index do |h,i|
       rows[i] ||= [i+1]
       price = (opts[:span] == "day" ? h["adjusted_open_equity"] : h["adjusted_close_equity"]).to_f
-      date = h["begins_at"].in_time_zone("Eastern Time (US & Canada)").strftime '%m/%d/%y %l:%M%P'
+      date = h["begins_at"].in_time_zone('EST').strftime '%m/%d/%y %l:%M%P'
       rows[i] = rows[i] + [price, "$#{price} on #{date}"]
     end
     
@@ -294,19 +360,98 @@ module Robinhood
     raise combined.select{|data| data[:action].present?}.to_s
   end
 
+  def get_experiments
+    @experiments = robinhood_get "https://analytics.robinhood.com/experiments/"
+    @experiments.each do |experiment|
+      experiment['enabled'] = participating_in_experiment? experiment['experiment_name']
+    end
+  end
+
+  def participating_in_experiment? experiment_name
+    robinhood_get "https://analytics.robinhood.com/experiments/#{experiment_name}/participant/"
+  end
+
   def get_instruments query
-    @instruments = get_all_results robinhood_get("https://api.robinhood.com/instruments/?query=#{query}")
+    @instruments = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/instruments/?query=#{query}")
   end
 
   def instrument_from_symbol symbol
-    robinhood_get("https://api.robinhood.com/instruments/?symbol=#{symbol}")["results"].first
+    robinhood_get("#{ROBINHOOD_API_URL}/instruments/?symbol=#{symbol}")["results"].first
   end
 
   def get_splits instrument_id
     @splits = Rails.cache.fetch("#{instrument_id}_splits", expires_in: 12.hours) do
-      get_all_results robinhood_get("https://api.robinhood.com/instruments/#{instrument_id}/splits/")
+      get_all_results robinhood_get("#{ROBINHOOD_API_URL}/instruments/#{instrument_id}/splits/")
     end
   end
+
+  # CRYPTO
+
+  def get_crypto_portfolios
+    @crypto_portfolios = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/portfolios/")
+  end
+
+  def get_crypto_portfolio id
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/portfolios/#{id}/"
+  end
+
+  def get_crypto_holdings
+    @crypto_holdings = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/holdings/")
+  end
+
+  def get_crypto_watchlists
+    @crypto_watchlists = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/")
+  end
+
+  def get_crypto_watchlist id
+    robinhood_get("#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/")
+  end
+
+  def set_crypto_watchlist id, pair_ids
+    robinhood_patch "#{ROBINHOOD_CRYPTO_URL}/watchlists/#{id}/", {currency_pair_ids: pair_ids}
+  end
+
+  def get_crypto_pairs
+    @crypto_pairs = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/currency_pairs/")
+  end
+  
+  def get_crypto_pair id
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/#{id}/"
+  end
+
+  def get_crypto_pair_quotes ids
+    @crypto_quotes = get_all_results robinhood_get("#{ROBINHOOD_API_URL}/marketdata/forex/quotes/?ids=#{ids.join(',')}")
+  end
+
+  def get_cryptocurrencies
+    @cryptocurrencies = robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currencies/"
+  end
+
+  def get_cryptocurrency id
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/currencies/#{id}/"
+  end
+
+  def get_crypto_halts
+    robinhood_get "#{ROBINHOOD_CRYPTO_URL}/halts/"
+  end
+
+  def get_crypto_history id
+    robinhood_get "#{ROBINHOOD__CRYPTO_URL}/marketdata/forex/historicals/#{id}/"
+  end
+
+  def get_crypto_orders
+    @crypto_orders = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/orders/")
+  end
+
+  def activate_crypto_account data
+    robinhood_post "#{ROBINHOOD_CRYPTO_URL}/activations/", data
+  end
+
+  def get_crypto_account_activations
+    @crypto_activations = get_all_results robinhood_get("#{ROBINHOOD_CRYPTO_URL}/activations/")
+  end
+
+  # GENERAL
 
   def get_all_results response, params=""
     results = response["results"]
@@ -323,10 +468,21 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    headers = {"Accept" => 'application/json'}
-    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if session[:robinhood_auth_token].present?
-    request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers)
-    request.set_form_data(data)
+    request = Net::HTTP::Post.new(uri.request_uri, initheader=robinhood_headers(url))
+    #request.set_form_data(data)
+    request.body = data.to_json
+    request['content-type'] = 'application/json'
+    response = http.request(request)
+    JSON.parse(response.body)
+  end
+
+  def robinhood_patch url, data
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Patch.new(uri.request_uri, initheader=robinhood_headers(url))
+    request.body = data.to_json
+    request['content-type'] = 'application/json'
     response = http.request(request)
     JSON.parse(response.body)
   end
@@ -335,7 +491,7 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    request = Net::HTTP::Delete.new(uri.request_uri, initheader=robinhood_headers)
+    request = Net::HTTP::Delete.new(uri.request_uri, initheader=robinhood_headers(url))
     response = http.request(request)
   end
 
@@ -343,16 +499,18 @@ module Robinhood
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    request = Net::HTTP::Get.new(uri.request_uri, initheader=robinhood_headers)
+    request = Net::HTTP::Get.new(uri.request_uri, initheader=robinhood_headers(url))
     response = http.request(request)
     JSON.parse(response.body)
   end
 
   private
 
-  def robinhood_headers
+  def robinhood_headers url
     headers = {"Accept" => 'application/json'}
-    headers["Authorization"] = "Token #{session[:robinhood_auth_token]}" if session[:robinhood_auth_token].present?
+    if oauth_token_valid? && url !~ /migrate_token/i
+      headers["Authorization"] = "Bearer #{session[:robinhood_oauth]}"
+    end
     headers
   end
 end

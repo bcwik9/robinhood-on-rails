@@ -26,9 +26,13 @@
           = link_to "Portfolio", "#", data: {target: "#positions"}
         %li{role: "presentation"}
           = link_to "Watchlist", "#", data: {target: ".dashboard-watchlist"}
+        %li{role: "presentation"}
+          = link_to "Crypto Watchlist", "#", data: {target: ".crypto-watchlist"}
       #positions.sub-menu-tab{data: {behavior: "DeferredLoader", path: positions_path, refresh: 20}}
       .row.dashboard-watchlist.sub-menu-tab
-        #watchlist{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
+        .watchlist-content{data: {behavior: "DeferredLoader", path: watchlist_path, refresh: 20}}
+      .row.crypto-watchlist.sub-menu-tab
+        .crypto-watchlist-content{data: {behavior: "DeferredLoader", path: crypto_watchlist_path, refresh: 20}}
 
   = javascript_include_tag "https://www.gstatic.com/charts/loader.js"
 - else

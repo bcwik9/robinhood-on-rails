@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   get "dividends", to: "robinhood#dividends"
   get "documents", to: "robinhood#documents"
   get "price_chart", to: "robinhood#price_chart"
+  get "api", to: "robinhood#api"
+  get "experiments", to: "robinhood#experiments"
 
   get "positions", to: "robinhood#positions"
   post "reorder_positions", to: "robinhood#reorder_positions"
@@ -39,4 +41,7 @@ Rails.application.routes.draw do
 
   get "delete_stock_list", to: "robinhood#delete_stock_list"
   post "add_stock_list", to: "robinhood#add_stock_list"
+
+  # crypto
+  get "crypto_watchlist", to: "robinhood#crypto_watchlist"
 end

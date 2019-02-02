@@ -1,0 +1,27 @@
+.list-dependencies{data: {behavior: "DashboardList"}}
+.col-xs-12
+  .quotes
+    - @stock_lists.each do |list|
+      %div{class: "list-#{list.id}"}
+        - if list.name.present?
+          %h4
+            = list.name
+            %small
+              = link_to "x", delete_stock_list_path(id: list.id), remote: true, class: "hide-on-click", data: {target: ".list-#{list.id}"}
+
+        %table.table.sortable-table{data: {id: list.id, sort_target: ".watchlist-item"}}
+          %tr
+            %th From
+            %th To
+            %th Price
+            %th Today's change
+            %th Buy
+            %th Watchlist
+          - list.instruments.each do |instrument|
+            = render "crypto_quote", quote: @crypto_quotes.find{|q| q["id"] == instrument.robinhood_id}, from_pair: ($1.downcase if instrument["name"] =~ /^(.+) to /), to_pair: ($1.downcase if instrument["name"] =~ / to (.+)$/), instrument: instrument, list: list
+
+    = render "stock_list_form", group: "crypto_watchlist_#{@watchlist['name']}"
+    %br
+    %br
+    %br
+    %br

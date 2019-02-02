@@ -28,9 +28,10 @@
               %td.remove-from-watchlist
                 = form_tag remove_from_watchlist_path, remote: true do
                   = hidden_field_tag :symbol, instrument.symbol
+                  = hidden_field_tag :watchlist_id, list.id
                   = submit_tag "X", class: "btn btn-default hide-on-click", data: {target: ".watchlist-hide-#{instrument.id}"}
 
-    = render "stock_list_form", group: :watchlist
+    = render "stock_list_form", group: @stock_lists.first.try(:group)
     %br
     %br
     %br

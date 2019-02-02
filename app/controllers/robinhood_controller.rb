@@ -2,6 +2,8 @@ class RobinhoodController < ApplicationController
   include Robinhood
   include FinanceCalculator
 
+  #before_filter :set_oauth_token, except: [:login, :logout]
+
   def login
     response = set_account_token params[:username], params[:password], params[:security_code]
 
@@ -118,11 +120,31 @@ class RobinhoodController < ApplicationController
     else
       @quotes = {}
     end
+    crypto_quote
+  end
+
+  def crypto_quote
+    if params["symbols"].present?
+      @side = params[:side] || "buy"
+      if @side =~ /buy/i
+        pairs = []
+        get_crypto_pairs.each do |pair|
+          asset_currency = pair["asset_currency"]
+          if asset_currency["code"] =~ /#{params["symbols"]}/i || asset_currency["name"] =~ /#{params["symbols"]}/i
+            pairs << pair
+          end
+        end
+        @crypto_quotes = get_crypto_pair_quotes(pairs.map{|p| p["id"]}) || []
+        @crypto_quotes.each do |quote|
+          quote["pair"] = pairs.find{|pair| pair["id"] == quote["id"] }
+        end
+      end
+    end
   end
 
   def transfers
     get_transfers
-    @ach_accounts = robinhood_get("https://api.robinhood.com/ach/relationships/")["results"]
+    get_ach_accounts
   end
 
   def new_transfer
@@ -218,7 +240,8 @@ class RobinhoodController < ApplicationController
           current_shares_owned = (current_shares_owned / o["divisor"].to_f * o["multiplier"].to_f).to_i
         end
       end
-      data["quantity"] = current_shares_owned # override quantity from robinhood
+      # TODO: this quantity override doesnt seem to work for stocks received for free (like through the referral program)
+      #data["quantity"] = current_shares_owned # override quantity from robinhood
 
       # calculate todays return (basically check if anything was bought today)
       todays_buy_orders = buy_orders.select{|o| o["executions"].any?{|e| DateTime.parse(e["timestamp"]) > Date.today}}
@@ -266,8 +289,16 @@ class RobinhoodController < ApplicationController
     list = current_user.stock_lists.find params[:id]
     if list.present?
       robinhood_instruments = Instrument.find(params[:robinhood_order]).pluck(:robinhood_id)
-      reorder_portfolio_positions robinhood_instruments  if list.group == "portfolio"
-      reorder_watchlist :Default, robinhood_instruments  if list.group == "watchlist"
+      if list.group =~ /crypto_watchlist_(.+)/i
+        name = list.name || $1
+        get_crypto_watchlists
+        crypto_list = @crypto_watchlists.find{|l| l["name"] == name}
+        response = set_crypto_watchlist crypto_list["id"], instrument_order.pluck(:robinhood_id)
+      elsif list.group == "portfolio"
+        reorder_portfolio_positions robinhood_instruments
+      else
+        reorder_watchlist list.group, robinhood_instruments
+      end
       instrument = Instrument.find params[:instrument_id]
       group_lists = current_user.stock_lists.where(group: list.group)
       group_lists.each do |l|
@@ -290,30 +321,38 @@ class RobinhoodController < ApplicationController
   def watchlist
     @side = :buy
     get_watchlists
-    default_watchlist = robinhood_get @watchlists.first["url"]
+    default_watchlist = @watchlists.first
+    default_watchlist_data = robinhood_get default_watchlist["url"]
     @instruments = []
     @investments = {}
-    get_all_results(default_watchlist).each do |stock|
+    get_all_results(default_watchlist_data).each do |stock|
       instrument = find_or_create_instrument stock["instrument"]
       @instruments << instrument
       @investments[instrument.symbol] = {instrument: instrument}
     end
 
-    @quotes = get_quotes @investments.keys
+    get_quotes @investments.keys
     @quotes.each do |quote|
+      next if quote.blank?
       @investments[quote["symbol"]].merge! quote
     end
 
     get_accounts
 
-    @stock_lists = current_user.update_stock_list :watchlist, @instruments
+    @stock_lists = current_user.update_stock_list default_watchlist["name"], @instruments
     @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
 
     render layout: false
   end
 
   def add_to_watchlist
-    response = robinhood_post("https://api.robinhood.com/watchlists/Default/bulk_add/", {symbols: params["symbols"]})
+    if params[:type].present? && params[:type] =~ /crypto/i
+      get_crypto_watchlists
+      watchlist = @crypto_watchlists.first
+      response = set_crypto_watchlist watchlist["id"], (watchlist["currency_pair_ids"] << params[:robinhood_id])
+    else
+      response = add_symbols_to "Default", [params["symbols"]]
+    end
     if response.present?
       flash[:success] = "Added position to watchlist."
       redirect_to root_path
@@ -324,10 +363,39 @@ class RobinhoodController < ApplicationController
   end
 
   def remove_from_watchlist
+    stock_list = current_user.stock_lists.find params[:watchlist_id]
     instrument = instrument_from_symbol params["symbol"]
-    response = robinhood_delete "https://api.robinhood.com/watchlists/Default/#{instrument["id"]}/"
+    if stock_list.cryptocurrency_list?
+      get_crypto_watchlists
+      watchlist = @crypto_watchlists.find{|list| list["name"] == stock_list.crypto_group }
+      response = set_crypto_watchlist watchlist["id"], watchlist["currency_pair_ids"].select{|id| id != params["robinhood_id"]}
+    else
+      response = remove_symbol_from stock_list.group, instrument["id"]
+    end
     flash[:success] = "Removed #{params["symbol"]} from watchlist."
     redirect_to root_path
+  end
+  
+  def crypto_watchlist
+    @side = :buy
+    get_crypto_watchlists
+    @watchlist = @crypto_watchlists.first
+
+    @instruments = []
+    #@investments = {}
+    @watchlist['currency_pair_ids'].each do |pair_id|
+      instrument = find_or_create_crypto_pair pair_id
+      @instruments << instrument
+      #@investments[instrument.symbol] = {instrument: instrument}
+    end
+    get_crypto_pair_quotes @watchlist['currency_pair_ids']
+
+    get_accounts
+
+    @stock_lists = current_user.update_stock_list "crypto_watchlist_#{@watchlist['name']}", @instruments
+    @stock_lists = @stock_lists.sort{|a,b| a.name.nil? ? 0 : 1}
+
+    render layout: false    
   end
 
   def orders
@@ -376,5 +444,15 @@ class RobinhoodController < ApplicationController
     end
 
     redirect_to orders_path
+  end
+
+  def api
+    @url = params["url"] || 'https://api.robinhood.com/'
+    get_user unless params["url"].present?
+    @data = robinhood_get @url
+  end
+
+  def experiments
+    get_experiments
   end
 end

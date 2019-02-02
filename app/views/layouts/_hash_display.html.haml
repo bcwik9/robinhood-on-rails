@@ -1,0 +1,19 @@
+- if data.is_a?(Hash) && data["results"].present?
+  - data = data["results"]
+- if data.is_a? Array
+  - data.each do |a|
+    - a.each do |k,v|
+      .col-xs-4.col-sm-3
+        - if v =~ /http/
+          = link_to k, api_path(url: v)
+        - else
+          #{k}: #{v}
+        %br
+- else
+  - data.each do |k,v|
+    .col-xs-4.col-sm-3
+      - if v =~ /http/
+        = link_to k, api_path(url: v)
+      - else
+        #{k}: #{v}
+      %br

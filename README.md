@@ -9,6 +9,11 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+#### 2/2/2019
+- Started cryptocurrency watchlist support
+- Added rough API explorer portal
+- Updated token to Oauth2
+
 #### 10/23/2017
 - Bug fix for correcting the buying power for instant accounts
 
@@ -52,6 +57,9 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Dividends
 - Notifications
   - View and dismiss
+- Cryptocurrency
+  - Search and view prices for cryptocurrencies
+  - Watchlist management
   
 ### Future features
 - Estimates

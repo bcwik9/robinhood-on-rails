@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170426005748) do
+ActiveRecord::Schema.define(version: 20180212231928) do
 
   create_table "instruments", force: :cascade do |t|
     t.string   "url"

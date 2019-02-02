@@ -1,0 +1,19 @@
+.col-xs-10
+  %h2 API Explorer
+  - if @user.blank?
+    %h4= link_to "< Back", "javascript: history.go(-1);"
+  - if @user.present?
+    = render "layouts/hash_display", data: @user
+    .col-xs-4.col-sm-3
+      = link_to "Experiments", experiments_path
+
+  = render "layouts/hash_display", data: @data
+  
+  .col-xs-12
+    %br
+    %h3 Custom API URL
+    = form_tag api_path, method: :get do
+      .form-group
+        .col-xs-3
+          = text_field_tag :url, @url, class: 'form-control'
+        = submit_tag 'Submit', class: 'btn btn-primary'

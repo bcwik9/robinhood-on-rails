@@ -1,0 +1,10 @@
+#experiments
+  .col-xs-10
+    %h2 Experiments
+    - @experiments.each do |experiment|
+      .col-xs-4.col-sm-3
+        .experiment
+          %h3= experiment["experiment_name"]
+          Enabled: #{experiment["enabled"]["is_participant"]}
+          %br
+          Selected bucket: #{experiment["enabled"]["selected_bucket"]}

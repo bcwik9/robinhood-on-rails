@@ -5,11 +5,13 @@ PreventDeferredLoader = function(element) {
 
   $(".modal").on("show.bs.modal", function(event){
     set_loader_state($("#positions"), true)
-    set_loader_state($("#watchlist"), true)
+    set_loader_state($(".watchlist-content"), true)
+    set_loader_state($(".crypto-watchlist-content"), true)
   })
 
   $(".modal").on("hide.bs.modal", function(event){
     set_loader_state($("#positions"), false)
-    set_loader_state($("#watchlist"), false)
+    set_loader_state($(".watchlist-content"), false)
+    set_loader_state($(".crypto-watchlist-content"), false)
   })
 }

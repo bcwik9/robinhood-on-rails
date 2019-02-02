@@ -5,7 +5,7 @@ module ApplicationHelper
   end
 
   def user_logged_in_to_robinhood?
-    session[:robinhood_auth_token].present? && session[:robinhood_id].present?
+    session[:robinhood_oauth].present? && session[:robinhood_id].present?
   end
   
   def price_display amount
@@ -43,6 +43,11 @@ module ApplicationHelper
 
   def google_stock_comparison_link symbols
     link_to symbols.join(" vs "), "https://www.google.com/finance?q=#{symbols.join(',')}", target: :_blank
+  end
+
+  def crypto_link name, opts={}
+    opts[:target] = :_blank
+    link_to name.titleize, "https://coinmarketcap.com/currencies/#{name.gsub(" ", "-")}", opts
   end
 
   def set_num_decimals amount, opts={}

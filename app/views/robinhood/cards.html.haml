@@ -7,7 +7,7 @@
       .card
         %h3= card["title"]
         - if card["time"].present?
-          = DateTime.parse(card["time"]).in_time_zone(user_timezone).strftime("%b %e %Y %l%P")
+          = DateTime.parse(card["time"]).in_time_zone(user_timezone).strftime("%b %e %Y %l:%M%P")
           %br
         = card["message"]
         %br

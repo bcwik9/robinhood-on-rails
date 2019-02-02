@@ -1,0 +1,22 @@
+- return if quote.nil?
+- price = quote["mark_price"]
+- instrument ||= nil
+%tr.watchlist-item.fundamentals-tooltip{class: "watchlist-hide-#{instrument.try(:id)}", data: { instrument_id: instrument.try(:id)}}
+  %td= crypto_link(from_pair, {class: "symbol", data:{ html: true, placement: :right}})
+  %td= to_pair =~ /us\s*dollar/i ? to_pair.titleize.pluralize : crypto_link(to_pair, {class: "symbol", data:{ html: true, placement: :right}})
+  %td= price_display price
+  %td.change{class: "text-" + up_down(quote["open_price"], price)}
+    = change_display(quote["open_price"], price)
+  %td= "TODO" #render "robinhood/order_form_modal", symbol: instrument.symbol, side: @side, price: price, num_shares: (@investments.present? ? @investments[instrument.symbol]["quantity"] : nil)
+  - if instrument.present?
+    %td.remove-from-watchlist
+      = form_tag remove_from_watchlist_path, remote: true do
+        = hidden_field_tag :robinhood_id, instrument.robinhood_id
+        = hidden_field_tag :watchlist_id, list.id
+        = submit_tag "X", class: "btn btn-default hide-on-click", data: {target: ".watchlist-hide-#{instrument.id}"}
+  - else
+    %td.add-to-watchlist
+      = form_tag add_to_watchlist_path do
+        = hidden_field_tag :robinhood_id, quote["id"]
+        = hidden_field_tag :type, :crypto
+        = submit_tag "+", class: "btn btn-default"

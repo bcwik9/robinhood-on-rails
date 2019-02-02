@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   before_filter :check_for_new_user
 
   def user_logged_in_to_robinhood?
-    @logged_in ||= session[:robinhood_auth_token].present? && session[:robinhood_id].present?
+    @logged_in ||= session[:robinhood_oauth].present? && session[:robinhood_id].present?
   end
 
   def current_user
@@ -23,6 +23,20 @@ class ApplicationController < ActionController::Base
                                       symbol: instrument_data["symbol"],
                                       fundamentals_url: instrument_data["fundamentals"],
                                       robinhood_id: instrument_data["id"]
+                                      )
+    end
+    instrument
+  end
+
+  def find_or_create_crypto_pair pair_id
+    instrument = Instrument.find_by robinhood_id: pair_id
+    if instrument.nil?
+      data = get_crypto_pair pair_id
+      instrument = Instrument.create!(
+                                      name: data["name"],
+                                      symbol: data["symbol"],
+                                      robinhood_id: data["id"],
+                                      url: "#{ROBINHOOD_CRYPTO_URL}/currency_pairs/#{data["id"]}/"
                                       )
     end
     instrument
@@ -57,13 +71,26 @@ class ApplicationController < ActionController::Base
       
       # load watchlist
       get_watchlists
-      default_watchlist = robinhood_get @watchlists.first["url"]
+      default_watchlist = @watchlists.first
+      default_watchlist_data = robinhood_get default_watchlist["url"]
       instruments = []
-      get_all_results(default_watchlist).each do |stock|
+      get_all_results(default_watchlist_data).each do |stock|
         instrument = find_or_create_instrument stock["instrument"]
         instruments << instrument
       end
-      current_user.main_account.stock_lists.create! group: :watchlist, instruments: instruments
+      current_user.main_account.stock_lists.create! group: default_watchlist["name"], instruments: instruments
+
+      # load crypto watchlist
+      if false
+        get_crypto_watchlists
+        default_watchlist = @crypto_watchlists.first
+        instruments = []
+        default_watchlist["currency_pair_ids"].each do |pair_id|
+          instrument = find_or_create_crypto_pair pair_id
+          instruments << instrument
+        end
+        current_user.main_account.stock_lists.create! group: "crypto_watchlist_#{default_watchlist["name"]}", instruments: instruments
+      end
     end
   end
 

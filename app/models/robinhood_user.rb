@@ -6,7 +6,7 @@ class RobinhoodUser < ApplicationRecord
     robinhood_accounts.first
   end
 
-  # ensures that all instruments are contained in at least on stock list for a group.
+  # ensures that all instruments are contained in at least one stock list for a group.
   def update_stock_list group, instruments
     main_account.stock_lists.create!(group: group, name: nil) unless stock_lists.exists?(group: group)
     lists = stock_lists.where(group: group)
@@ -23,4 +23,5 @@ class RobinhoodUser < ApplicationRecord
     end
     lists
   end
+
 end
