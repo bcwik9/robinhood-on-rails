@@ -15,10 +15,11 @@ module Robinhood
     raw_vars = response.scan(/(window\.\w+\s*=\s*'?\S+'?;)+/).flatten
     parsed_vars = {}
     raw_vars.each do |v|
-      if v =~ /window\.(\w+)\s*=\s*'(\S+)'/i
+      if v =~ /window\.(\w+)\s*=\s*[\\\"|'](\S+)[\\\"|']/i
         parsed_vars[$1] = $2
       end
     end
+    raise "Failed to parse login variables" if parsed_vars.empty?
     parsed_vars
   end
 
