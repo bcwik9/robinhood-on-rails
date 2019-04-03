@@ -11,6 +11,9 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+#### 4/3/2019
+- Fixed login bug
+
 #### 2/2/2019
 - Started cryptocurrency watchlist support
 - Added rough API explorer portal
