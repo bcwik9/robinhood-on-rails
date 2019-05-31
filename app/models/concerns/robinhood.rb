@@ -13,9 +13,10 @@ module Robinhood
   def get_login_variables
     response = `curl #{ROBINHOOD_URL}/login/`
     raw_vars = response.scan(/(window\.\w+\s*=\s*'?\S+'?;)+/).flatten
+    raw_vars += response.scan(/(\w+:\s*"\S+")+/).flatten.map{|e| e.gsub(':', '=')}
     parsed_vars = {}
     raw_vars.each do |v|
-      if v =~ /window\.(\w+)\s*=\s*[\\\"|'](\S+)[\\\"|']/i
+      if v =~ /[window\.]?(\w+)\s*=\s*[\\\"|'](\S+)[\\\"|']/i
         parsed_vars[$1] = $2
       end
     end
@@ -27,21 +28,35 @@ module Robinhood
     if session[:robinhood_oauth_client_id].blank?
       login_vars = get_login_variables
       session[:robinhood_oauth_client_id] = login_vars['oauthClientId']
+      session[:robinhood_device_token] ||= login_vars['clientId']
     end
     opts = {
       username: username,
       password: password,
       grant_type: 'password',
+      device_token: session[:robinhood_device_token],
       client_id: session[:robinhood_oauth_client_id]
     }
     opts["mfa_code"] = security_code if security_code.present?
     response = robinhood_post "#{ROBINHOOD_API_URL}/oauth2/token/", opts
-    if !response["mfa_required"]
+    
+    if response["accept_challenge_types"]
+      opts[:challenge_type] = "sms" # can also do 'email'
+      challenge_request_details = robinhood_post("#{ROBINHOOD_API_URL}/oauth2/token/", opts)
+      session[:robinhood_challenge_id] = challenge_request_details["challenge"]["id"]
+    elsif !response["mfa_required"]
+      raise "Missing device token" unless session[:robinhood_device_token].present?
       set_oauth_token response
       get_user
       session[:robinhood_id] = @user["id"]
     end
     response
+  end
+    
+  def complete_challenge code
+    raise "Missing challenge ID" unless session[:robinhood_challenge_id].present?
+    response = robinhood_post "#{ROBINHOOD_API_URL}/challenge/#{session[:robinhood_challenge_id]}/respond/", {response: code}
+    response["status"] == 'validated'
   end
 
   def oauth_token_valid?
@@ -508,7 +523,12 @@ module Robinhood
   private
 
   def robinhood_headers url
-    headers = {"Accept" => 'application/json'}
+    headers = {
+      "Accept" => 'application/json'
+    }
+    if session[:robinhood_challenge_id].present?
+      headers['X-ROBINHOOD-CHALLENGE-RESPONSE-ID'] = session[:robinhood_challenge_id]
+    end
     if oauth_token_valid? && url !~ /migrate_token/i
       headers["Authorization"] = "Bearer #{session[:robinhood_oauth]}"
     end
