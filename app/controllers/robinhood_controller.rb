@@ -5,11 +5,17 @@ class RobinhoodController < ApplicationController
   #before_filter :set_oauth_token, except: [:login, :logout]
 
   def login
+    if params[:challenge_code].present?
+      success = complete_challenge params[:challenge_code]
+      session[:robinhood_device_token] = nil unless success
+    end
     response = set_account_token params[:username], params[:password], params[:security_code]
-
-    flash[:info] = "Please provide the security code that was sent via text." if response["mfa_required"]
+    
+    if response["mfa_required"] || response["accept_challenge_types"]
+      flash[:info] = "Please provide the security code that was sent via text."
+    end
     flash[:warning] = response["non_field_errors"].join if response["non_field_errors"].present?
-    redirect_to root_path(mfa_required: response["mfa_required"])
+    redirect_to root_path(mfa_required: response["mfa_required"], challenge_required: response["accept_challenge_types"].present?)
   end
 
   def logout

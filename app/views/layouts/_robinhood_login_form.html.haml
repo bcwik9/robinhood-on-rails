@@ -11,4 +11,8 @@
         .form-group
           = label_tag "Security code"
           = text_field_tag :security_code, nil, placeholder: "Code", class: "form-control", required: true
+      - if params["challenge_required"]
+        .form-group
+          = label_tag "Security code"
+          = text_field_tag :challenge_code, nil, placeholder: "Code", class: "form-control", required: true
       = submit_tag "Log in", class: "btn btn-default"
