@@ -11,6 +11,9 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+#### 4/27/2020
+- Fixed another login bug
+
 #### 5/31/2019
 - Added support for new challenge login authentication
 
