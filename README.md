@@ -82,12 +82,12 @@ You have the choice of a basic installation or Docker (see instructions below).
 
 ### Basic installation
 This is a basic Rails project. You can install Ruby on Rails (and RVM) by visiting [the RVM install page](https://rvm.io/rvm/install). If you already have ruby on rails set up, simply clone this project. Then run the basic steps to run the project like you would any other rails project:
+* `rvm install 2.3.5`
+* `rvm use 2.3.5`
 * `bundle update`
 * `bundle install`
 * `bundle exec rake db:create db:migrate`
-  * it doesn't actually rely on a database, but rails might complain that it isnt set up
-* then, start the web server:
-  * `bundle exec rails server`
+* `bundle exec rails server`
 * navigate to http://localhost:3000/ in whatever webrowser you use (I use chrome, for instance), and you should see a login screen:
 ![image](https://cloud.githubusercontent.com/assets/508449/24683768/3c277326-196f-11e7-8687-c3785c2bdd1a.png)
 * Enter your log in info, and you'll be presented with your Robinhood dashboard.

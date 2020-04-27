@@ -20,15 +20,32 @@ module Robinhood
         parsed_vars[$1] = $2
       end
     end
+
+    # It seems robinhood no longer puts info in window vars any more
+    # Check generated JS scripts sent with HTML response for client ID
+    # JS script we're looking for looks like:
+    # https://cdn.robinhood.com/assets/generated_assets/App-1a08b7382e131f681667.js
+    if response =~ /(https\S+App-\w+\.js)/ && parsed_vars['oauthClientId'].blank?
+      parsed_vars['oauthClientId'] = get_generated_client_id $1
+    end
+
     raise "Failed to parse login variables" if parsed_vars.empty?
     parsed_vars
+  end
+
+  def get_generated_client_id url
+    response = `curl #{url}`
+    return $1 if response =~ /PRODUCTION:return"(\w+)";/
   end
 
   def set_account_token username, password, security_code=nil
     if session[:robinhood_oauth_client_id].blank?
       login_vars = get_login_variables
+      #default_client_id = 'c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS'
+      #  it seems the device token can be any hexadecimal numbers in the following format
+      default_device_token = '1234567a-1234-1234-1234-123456789012'
       session[:robinhood_oauth_client_id] = login_vars['oauthClientId']
-      session[:robinhood_device_token] ||= login_vars['clientId']
+      session[:robinhood_device_token] ||= login_vars['clientId'] || default_device_token
     end
     opts = {
       username: username,
