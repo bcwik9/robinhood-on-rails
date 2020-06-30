@@ -11,6 +11,10 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 
 ### Latest updates
 
+#### 6/30/2020
+- Made it easier to log in with 2FA enabled
+- Fixed login bug with challenge authentication
+
 #### 4/27/2020
 - Fixed another login bug
 
@@ -71,6 +75,9 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Cryptocurrency
   - Search and view prices for cryptocurrencies
   - Watchlist management
+- Security
+  - 2FA support
+  - Challenge authentication support
   
 ### Future features
 - Estimates
@@ -79,6 +86,7 @@ I am not affiliated with Robinhood or its associates. I am in no way responsible
 - Future dividends
 - Volume charts
 - Improving performance of Orders page
+- Automated, complex trading rules
 
 ## Usage
 You have the choice of a basic installation or Docker (see instructions below).
