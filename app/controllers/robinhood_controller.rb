@@ -13,6 +13,8 @@ class RobinhoodController < ApplicationController
     
     if response["mfa_required"] || response["accept_challenge_types"]
       flash[:info] = "Please provide the security code that was sent via text."
+      flash[:password] = params[:password]
+      flash[:username] = params[:username]
     end
     flash[:warning] = response["non_field_errors"].join if response["non_field_errors"].present?
     redirect_to root_path(mfa_required: response["mfa_required"], challenge_required: response["accept_challenge_types"].present?)

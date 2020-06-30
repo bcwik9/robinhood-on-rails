@@ -3,15 +3,15 @@
     = form_tag robinhood_login_path, method: :post do
       .form-group
         = label_tag "Robinhood username"
-        = text_field_tag :username, params[:username], placeholder: "Robinhood username", class: "form-control", required: true, autofocus: true
+        = text_field_tag :username, flash[:username], placeholder: "Robinhood username", class: "form-control", required: true, autofocus: true
       .form-group
         = label_tag "Password"
-        = password_field_tag :password, params[:password], placeholder: "Password", class: "form-control", required: true
-      - if params["mfa_required"]
+        = password_field_tag :password, flash[:password], placeholder: "Password", class: "form-control", required: true
+      - if params["mfa_required"] == 'true'
         .form-group
           = label_tag "Security code"
           = text_field_tag :security_code, nil, placeholder: "Code", class: "form-control", required: true
-      - if params["challenge_required"]
+      - if params["challenge_required"] == 'true'
         .form-group
           = label_tag "Security code"
           = text_field_tag :challenge_code, nil, placeholder: "Code", class: "form-control", required: true
