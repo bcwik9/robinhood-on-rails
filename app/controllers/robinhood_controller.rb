@@ -409,7 +409,7 @@ class RobinhoodController < ApplicationController
   def orders
     get_orders
     @orders.each do |order|
-      order["instrument"] = robinhood_get order["instrument"]
+      order["instrument"] = find_or_create_instrument order["instrument"]
       order["filled_quantity"] = order["executions"].map{|e| e["quantity"].to_i}.sum.to_s
     end
   end
